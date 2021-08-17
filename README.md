@@ -4,11 +4,11 @@
     <img src="https://user-images.githubusercontent.com/36470472/129739040-bf35eae7-97fe-4ddd-9140-9f3619ad7bf8.png" alt="Logo" width="150" height="150">
   </p>
   <div>
-    <a href="#" target="_blank"><img src="https://img.shields.io/badge/Python-3776AB.svg?style=flat&logo=Python&logoColor=white" alt="python" /></a>
-    <a href="#" target="_blank"><img src="https://img.shields.io/badge/Django-092E20?style=flat&logo=Django&logoColor=white" alt="django" /></a>
-    <a href="#" target="_blank"><img src="https://img.shields.io/badge/Docker-2496ED?style=flat&logo=Docker&logoColor=white" alt="docker" /></a>
+    <a href="#" target="_blank"><img src="https://img.shields.io/badge/Python%203.9.6-3776AB.svg?style=flat&logo=Python&logoColor=white" alt="python" /></a>
+    <a href="#" target="_blank"><img src="https://img.shields.io/badge/Django%203.2.6-092E20?style=flat&logo=Django&logoColor=white" alt="django" /></a>
   </div>
   <div>
+    <a href="#" target="_blank"><img src="https://img.shields.io/badge/Docker-2496ED?style=fpip inlat&logo=Docker&logoColor=white" alt="docker" /></a>
     <a href="#" target="_blank"><img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=Mysql&logoColor=white" alt="mysql" /></a>
     <a href="#" target="_blank"><img src="https://img.shields.io/badge/Redis-DC382D?style=flat&logo=Redis&logoColor=white" alt="redis" /></a>
   </div>
