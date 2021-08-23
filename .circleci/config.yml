@@ -149,14 +149,6 @@ jobs:
           command: |
             source ~/workspace/venv/bin/activate
             codecov -t $CODECOV_TOKEN
-
-      - slack/notify:
-          event: pass
-          template: slack_test_success
-
-      - slack/notify:
-          event: pass
-          template: slack_build_success
   deploy_staging:
     executor: ozet-excutor
     parameters:
