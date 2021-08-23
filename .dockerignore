@@ -1,0 +1,12 @@
+*/settings/local.py
+.instance
+.circleci
+.cache
+.test-results
+.coverage
+coverage.xml
+**/__pycache__
+.idea
+.DS_Store
+.serverless
+static

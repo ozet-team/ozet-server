@@ -3,6 +3,18 @@ orbs:
   python: circleci/python@1.0.0
   slack: circleci/slack@4.4.3
 
+executors:
+  ozet-excutor:
+    environment:
+      IMAGE_NAME: bartkim07120/ozet-core
+      SLACK_APP_PLATFORM: OZET Core
+    docker:
+      - image: cimg/python:3.9.6
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
+    working_directory: ~/workspace
+
 commands:
   slack_chatie_notify:
     description: ""
@@ -69,25 +81,8 @@ commands:
               ]
             }
 
-
-executors:
-  ozet-excutor:
-    environment:
-      IMAGE_NAME: bartkim07120/ozet-core
-      PLATFORM: OZET Core
-    docker:
-      - image: cimg/python:3.9.6
-        auth:
-          username: $DOCKERHUB_USER
-          password: $DOCKERHUB_PASSWORD
-    working_directory: ~/workspace
-
 jobs:
   build:
-    parameters:
-      deploy_target:
-        description: Deploy target name
-        type: string
     executor: ozet-excutor
     steps:
       - checkout
@@ -133,8 +128,6 @@ jobs:
           name: Save artifacts - tests
           path: ~/workspace/app/tests
           destination: tests
-
-
   test:
     executor: ozet-excutor
     steps:
@@ -155,15 +148,6 @@ jobs:
           command: |
             source ~/workspace/venv/bin/activate
             codecov -t $CODECOV_TOKEN
-
-      - slack/notify:
-          event: pass
-          template: slack_test_success
-
-      - slack/notify:
-          event: pass
-          template: slack_build_success
-
   deploy_staging:
     executor: ozet-excutor
     parameters:
@@ -197,7 +181,7 @@ jobs:
       - run:
           name: Build docker image
           command: |
-            docker build -t $IMAGE_NAME:latest . -f Dockerfile
+            docker build --file .misc/docker/Dockerfile -t $IMAGE_NAME:latest .
 
       - run:
           name: Deploy docker image
@@ -218,7 +202,6 @@ jobs:
           header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
           img_url: "https://i.ibb.co/HVbJ5FC/free-icon-cancelled-5229496.png"
           event: fail
-
   deploy_production:
     executor: ozet-excutor
     parameters:
@@ -252,7 +235,7 @@ jobs:
       - run:
           name: Build docker image
           command: |
-            docker build -t $IMAGE_NAME:latest . -f Dockerfile
+            docker build --file .misc/docker/Dockerfile -t $IMAGE_NAME:latest .
 
       - run:
           name: Deploy docker image
@@ -295,7 +278,6 @@ workflows:
   deploy_staging:
     jobs:
       - build:
-          deploy_target: "스테이징 서버"
           filters: &filters-deploy
             branches:
               only:
@@ -313,11 +295,11 @@ workflows:
             - test
           filters:
             <<: *filters-deploy
+          deploy_target: "스테이징 서버"
 
   deploy_production:
     jobs:
       - build:
-          deploy_target: "프로덕션 서버"
           filters: &filters-deploy
             branches:
               only:
@@ -334,3 +316,4 @@ workflows:
             - test
           filters:
             <<: *filters-deploy
+          deploy_target: "프로덕션 서버"

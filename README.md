@@ -1,7 +1,7 @@
 <div align="center">
   <h1>OZET Core </h1>
   <p>
-    <img src="https://user-images.githubusercontent.com/36470472/129739040-bf35eae7-97fe-4ddd-9140-9f3619ad7bf8.png" alt="Logo" width="150" height="150">
+    <img src="https://user-images.githubusercontent.com/36470472/130461510-d2784c54-114d-4afc-8201-7e9b9a35a161.png" alt="Logo" width="150" height="150">
   </p>
   <div>
     <a href="#" target="_blank"><img src="https://img.shields.io/badge/Python%203.9.6-3776AB.svg?style=flat&logo=Python&logoColor=white" alt="python" /></a>
