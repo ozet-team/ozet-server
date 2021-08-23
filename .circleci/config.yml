@@ -182,7 +182,7 @@ jobs:
       - run:
           name: Build docker image
           command: |
-            docker build -t $IMAGE_NAME:latest . -f Dockerfile
+            docker build --file .misc/docker/Dockerfile -t $IMAGE_NAME:latest .
 
       - run:
           name: Deploy docker image
@@ -236,7 +236,7 @@ jobs:
       - run:
           name: Build docker image
           command: |
-            docker build -t $IMAGE_NAME:latest . -f Dockerfile
+            docker build --file .misc/docker/Dockerfile -t $IMAGE_NAME:latest .
 
       - run:
           name: Deploy docker image
