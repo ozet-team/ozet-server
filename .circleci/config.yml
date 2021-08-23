@@ -3,6 +3,18 @@ orbs:
   python: circleci/python@1.0.0
   slack: circleci/slack@4.4.3
 
+executors:
+  ozet-excutor:
+    environment:
+      IMAGE_NAME: bartkim07120/ozet-core
+      PLATFORM: OZET Core
+    docker:
+      - image: cimg/python:3.9.6
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
+    working_directory: ~/workspace
+
 commands:
   slack_chatie_notify:
     description: ""
@@ -68,19 +80,6 @@ commands:
                 }
               ]
             }
-
-
-executors:
-  ozet-excutor:
-    environment:
-      IMAGE_NAME: bartkim07120/ozet-core
-      PLATFORM: OZET Core
-    docker:
-      - image: cimg/python:3.9.6
-        auth:
-          username: $DOCKERHUB_USER
-          password: $DOCKERHUB_PASSWORD
-    working_directory: ~/workspace
 
 jobs:
   build:
@@ -250,11 +249,11 @@ jobs:
             echo 'Deploy Trigger'
 
       - slack_chatie_notify:
-          header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
+          header: "${PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
           img_url: "https://i.ibb.co/52X6Dnc/free-icon-backlog-5229430.png"
           event: pass
       - slack_chatie_notify:
-          header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
+          header: "${PLATFORM}를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
           img_url: "https://i.ibb.co/HVbJ5FC/free-icon-cancelled-5229496.png"
           event: fail
 
