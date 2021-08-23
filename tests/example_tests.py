@@ -12,3 +12,7 @@ def module_fixture():
     print('Fixture for module')
     return 2
 
+
+def test_zero_division():
+    with pytest.raises(ZeroDivisionError):
+        var = 1 / 0
