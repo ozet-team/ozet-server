@@ -287,7 +287,6 @@ workflows:
   deploy_staging:
     jobs:
       - build:
-          deploy_target: "스테이징 서버"
           filters: &filters-deploy
             branches:
               only:
@@ -305,11 +304,11 @@ workflows:
             - test
           filters:
             <<: *filters-deploy
+          deploy_target: "스테이징 서버"
 
   deploy_production:
     jobs:
       - build:
-          deploy_target: "프로덕션 서버"
           filters: &filters-deploy
             branches:
               only:
@@ -326,3 +325,4 @@ workflows:
             - test
           filters:
             <<: *filters-deploy
+          deploy_target: "프로덕션 서버"
