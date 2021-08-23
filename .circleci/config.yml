@@ -3,6 +3,18 @@ orbs:
   python: circleci/python@1.0.0
   slack: circleci/slack@4.4.3
 
+executors:
+  ozet-excutor:
+    environment:
+      IMAGE_NAME: bartkim07120/ozet-core
+      SLACK_APP_PLATFORM: OZET Core
+    docker:
+      - image: cimg/python:3.9.6
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
+    working_directory: ~/workspace
+
 commands:
   slack_chatie_notify:
     description: ""
@@ -68,19 +80,6 @@ commands:
                 }
               ]
             }
-
-
-executors:
-  ozet-excutor:
-    environment:
-      IMAGE_NAME: bartkim07120/ozet-core
-      PLATFORM: OZET Core
-    docker:
-      - image: cimg/python:3.9.6
-        auth:
-          username: $DOCKERHUB_USER
-          password: $DOCKERHUB_PASSWORD
-    working_directory: ~/workspace
 
 jobs:
   build:
