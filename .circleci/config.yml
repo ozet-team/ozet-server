@@ -84,10 +84,6 @@ executors:
 
 jobs:
   build:
-    parameters:
-      deploy_target:
-        description: Deploy target name
-        type: string
     executor: ozet-excutor
     steps:
       - checkout
@@ -133,8 +129,6 @@ jobs:
           name: Save artifacts - tests
           path: ~/workspace/app/tests
           destination: tests
-
-
   test:
     executor: ozet-excutor
     steps:
@@ -163,7 +157,6 @@ jobs:
       - slack/notify:
           event: pass
           template: slack_build_success
-
   deploy_staging:
     executor: ozet-excutor
     parameters:
@@ -218,7 +211,6 @@ jobs:
           header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
           img_url: "https://i.ibb.co/HVbJ5FC/free-icon-cancelled-5229496.png"
           event: fail
-
   deploy_production:
     executor: ozet-excutor
     parameters:
