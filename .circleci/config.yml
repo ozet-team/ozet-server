@@ -1,0 +1,336 @@
+version: 2.1
+orbs:
+  python: circleci/python@1.0.0
+  slack: circleci/slack@4.4.3
+
+commands:
+  slack_chatie_notify:
+    description: ""
+    parameters:
+      header:
+        type: string
+      img_url:
+        type: string
+      event:
+        description: |
+          In what event should this message send? Options: ["fail", "pass", "always"]
+        type: enum
+        enum: ["fail", "pass", "always"]
+        default: "always"
+    steps:
+      - slack/notify:
+          event: << parameters.event >>
+          custom: >
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "<< parameters.header >>",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "$(date +'%Y/%m/%d @%T')"
+                  },
+                  "accessory": {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "CircleCI", "emoji": true
+                    },
+                    "value": "circle_ci_url",
+                    "url": "${CIRCLE_BUILD_URL}",
+                    "action_id": "button-action"
+                  }
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "section",
+                  "text": {
+                      "type": "mrkdwn",
+                      "text": "> *작업 브랜치* - `$CIRCLE_PROJECT_REPONAME/$CIRCLE_BRANCH`\n> *작업자* - `$CIRCLE_USERNAME`\n> <!here>"
+                  },
+                  "accessory": {
+                    "type": "image",
+                    "image_url": "<< parameters.img_url >>",
+                    "alt_text": "status-image"
+                  }
+                },
+                {
+                  "type": "divider"
+                }
+              ]
+            }
+
+
+executors:
+  ozet-excutor:
+    environment:
+      IMAGE_NAME: bartkim07120/ozet-core
+      PLATFORM: OZET Core
+    docker:
+      - image: cimg/python:3.9.6
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
+    working_directory: ~/workspace
+
+jobs:
+  build:
+    parameters:
+      deploy_target:
+        description: Deploy target name
+        type: string
+    executor: ozet-excutor
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - deps1-{{ .Branch }}-{{ checksum ".misc/requirements/base.txt" }}
+          # fallback to using the latest cache if no exact match is found
+          - deps1-
+
+      - run:
+          name: Install virtual environments
+          command: |
+            pip install virtualenv
+            virtualenv ~/workspace/venv
+
+            source ~/workspace/venv/bin/activate
+            pip install --upgrade pip
+            pip install --upgrade pip-tools
+      - run:
+          name: Install dependencies
+          command: |
+            source ~/workspace/venv/bin/activate
+            pip-sync .misc/requirements/test.txt
+
+      - run:
+          name: Install Environment
+          command: |
+            touch .misc/env/prod.env
+            env > .misc/env/prod.env
+
+      - save_cache:
+          key: deps1-{{ .Branch }}-{{ checksum ".misc/requirements/base.txt" }}
+          paths:
+            - ./*
+
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - ./*
+
+      - store_artifacts:
+          name: Save artifacts - tests
+          path: ~/workspace/app/tests
+          destination: tests
+
+
+  test:
+    executor: ozet-excutor
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - run:
+          name: Run tests
+          command: |
+            source ~/workspace/venv/bin/activate
+            sh .misc/scripts/run_tests.sh
+            cp -r ~/workspace/.pytest_results ~/workspace/.tests-results
+
+      - store_test_results:
+          path: ~/workspace/.tests-results
+
+      - run:
+          name: Upload Codecov
+          command: |
+            source ~/workspace/venv/bin/activate
+            codecov -t $CODECOV_TOKEN
+
+      - slack/notify:
+          event: pass
+          template: slack_test_success
+
+      - slack/notify:
+          event: pass
+          template: slack_build_success
+
+  deploy_staging:
+    executor: ozet-excutor
+    parameters:
+      deploy_target:
+        description: Deploy target name
+        type: string
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+
+      - setup_remote_docker:
+          version: 20.10.2
+
+      - run:
+          name: Install Package
+          command: |
+            sudo apt-get update
+            sudo apt-get install sshpass
+
+      - run:
+          name: Install Environment
+          command: |
+            env > .env
+            cp .env prod.env
+
+      - run:
+          name: Login to docker hub
+          command: |
+            docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
+
+      - run:
+          name: Build docker image
+          command: |
+            docker build -t $IMAGE_NAME:latest . -f Dockerfile
+
+      - run:
+          name: Deploy docker image
+          command: |
+            docker push $IMAGE_NAME:latest
+
+      - run:
+          name: Release docker image
+          command: |
+            #sshpass -p $RELEASE_PASSWORD ssh -o StrictHostKeyChecking=no $RELEASE_HOST "$RELEASE_HOOK"
+            echo 'Deploy Trigger'
+
+      - slack_chatie_notify:
+          header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
+          img_url: "https://i.ibb.co/52X6Dnc/free-icon-backlog-5229430.png"
+          event: pass
+      - slack_chatie_notify:
+          header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
+          img_url: "https://i.ibb.co/HVbJ5FC/free-icon-cancelled-5229496.png"
+          event: fail
+
+  deploy_production:
+    executor: ozet-excutor
+    parameters:
+      deploy_target:
+        description: Deploy target name
+        type: string
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+
+      - setup_remote_docker:
+          version: 20.10.2
+
+      - run:
+          name: Install Package
+          command: |
+            sudo apt-get update
+            sudo apt-get install sshpass
+
+      - run:
+          name: Install Environment
+          command: |
+            env > .env
+            cp .env prod.env
+
+      - run:
+          name: Login to docker hub
+          command: |
+            docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
+
+      - run:
+          name: Build docker image
+          command: |
+            docker build -t $IMAGE_NAME:latest . -f Dockerfile
+
+      - run:
+          name: Deploy docker image
+          command: |
+            docker push $IMAGE_NAME:latest
+
+      - run:
+          name: Release docker image
+          command: |
+            #sshpass -p $RELEASE_PASSWORD ssh -o StrictHostKeyChecking=no $RELEASE_HOST "$RELEASE_HOOK"
+            echo 'Deploy Trigger'
+
+      - slack_chatie_notify:
+          header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
+          img_url: "https://i.ibb.co/52X6Dnc/free-icon-backlog-5229430.png"
+          event: pass
+      - slack_chatie_notify:
+          header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
+          img_url: "https://i.ibb.co/HVbJ5FC/free-icon-cancelled-5229496.png"
+          event: fail
+
+workflows:
+  build-with-test:
+    jobs:
+      - build:
+          filters: &filters-build-with-test
+            branches:
+              only:
+                - /^(enhance)[/].+/
+                - /^(feature)[/].+/
+                - /^(hotfix)[/].+/
+                - /^(fix)[/].+/
+
+      - test:
+          requires:
+            - build
+          filters:
+            <<: *filters-build-with-test
+
+  deploy_staging:
+    jobs:
+      - build:
+          deploy_target: "스테이징 서버"
+          filters: &filters-deploy
+            branches:
+              only:
+                - develop
+                - /^(circleci)[/].+/
+
+      - test:
+          requires:
+            - build
+          filters:
+            <<: *filters-deploy
+
+      - deploy_staging:
+          requires:
+            - test
+          filters:
+            <<: *filters-deploy
+
+  deploy_production:
+    jobs:
+      - build:
+          deploy_target: "프로덕션 서버"
+          filters: &filters-deploy
+            branches:
+              only:
+                - master
+
+      - test:
+          requires:
+            - build
+          filters:
+            <<: *filters-deploy
+
+      - deploy_staging:
+          requires:
+            - test
+          filters:
+            <<: *filters-deploy
