@@ -5,9 +5,13 @@
 #    pip-compile --output-file=.misc/requirements/base.txt .misc/requirements/base.in
 #
 asgiref==3.4.1
-    # via django
+    # via
+    #   django
+    #   uvicorn
 certifi==2021.5.30
     # via sentry-sdk
+click==8.0.1
+    # via uvicorn
 django==3.2.6
     # via
     #   -r .misc/requirements/base.in
@@ -26,6 +30,10 @@ django-redis==5.0.0
     # via -r .misc/requirements/base.in
 djangorestframework==3.12.4
     # via -r .misc/requirements/base.in
+gunicorn==20.1.0
+    # via -r .misc/requirements/base.in
+h11==0.12.0
+    # via uvicorn
 python-dotenv==0.18.0
     # via -r .misc/requirements/base.in
 pytz==2021.1
@@ -38,3 +46,10 @@ sqlparse==0.4.1
     # via django
 urllib3==1.26.6
     # via sentry-sdk
+uvicorn==0.15.0
+    # via -r .misc/requirements/base.in
+whitenoise==5.3.0
+    # via -r .misc/requirements/base.in
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
