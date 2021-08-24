@@ -309,7 +309,7 @@ workflows:
           filters:
             <<: *filters-deploy
 
-      - deploy_staging:
+      - deploy_production:
           requires:
             - test
           filters:
