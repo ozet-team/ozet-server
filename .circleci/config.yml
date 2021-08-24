@@ -191,8 +191,7 @@ jobs:
       - run:
           name: Release docker image
           command: |
-            #sshpass -p $RELEASE_PASSWORD ssh -o StrictHostKeyChecking=no $RELEASE_HOST "$RELEASE_HOOK"
-            echo 'Deploy Trigger'
+            ssh ubuntu@staging.luxquad.com "sh /docker/ozet-core/deploy.sh"
 
       - slack_chatie_notify:
           header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
@@ -245,8 +244,7 @@ jobs:
       - run:
           name: Release docker image
           command: |
-            #sshpass -p $RELEASE_PASSWORD ssh -o StrictHostKeyChecking=no $RELEASE_HOST "$RELEASE_HOOK"
-            echo 'Deploy Trigger'
+            ssh ubuntu@staging.luxquad.com "sh /docker/ozet-core/deploy.sh"
 
       - slack_chatie_notify:
           header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
