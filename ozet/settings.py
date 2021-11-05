@@ -250,3 +250,15 @@ REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False
 }
 
+# internal-auth
+# https://docs.authlib.org/en/latest/
+INTERNAL_AUTH = {
+    # GCP <App: developer-tools>
+    'client': {
+        'client_id': '',
+        'client_secret': '',
+        'authorize_params': {},
+    },
+    'token_session_key': 'internal_access_token',
+    'allowed_domains': ['',]
+}
