@@ -103,7 +103,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ozet.urls'
+ROOT_URLCONF = 'ozet.urls.all'
 
 TEMPLATES = [
     {
@@ -249,3 +249,4 @@ REST_FRAMEWORK = {
     ),
     'COERCE_DECIMAL_TO_STRING': False
 }
+
