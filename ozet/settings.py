@@ -247,6 +247,5 @@ REST_FRAMEWORK = {
         'utils.django.rest_framework.authentications.JSONWebTokenAuthentication',
         'utils.django.rest_framework.authentications.FirebaseIdTokenSoftAuthentication',
     ),
-    'PAGE_SIZE': 20,
     'COERCE_DECIMAL_TO_STRING': False
 }

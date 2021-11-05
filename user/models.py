@@ -15,6 +15,8 @@ from django.db.models import Max, Q, F, Count
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext, gettext_lazy as _
+
+from user.managers import UserManager
 from utils.django.models import TimeStampedModel, SafeDeleteModel
 
 
@@ -55,6 +57,8 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
         verbose_name=_('어드민')
     )
 
+    objects = UserManager()
+
     USERNAME_FIELD = 'username'
 
     REQUIRED_FIELDS = ['nickname']
@@ -77,10 +81,6 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
     def is_staff(self):
         return self.is_admin
 
-    @property
-    def social_account(self):
-        # TODO: DEPRECATED
-        return self.socialaccount_set.first()
 
     def get_full_name(self):
         return self.nickname
