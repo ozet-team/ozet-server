@@ -262,3 +262,28 @@ INTERNAL_AUTH = {
     'token_session_key': 'internal_access_token',
     'allowed_domains': ['',]
 }
+
+CACHES = {
+    'default': {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            'CLIENT_CLASS': 'utils.django.redis.client.DefaultClient',
+        },
+    },
+    # 'default': {
+    #     "BACKEND": "django_redis.cache.RedisCache",
+    #     "LOCATION": "redis://ozet-prod.n1fpkb.clustercfg.apn2.cache.amazonaws.com:6379/0",
+    #     "OPTIONS": {
+    #         'CLIENT_CLASS': 'utils.django.redis.client.DefaultClient',
+    #         'REDIS_CLIENT_CLASS': 'rediscluster.RedisCluster',
+    #         'REDIS_CLIENT_KWARGS': {
+    #             'read_from_replicas': True
+    #         },
+    #         'CONNECTION_POOL_CLASS': 'rediscluster.connection.ClusterWithReadReplicasConnectionPool',
+    #         'CONNECTION_POOL_KWARGS': {
+    #             'skip_full_coverage_check': True  # AWS ElasticCache has disabled CONFIG commands
+    #         }
+    #     },
+    # },
+}

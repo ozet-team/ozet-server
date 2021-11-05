@@ -16,6 +16,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from utils.django.rest_framework.mixin import ClientIPContextMixin
 from . import serializers
 from ...exceptions import (
     SocialLoginError,
