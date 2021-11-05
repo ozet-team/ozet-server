@@ -239,3 +239,14 @@ SOCIALACCOUNT_PROVIDERS = {
         'VERSION': 'v6.0',
     }
 }
+
+# django-rest-framework
+# https://www.django-rest-framework.org/api-guide/settings/
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'utils.django.rest_framework.authentications.JSONWebTokenAuthentication',
+        'utils.django.rest_framework.authentications.FirebaseIdTokenSoftAuthentication',
+    ),
+    'PAGE_SIZE': 20,
+    'COERCE_DECIMAL_TO_STRING': False
+}
