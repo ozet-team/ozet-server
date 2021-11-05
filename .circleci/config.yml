@@ -15,7 +15,7 @@ executors:
           password: $DOCKERHUB_PASSWORD
     working_directory: ~/workspace
 commands:
-  slack_chatie_notify:
+  slack_ozet_notify:
     description: ""
     parameters:
       header:
@@ -180,11 +180,11 @@ jobs:
           name: Release docker image
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@staging.luxquad.com "sh /docker/ozet-core/deploy.sh"
-      - slack_chatie_notify:
+      - slack_ozet_notify:
           header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
           img_url: "https://i.ibb.co/52X6Dnc/free-icon-backlog-5229430.png"
           event: pass
-      - slack_chatie_notify:
+      - slack_ozet_notify:
           header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
           img_url: "https://i.ibb.co/HVbJ5FC/free-icon-cancelled-5229496.png"
           event: fail
@@ -229,11 +229,11 @@ jobs:
           name: Release docker image
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@staging.luxquad.com "sh /docker/ozet-core/deploy.sh"
-      - slack_chatie_notify:
+      - slack_ozet_notify:
           header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
           img_url: "https://i.ibb.co/52X6Dnc/free-icon-backlog-5229430.png"
           event: pass
-      - slack_chatie_notify:
+      - slack_ozet_notify:
           header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
           img_url: "https://i.ibb.co/HVbJ5FC/free-icon-cancelled-5229496.png"
           event: fail

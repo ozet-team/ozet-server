@@ -18,6 +18,7 @@ from rest_framework.views import APIView
 
 from utils.django.rest_framework.mixin import ClientIPContextMixin
 from . import serializers
+from ... import constants
 from ...exceptions import (
     SocialLoginError,
     FacebookLoginError,
@@ -55,7 +56,7 @@ class SocialLoginView(ClientIPContextMixin,
             user_ip=user_ip
         )
 
-    @swagger_auto_schema(tags=[constants.MEMBER_AUTH_APIS_TAG])
+    @swagger_auto_schema(tags=[constants.USER_AUTH_APIS_TAG])
     def post(self, request, *args, **kwargs):
         # noinspection PyAttributeOutsideInit
         self.serializer = self.get_serializer(data=self.request.data)
@@ -131,7 +132,7 @@ class LogoutAPIView(APIView):
     로그아웃 API
     """
 
-    @swagger_auto_schema(tags=[constants.MEMBER_AUTH_APIS_TAG])
+    @swagger_auto_schema(tags=[constants.USER_AUTH_APIS_TAG])
     def post(self, request, *args, **kwargs):
         jwt_value = getattr(request, 'jwt_value', None)
         if not jwt_value:

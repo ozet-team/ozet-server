@@ -18,7 +18,6 @@ from corsheaders.defaults import default_headers
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -34,7 +33,6 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1'
 ]
-
 
 # Application definition
 
@@ -123,7 +121,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ozet.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -132,6 +129,32 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+}
+
+REPLICATED_CACHE_BACKEND = None
+CACHES = {
+    'default': {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            'CLIENT_CLASS': 'utils.django.redis.client.DefaultClient',
+        },
+    },
+    # 'default': {
+    #     "BACKEND": "django_redis.cache.RedisCache",
+    #     "LOCATION": "redis://ozet-prod.n1fpkb.clustercfg.apn2.cache.amazonaws.com:6379/0",
+    #     "OPTIONS": {
+    #         'CLIENT_CLASS': 'utils.django.redis.client.DefaultClient',
+    #         'REDIS_CLIENT_CLASS': 'rediscluster.RedisCluster',
+    #         'REDIS_CLIENT_KWARGS': {
+    #             'read_from_replicas': True
+    #         },
+    #         'CONNECTION_POOL_CLASS': 'rediscluster.connection.ClusterWithReadReplicasConnectionPool',
+    #         'CONNECTION_POOL_KWARGS': {
+    #             'skip_full_coverage_check': True  # AWS ElasticCache has disabled CONFIG commands
+    #         }
+    #     },
+    # },
 }
 
 
@@ -153,7 +176,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -166,7 +188,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -260,30 +281,6 @@ INTERNAL_AUTH = {
         'authorize_params': {},
     },
     'token_session_key': 'internal_access_token',
-    'allowed_domains': ['',]
+    'allowed_domains': ['', ]
 }
 
-CACHES = {
-    'default': {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            'CLIENT_CLASS': 'utils.django.redis.client.DefaultClient',
-        },
-    },
-    # 'default': {
-    #     "BACKEND": "django_redis.cache.RedisCache",
-    #     "LOCATION": "redis://ozet-prod.n1fpkb.clustercfg.apn2.cache.amazonaws.com:6379/0",
-    #     "OPTIONS": {
-    #         'CLIENT_CLASS': 'utils.django.redis.client.DefaultClient',
-    #         'REDIS_CLIENT_CLASS': 'rediscluster.RedisCluster',
-    #         'REDIS_CLIENT_KWARGS': {
-    #             'read_from_replicas': True
-    #         },
-    #         'CONNECTION_POOL_CLASS': 'rediscluster.connection.ClusterWithReadReplicasConnectionPool',
-    #         'CONNECTION_POOL_KWARGS': {
-    #             'skip_full_coverage_check': True  # AWS ElasticCache has disabled CONFIG commands
-    #         }
-    #     },
-    # },
-}

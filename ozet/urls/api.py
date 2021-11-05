@@ -118,10 +118,10 @@ internal_auth_urls = create_internal_auth_urls()
 # Docs
 schema_view = get_schema_view(
    openapi.Info(
-      title="채티 API",
+      title="OZET API",
       default_version='v1',
-      contact=openapi.Contact(email='devteam@eineblu.me'),
-      license=openapi.License(name="Copyright © EINEBLUME CO., LTD. 2018-2019 All Rights Reserved"),
+      contact=openapi.Contact(email='devteam@ozet.me'),
+      license=openapi.License(name="Copyright © OZET CO., LTD. 2021-2023 All Rights Reserved"),
    ),
    url=swagger_settings.DEFAULT_API_URL,
    public=True,
