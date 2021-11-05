@@ -71,6 +71,8 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
             models.Index(fields=['deleted', 'is_active']),
         ]
 
+        db_table = 'account_user'
+
     def __str__(self):
         return self.__repr__()
 
@@ -80,7 +82,6 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
     @property
     def is_staff(self):
         return self.is_admin
-
 
     def get_full_name(self):
         return self.nickname
@@ -95,3 +96,38 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
     # noinspection PyMethodMayBeStatic
     def has_module_perms(self, app_label):
         return True
+
+
+class UserToken(TimeStampedModel):
+    user = models.ForeignKey(
+        User,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='token_set',
+        verbose_name=_('회원'),
+    )
+    token = models.CharField(
+        max_length=255,
+        null=False,
+        blank=False,
+        verbose_name=_('토큰'),
+        unique=True,
+    )
+    user_agent = models.TextField(
+        null=True,
+        blank=False,
+        verbose_name=_('Agent'),
+    )
+    user_ip = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        verbose_name=_('IP'),
+    )
+
+    class Meta:
+        verbose_name = _('회원 토큰')
+        verbose_name_plural = _('회원 토큰 목록')
+
+        db_table = 'account_user_token'

@@ -9,6 +9,7 @@ django-model-utils==4.2.0
 django-mysql==4.2.0
 django-phonenumber-field==5.2.0
 django-summernote==0.8.20.0
+django-replicated==2.7
 
 # WSGI
 gunicorn==20.1.0
