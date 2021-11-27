@@ -15,11 +15,12 @@ RUN rm /tmp/requirements.txt
 COPY . /app
 RUN cp /app/.misc/docker/gunicorn.py /conf
 
+WORKDIR /app
+
 # Static
-RUN cd /app && \
-    mkdir static && \
+RUN mkdir static && \
     DJANGO_SETTINGS_MODULE=ozet.settings python manage.py collectstatic --noinput
 
 EXPOSE 8080
 
-CMD cd /app && gunicorn ozet.asgi:application -b :8080 -k uvicorn.workers.UvicornWorker
+CMD gunicorn ozet.asgi:application -b :8080 -k uvicorn.workers.UvicornWorker
