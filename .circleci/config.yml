@@ -6,8 +6,8 @@ orbs:
 executors:
   ozet-excutor:
     environment:
-      IMAGE_NAME: bartkim07120/ozet-core
-      SLACK_APP_PLATFORM: OZET Core
+      IMAGE_NAME: ozetteam/ozet-server
+      SLACK_APP_PLATFORM: OZET Server
     docker:
       - image: cimg/python:3.9.6
         auth:
@@ -66,7 +66,7 @@ commands:
                   "type": "section",
                   "text": {
                       "type": "mrkdwn",
-                      "text": "> *작업 브랜치* - `$CIRCLE_PROJECT_REPONAME/$CIRCLE_BRANCH`\n> *작업자* - `$CIRCLE_USERNAME`\n> <!here>"
+                      "text": "> *작업 브랜치* - `$CIRCLE_PROJECT_REPONAME/$CIRCLE_BRANCH`\n> *작업자* - `$CIRCLE_USERNAME`\n> *개발팀* - <!subteam^S023Z4GR59P>"
                   },
                   "accessory": {
                     "type": "image",
@@ -174,19 +174,19 @@ jobs:
             docker push $IMAGE_NAME:latest
       - add_ssh_keys:
           fingerprints:
-            - "5b:6c:76:ff:d0:dd:25:02:a4:15:1e:d4:3f:b8:ae:63"
-            - "20:0e:88:8b:96:4f:c0:d9:27:0b:f9:d8:59:06:14:59"
+            - "01:29:99:65:69:4a:8a:8e:bc:47:0f:fa:72:51:0c:9a"
+            - "5e:de:15:9f:f3:13:c1:40:d4:82:7e:89:fe:56:c8:9c"
       - run:
           name: Release docker image
           command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@staging.luxquad.com "sh /docker/ozet-core/deploy.sh"
+            ssh -o StrictHostKeyChecking=no ubuntu@staging.luxquad.com "sh /docker/ozet-server/deploy.sh"
       - slack_chatie_notify:
           header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
-          img_url: "https://i.ibb.co/52X6Dnc/free-icon-backlog-5229430.png"
+          img_url: "https://user-images.githubusercontent.com/36470472/132522100-b182718b-5f22-4cfa-8443-d602bede1853.png"
           event: pass
       - slack_chatie_notify:
           header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
-          img_url: "https://i.ibb.co/HVbJ5FC/free-icon-cancelled-5229496.png"
+          img_url: "https://user-images.githubusercontent.com/36470472/132522181-f446d07b-091e-4f69-b0a9-a04e7afc3b33.png"
           event: fail
   deploy_production:
     executor: ozet-excutor
@@ -223,19 +223,19 @@ jobs:
             docker push $IMAGE_NAME:latest
       - add_ssh_keys:
           fingerprints:
-            - "5b:6c:76:ff:d0:dd:25:02:a4:15:1e:d4:3f:b8:ae:63"
-            - "20:0e:88:8b:96:4f:c0:d9:27:0b:f9:d8:59:06:14:59"
+            - "01:29:99:65:69:4a:8a:8e:bc:47:0f:fa:72:51:0c:9a"
+            - "5e:de:15:9f:f3:13:c1:40:d4:82:7e:89:fe:56:c8:9c"
       - run:
           name: Release docker image
           command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@staging.luxquad.com "sh /docker/ozet-core/deploy.sh"
+            ssh -o StrictHostKeyChecking=no ubuntu@luxquad.com "sh /docker/ozet-server/deploy.sh"
       - slack_chatie_notify:
           header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
-          img_url: "https://i.ibb.co/52X6Dnc/free-icon-backlog-5229430.png"
+          img_url: "https://user-images.githubusercontent.com/36470472/132522100-b182718b-5f22-4cfa-8443-d602bede1853.png"
           event: pass
       - slack_chatie_notify:
           header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
-          img_url: "https://i.ibb.co/HVbJ5FC/free-icon-cancelled-5229496.png"
+          img_url: "https://user-images.githubusercontent.com/36470472/132522176-4d62ccc8-1f46-407c-a9ef-f12ad49d6a9c.png"
           event: fail
 workflows:
   build-with-test:

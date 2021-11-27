@@ -1,6 +1,6 @@
 FROM python:3.9.6
 
-LABEL maintainer="devteam@luxquad.com"
+LABEL maintainer="ozetteam@gmail.com"
 LABEL title="core-server"
 LABEL version="1.0"
 
