@@ -7,7 +7,7 @@ executors:
   ozet-excutor:
     environment:
       IMAGE_NAME: ozetteam/ozet-server
-      SLACK_APP_PLATFORM: OZET Server
+      SLACK_APP_PLATFORM: OZET 서버
     docker:
       - image: cimg/python:3.9.6
         auth:
@@ -181,11 +181,11 @@ jobs:
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@staging.luxquad.com "sh /docker/ozet-server-docker/deploy.sh"
       - slack_chatie_notify:
-          header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
+          header: "${SLACK_APP_PLATFORM} 를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
           img_url: "https://user-images.githubusercontent.com/36470472/132522100-b182718b-5f22-4cfa-8443-d602bede1853.png"
           event: pass
       - slack_chatie_notify:
-          header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
+          header: "${SLACK_APP_PLATFORM} 를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
           img_url: "https://user-images.githubusercontent.com/36470472/132522181-f446d07b-091e-4f69-b0a9-a04e7afc3b33.png"
           event: fail
   deploy_production:
@@ -246,6 +246,7 @@ workflows:
               only:
                 - /^(enhance)[/].+/
                 - /^(feature)[/].+/
+                - /^(feat)[/].+/
                 - /^(hotfix)[/].+/
                 - /^(fix)[/].+/
 
@@ -275,7 +276,7 @@ workflows:
             - test
           filters:
             <<: *filters-deploy
-          deploy_target: "스테이징 서버"
+          deploy_target: "스테이징"
 
   deploy_production:
     jobs:
@@ -296,4 +297,4 @@ workflows:
             - test
           filters:
             <<: *filters-deploy
-          deploy_target: "프로덕션 서버"
+          deploy_target: "프로덕션"
