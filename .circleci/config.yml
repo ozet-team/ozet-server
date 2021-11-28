@@ -175,7 +175,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "01:29:99:65:69:4a:8a:8e:bc:47:0f:fa:72:51:0c:9a"
-            - "5e:de:15:9f:f3:13:c1:40:d4:82:7e:89:fe:56:c8:9c"
+            - "21:16:51:85:ec:f5:69:71:4b:e1:00:44:6b:e2:05:34"
       - run:
           name: Release docker image
           command: |
@@ -224,7 +224,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "01:29:99:65:69:4a:8a:8e:bc:47:0f:fa:72:51:0c:9a"
-            - "5e:de:15:9f:f3:13:c1:40:d4:82:7e:89:fe:56:c8:9c"
+            - "21:16:51:85:ec:f5:69:71:4b:e1:00:44:6b:e2:05:34"
       - run:
           name: Release docker image
           command: |
