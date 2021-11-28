@@ -181,11 +181,11 @@ jobs:
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@api-staging.luxquad.com "sh /docker/ozet-server-docker/deploy.sh"
       - slack_chatie_notify:
-          header: "${SLACK_APP_PLATFORM} 를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
+          header: "${SLACK_APP_PLATFORM} 를 << parameters.deploy_target >>에 성공적으로 배포했습니다 :tada:"
           img_url: "https://user-images.githubusercontent.com/36470472/132522100-b182718b-5f22-4cfa-8443-d602bede1853.png"
           event: pass
       - slack_chatie_notify:
-          header: "${SLACK_APP_PLATFORM} 를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
+          header: "${SLACK_APP_PLATFORM} 를 << parameters.deploy_target >>에 배포하는 중에 문제가 발생했습니다 :warning:"
           img_url: "https://user-images.githubusercontent.com/36470472/132522181-f446d07b-091e-4f69-b0a9-a04e7afc3b33.png"
           event: fail
   deploy_production:
@@ -230,11 +230,11 @@ jobs:
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@api.luxquad.com "sh /docker/ozet-server-docker/deploy.sh"
       - slack_chatie_notify:
-          header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
+          header: "${SLACK_APP_PLATFORM}를 << parameters.deploy_target >>에 성공적으로 배포했습니다 :tada:"
           img_url: "https://user-images.githubusercontent.com/36470472/132522100-b182718b-5f22-4cfa-8443-d602bede1853.png"
           event: pass
       - slack_chatie_notify:
-          header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
+          header: "${SLACK_APP_PLATFORM}를 << parameters.deploy_target >>에 배포하는 중에 문제가 발생했습니다 :warning:"
           img_url: "https://user-images.githubusercontent.com/36470472/132522176-4d62ccc8-1f46-407c-a9ef-f12ad49d6a9c.png"
           event: fail
 workflows:
