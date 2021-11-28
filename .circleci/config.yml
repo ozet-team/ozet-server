@@ -179,7 +179,7 @@ jobs:
       - run:
           name: Release docker image
           command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@staging.luxquad.com "sh /docker/ozet-server-docker/deploy.sh"
+            ssh -o StrictHostKeyChecking=no ubuntu@api-staging.luxquad.com "sh /docker/ozet-server-docker/deploy.sh"
       - slack_chatie_notify:
           header: "${SLACK_APP_PLATFORM} 를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
           img_url: "https://user-images.githubusercontent.com/36470472/132522100-b182718b-5f22-4cfa-8443-d602bede1853.png"
@@ -228,7 +228,7 @@ jobs:
       - run:
           name: Release docker image
           command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@luxquad.com "sh /docker/ozet-server-docker/deploy.sh"
+            ssh -o StrictHostKeyChecking=no ubuntu@api.luxquad.com "sh /docker/ozet-server-docker/deploy.sh"
       - slack_chatie_notify:
           header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
           img_url: "https://user-images.githubusercontent.com/36470472/132522100-b182718b-5f22-4cfa-8443-d602bede1853.png"
