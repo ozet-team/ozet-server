@@ -8,6 +8,7 @@ LABEL version="1.0"
 RUN apt-get update
 RUN apt-get install -y gcc
 RUN apt-get install -y python3-dev default-libmysqlclient-dev build-essential
+
 RUN apt-get install -y python3-mysqldb
 ENV PYTHONBUFFERED 1
 
@@ -17,7 +18,7 @@ RUN python -m pip install --upgrade pip
 # Install server deps 
 RUN pip install --upgrade setuptools
 RUN pip install --upgrade pip-tools
-RUN pip install mysqlclient==2.1.0
+RUN pip install --force-reinstall --ignore-installed --no-binary :all: mysqlclient
 
 # Install django deps
 ADD ./.misc/requirements/dev.txt /tmp/requirements.txt
