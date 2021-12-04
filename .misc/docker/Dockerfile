@@ -8,7 +8,11 @@ LABEL version="1.0"
 RUN apt-get update
 RUN apt-get install -y gcc
 RUN apt-get install -y python3-dev default-libmysqlclient-dev build-essential
+RUN apt-get install -y python3-mysqldb
 ENV PYTHONBUFFERED 1
+
+# Update PIP
+RUN python -m pip install --upgrade pip
 
 # Install server deps 
 RUN pip install --upgrade setuptools
