@@ -15,12 +15,6 @@ class Announcement(models.Model):
         YEAR = "YE", "연봉"
         IRRELEVANT = "IR", "무관"
 
-    class EmployeeType(models.TextChoices):
-        INTERN = "IN", "인턴"
-        MANAGER = "MA", "매니저"
-        DESIGNER = "DE", "디자이너"
-        CHIEF = "CH", "원장"
-
     title = models.CharField("제목", max_length=128)
     shop_name = models.CharField("지점명", max_length=128)
     manager_name = models.CharField("담장자 이름", max_length=32)
@@ -28,7 +22,7 @@ class Announcement(models.Model):
     expired_datetime = models.DateField("마감일")
     working_hour_start = models.IntegerField("업무 시작시간")
     working_hour_end = models.IntegerField("업무 종료시간")
-    pay_type = models.CharField("급여 종류", max_length=2, choices=PayType)
+    pay_type = models.CharField("급여 종류", max_length=2, choices=PayType.choices)
     pay_amount = models.IntegerField("급여량")
     employee_types = models.ManyToManyField(
         EmployeeType,
