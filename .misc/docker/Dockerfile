@@ -16,8 +16,8 @@ RUN python -m pip install --upgrade pip
 # Install server deps 
 RUN pip install --upgrade setuptools
 RUN pip install --upgrade pip-tools
-RUN pip install http://cdn.mysql.com/Downloads/Connector-Python/mysql-connector-python-2.0.4.zip
-RUN pip install --force-reinstall --ignore-installed --no-binary :all: mysqlclient
+RUN pip install pymysql
+RUN pip install mysqlclient
 
 # Install django deps
 ADD ./.misc/requirements/dev.txt /tmp/requirements.txt
