@@ -12,6 +12,8 @@ RUN apt-get install -y python3-dev
 
 # Update PIP
 RUN python -m pip install --upgrade pip
+RUN pip install --upgrade setuptools
+RUN pip install --upgrade pip-tools
 
 # Install django deps
 ADD ./.misc/requirements/dev.txt /tmp/requirements.txt
@@ -19,8 +21,6 @@ RUN pip-sync /tmp/requirements.txt
 RUN rm /tmp/requirements.txt
 
 # Install server deps 
-RUN pip install --upgrade setuptools
-RUN pip install --upgrade pip-tools
 RUN pip install pymysql
 
 # Init project
