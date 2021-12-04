@@ -21,6 +21,9 @@ WORKDIR /app
 RUN mkdir static && \
     DJANGO_SETTINGS_MODULE=ozet.settings.live python manage.py collectstatic --noinput
 
+# Migration
+RUN python manage.py migrate
+
 EXPOSE 8080
 
 CMD gunicorn ozet.asgi:application -b :8080 -k uvicorn.workers.UvicornWorker
