@@ -7,9 +7,7 @@ LABEL version="1.0"
 # Install system deps
 RUN apt-get update
 RUN apt-get install -y gcc
-RUN apt-get install -y default-libmysqlclient-dev
-RUN apt-get install -y default-mysql-client
-RUN apt-get install -y python3-mysqldb
+RUN apt-get install -y python3-dev default-libmysqlclient-dev build-essential
 ENV PYTHONBUFFERED 1
 
 # Install server deps 
