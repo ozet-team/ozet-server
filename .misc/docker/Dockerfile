@@ -8,7 +8,7 @@ LABEL version="1.0"
 RUN apt-get update
 RUN apt-get install -y gcc
 RUN apt-get install -y default-libmysqlclient-dev
-RUN apt-get install -y mysql-client
+RUN apt-get install -y default-mysql-client
 ENV PYTHONBUFFERED 1
 
 RUN pip install --upgrade pip-tools
