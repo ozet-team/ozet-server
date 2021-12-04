@@ -29,7 +29,7 @@ RUN cp /app/.misc/docker/gunicorn.py /conf
 WORKDIR /app
 
 # Migration
-RUN python manage.py migrate
+RUN DJANGO_SETTINGS_MODULE=ozet.settings.live python manage.py migrate
 
 # Static
 RUN mkdir static && \
