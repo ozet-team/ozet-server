@@ -19,6 +19,7 @@ RUN pip install --upgrade setuptools
 RUN pip install --upgrade pip-tools
 RUN pip install mysqlclient
 RUN pip install django-mysql
+RUN pip install MySQL-python
 
 # Install django deps
 ADD ./.misc/requirements/dev.txt /tmp/requirements.txt
