@@ -94,10 +94,10 @@ WSGI_APPLICATION = "ozet.wsgi.application"
 DATABASES = {
     'default' : {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db-staging.ozet.app',
+        'NAME': 'ozet',
         'USER': 'admin',
         'PASSWORD': 'ozetword!',
-        'HOST': 'localhost',
+        'HOST': 'db-staging.ozet.app',
         'PORT': '3306',
     }
 }
