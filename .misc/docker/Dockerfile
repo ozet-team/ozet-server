@@ -6,7 +6,7 @@ LABEL version="1.0"
 
 # Install deps
 RUN pip install --upgrade pip-tools
-RUN pip isntalla mysqlclient
+RUN pip install mysqlclient
 ADD ./.misc/requirements/dev.txt /tmp/requirements.txt
 RUN pip-sync /tmp/requirements.txt
 RUN rm /tmp/requirements.txt
