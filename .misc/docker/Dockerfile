@@ -38,4 +38,4 @@ RUN mkdir static && \
 
 EXPOSE 8080
 
-CMD gunicorn ozet.asgi:application -b :8080 -k uvicorn.workers.UvicornWorker
+CMD DJANGO_SETTINGS_MODULE=ozet.settings.live gunicorn ozet.asgi:application -b :8080 -k uvicorn.workers.UvicornWorker
