@@ -28,12 +28,12 @@ RUN cp /app/.misc/docker/gunicorn.py /conf
 
 WORKDIR /app
 
+# Migration
+RUN python manage.py migrate
+
 # Static
 RUN mkdir static && \
     DJANGO_SETTINGS_MODULE=ozet.settings.live python manage.py collectstatic --noinput
-
-# Migration
-RUN python manage.py migrate
 
 EXPOSE 8080
 
