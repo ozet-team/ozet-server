@@ -5,6 +5,11 @@ LABEL title="core-server"
 LABEL version="1.0"
 
 # Install deps
+RUN apt-get update
+RUN apt-get install -y gcc
+RUN apt-get install -y default-libmysqlclient-dev
+ENV PYTHONBUFFERED 1
+
 RUN pip install --upgrade pip-tools
 RUN pip install mysqlclient
 ADD ./.misc/requirements/dev.txt /tmp/requirements.txt
