@@ -19,11 +19,11 @@ class Announcement(models.Model):
     shop_name = models.CharField("지점명", max_length=128)
     manager_name = models.CharField("담장자 이름", max_length=32)
     manager_phone_number = PhoneNumberField("담장자 전화번호", max_length=32)
-    expired_datetime = models.DateField("마감일")
-    working_hour_start = models.IntegerField("업무 시작시간")
-    working_hour_end = models.IntegerField("업무 종료시간")
+    expired_datetime = models.DateTimeField("마감일")
+    working_hour_start = models.DateTimeField("업무 시작시간")
+    working_hour_end = models.DateTimeField("업무 종료시간")
     pay_type = models.CharField("급여 종류", max_length=2, choices=PayType.choices)
-    pay_amount = models.IntegerField("급여량")
+    pay_amount = models.PositiveIntegerField("급여량")
     employee_types = models.ManyToManyField(
         EmployeeType,
         related_name="announcements",
