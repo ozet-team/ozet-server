@@ -305,7 +305,7 @@ class UserPasscodeVerify(TimeStampedModel):
             if latest_passcode_verify.status == cls.Status.pending and \
                (
                     not latest_passcode_verify.expire_at or
-                        latest_passcode_verify.expire_at >= timezone.now()
+                        latest_passcode_verify.expire_at <= timezone.now()
                ):
                 latest_passcode_verify.status = cls.Status.expire
                 latest_passcode_verify.save()

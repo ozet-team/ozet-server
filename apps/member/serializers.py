@@ -29,11 +29,11 @@ from apps.member.exceptions import (
 
 # noinspection PyAbstractClass
 class JWTSerializer(BaseJWTSerializer):
-    is_registration = serializers.SerializerMethodField(label=_('첫 가입 여부'), default=False, read_only=True)
+    is_registration = serializers.SerializerMethodField(label=_("첫 가입 여부"), default=False, read_only=True)
 
     # noinspection PyMethodMayBeStatic
     def get_is_registration(self, obj):
-        return getattr(obj.get('user', None), 'is_registration', False)
+        return getattr(obj.get("user", None), "is_registration", False)
 
 
 class UserSerializer(ModelSerializer):
@@ -63,13 +63,14 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
                 "requester_phone_number",
                 "requester_device_uuid",
                 "status",
+                "expire_at",
             )
 
     # Write Only
     phone_number = PhoneNumberField(required=True, allow_blank=False, allow_null=False, write_only=True)
 
     # Read Only
-    requested_verify = NestedUserPasscodeVerifyRequestSerializer(label=_('요청된 인증 상태'), read_only=True)
+    requested_verify = NestedUserPasscodeVerifyRequestSerializer(label=_("요청된 인증 상태"), read_only=True)
 
     # Both
 
@@ -92,7 +93,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
             response: Naver API 응답
         """
         passcode = self.passcode_generate()
-        message = f'[OZET] 인증번호: {passcode}\n인증번호를 입력해 주세요.'
+        message = f"[OZET] 인증번호: {passcode}\n인증번호를 입력해 주세요."
 
         res = NaverCloudAPI.send_sms(phone_number, None, message)
         if res.status_code != HTTPStatus.ACCEPTED:
@@ -104,7 +105,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
         return data
 
     def create(self, validated_data):
-        requester_phone_number = validated_data['phone_number']
+        requester_phone_number = validated_data["phone_number"]
 
         # 사용자 인증
         try:
@@ -112,7 +113,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
         except User.DoesNotExist:
             with transaction.atomic():
                 # Pre-SignUp
-                username = f'ozet_{str(uuid.uuid4()).replace("-", "")}'
+                username = f"ozet_{str(uuid.uuid4()).replace('-', '')}"
                 user = User.objects.create_user(
                     username=username,
                     email=None,
@@ -121,7 +122,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
                 )
 
                 token = user.get_valid_token(auto_generate=True)
-                if not user.is_valid_token(token.decode('utf-8')):
+                if not user.is_valid_token(token.decode("utf-8")):
                     raise PasscodeVerifySignUpError()
 
         # 중복 인증
@@ -156,8 +157,8 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
         return data
 
     def create(self, validated_data):
-        requester_phone_number = validated_data['phone_number']
-        passcode = validated_data['passcode']
+        requester_phone_number = validated_data["phone_number"]
+        passcode = validated_data["passcode"]
 
         user = User.objects.get(phone_number=requester_phone_number)
 
@@ -177,30 +178,30 @@ class UserMeSerializer(ModelSerializer):
         class Meta:
             model = UserProfile
             fields = (
-                'introduce',
-                'policy_for_terms_agreed',
-                'policy_for_privacy_agreed',
-                'extra',
+                "introduce",
+                "policy_for_terms_agreed",
+                "policy_for_privacy_agreed",
+                "extra",
             )
             read_only = (
-                'policy_for_terms_agreed',
-                'policy_for_privacy_agreed',
-                'extra',
+                "policy_for_terms_agreed",
+                "policy_for_privacy_agreed",
+                "extra",
             )
 
     class Meta:
         model = User
         fields = (
-            'username',
-            'name',
-            'email',
-            'profile',
-            'phone_number',
+            "username",
+            "name",
+            "email",
+            "profile",
+            "phone_number",
         )
         read_only = (
-            'username',
-            'phone_number',
-            'profile',
+            "username",
+            "phone_number",
+            "profile",
         )
 
     profile = NestedProfileSerializer(flatten=True, read_only=True)
@@ -211,29 +212,29 @@ class UserDetailsSerializer(ModelSerializer):
         class Meta:
             model = UserProfile
             fields = (
-                'introduce',
+                "introduce",
             )
             read_only_fields = (
-                'introduce',
+                "introduce",
             )
 
     class Meta:
         model = User
         fields = (
-            'id',
-            'email',
-            'username',
-            'name',
-            'phone_number',
+            "id",
+            "email",
+            "username",
+            "name",
+            "phone_number",
         )
         read_only_fields = (
-            'id',
-            'email',
-            'username',
-            'name',
-            'created',
-            'profile',
-            'phone_number',
+            "id",
+            "email",
+            "username",
+            "name",
+            "created",
+            "profile",
+            "phone_number",
         )
 
     profile = NestedProfileSerializer(flatten=True, read_only=True)
