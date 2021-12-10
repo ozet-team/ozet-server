@@ -312,7 +312,8 @@ class UserPasscodeVerify(TimeStampedModel):
                     not latest_passcode_verify.expire_at or
                         latest_passcode_verify.expire_at <= timezone.now()
                ):
-                latest_passcode_verify.update(status=cls.Status.expire)
+                latest_passcode_verify.status = cls.Status.expire
+                latest_passcode_verify.save(update_fields=['status'])
 
         if is_transaction:
             with transaction.atomic():
@@ -340,7 +341,8 @@ class UserPasscodeVerify(TimeStampedModel):
 
         def __process():
             if latest_passcode_verify.passcode == passcode:
-                latest_passcode_verify.update(status=cls.Status.verified)
+                latest_passcode_verify.status = cls.Status.verified
+                latest_passcode_verify.save(update_fields=['status'])
 
         if is_transaction:
             with transaction.atomic():
