@@ -15,6 +15,7 @@ from phonenumber_field.serializerfields import PhoneNumberField
 from phonenumber_field.phonenumber import PhoneNumber
 
 from apps.member.models import User, UserProfile, UserPasscodeVerify, UserToken
+from utils.django.rest_framework.mixins import UserContextMixin
 from utils.django.rest_framework.serializers import SimpleSerializer, ModelSerializer
 from utils.naver.api import NaverCloudAPI
 
@@ -121,7 +122,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
                 )
 
                 token = user.get_valid_token(auto_generate=True)
-                if not user.is_valid_token(token):
+                if not user.is_valid_token(token.decode('utf-8')):
                     raise PasscodeVerifySignUpError()
 
         # 중복 인증
@@ -171,7 +172,7 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
         return dict(token=user.get_valid_token(auto_generate=True).token)
 
 
-class UserProfileViewSerializer(ModelSerializer):
+class UserProfileViewSerializer(UserContextMixin, ModelSerializer):
     class Meta:
         model = UserProfile
         fields = [
