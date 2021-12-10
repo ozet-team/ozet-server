@@ -181,6 +181,11 @@ class UserMeSerializer(ModelSerializer):
                 'policy_for_privacy_agreed',
                 'extra',
             )
+            read_only = (
+                'policy_for_terms_agreed',
+                'policy_for_privacy_agreed',
+                'extra',
+            )
 
     class Meta:
         model = User
@@ -190,6 +195,11 @@ class UserMeSerializer(ModelSerializer):
             'email',
             'profile',
             'phone_number',
+        )
+        read_only = (
+            'username',
+            'phone_number',
+            'profile',
         )
 
     profile = NestedProfileSerializer(flatten=True, read_only=True)
