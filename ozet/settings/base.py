@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 
 import pymysql
+
 pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -162,4 +163,13 @@ REST_FRAMEWORK = {
         # NOTE(찬혁): 공통 인증 authentication 필요
     ],
     'DEFAULT_PERMISSION_CLASSES': [],
+    'DEFAULT_RENDERER_CLASSES': (
+        'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
+        'djangorestframework_camel_case.render.CamelCaseBrowsableAPIRenderer',
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'djangorestframework_camel_case.parser.CamelCaseFormParser',
+        'djangorestframework_camel_case.parser.CamelCaseMultiPartParser',
+        'commons.contrib.rest_framework.parser.NoUnderscoreBeforeNumberCamelCaseJSONParser',
+    ),
 }
