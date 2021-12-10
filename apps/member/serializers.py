@@ -189,16 +189,16 @@ class UserMeSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = [
+        fields = (
             'username',
             'name',
             'email',
             'phone_number',
-        ]
-        read_only = [
+        )
+        read_only = (
             'username',
             'phone_number',
-        ]
+        )
 
 
 class UserDetailsSerializer(ModelSerializer):

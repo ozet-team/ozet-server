@@ -36,6 +36,8 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
         max_length=32,
         null=False,
         blank=False,
+        db_index=True,
+        unique=True,
         verbose_name=_("전화번호"),
     )
 
