@@ -57,7 +57,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
             model = UserPasscodeVerify
             fields = [
                 "requester_phone_number",
-                "requsster_device_uuid",
+                "requester_device_uuid",
                 "status",
             ]
 
