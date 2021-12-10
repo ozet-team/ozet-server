@@ -8,13 +8,9 @@ from apps.member import serializers
 
 class UserPasscodeVertifyRequestView(CreateAPIView):
     permission_classes = ()
-    serializer_class = serializers.UserPasscodeVertifySerializer
+    serializer_class = serializers.UserPasscodeVertifyRequestSerializer
 
     def post(self, request, *args, **kwargs):
-        """
-        @TODO 네이버 SMS 요청
-        """
-
         return super(UserPasscodeVertifyRequestView, self).post(request, *args, **kwargs)
 
 

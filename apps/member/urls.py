@@ -4,13 +4,13 @@ from django.urls import path
 
 urlpatterns = [
     path(
-        "user/auth/passcode",
-        views.UserPasscodeVertifyView.as_view(),
-        name=views.UserPasscodeVertifyView.__name__,
+        "auth/passcode/request",
+        views.UserPasscodeVertifyRequestView.as_view(),
+        name=views.UserPasscodeVertifyRequestView.__name__,
     ),
     path(
-        "user/auth/passcode/request",
+        "auth/passcode",
         views.UserPasscodeVertifyView.as_view(),
-        name=views.UserPasscodeVertifyRequestView.__name__,
+        name=views.UserPasscodeVertifyView.__name__,
     ),
 ]
