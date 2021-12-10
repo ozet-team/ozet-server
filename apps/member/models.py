@@ -30,6 +30,8 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
     phone_number = PhoneNumberField(
         "전화번호",
+        null=False,
+        blank=False,
         max_length=32
     )
 
