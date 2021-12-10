@@ -1,6 +1,7 @@
 from typing import Union
 
 from djchoices import DjangoChoices, ChoiceItem
+from model_utils.fields import AutoCreatedField
 from phonenumber_field.modelfields import PhoneNumberField
 
 from django.utils.translation import gettext_lazy as _
@@ -81,6 +82,24 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
         db_table = 'member_user'
 
+    def save(self, *args, **kwargs):
+        if not self.id:
+            rv = super(User, self).save(*args, **kwargs)
+            UserProfile.objects.create(user=self,
+                                       policy_for_terms_agreed=self.created,
+                                       policy_for_privacy_agreed=self.created)
+
+            return rv
+
+        old_instance = User.objects.filter(id=self.id).first()
+        if not old_instance:
+            return super(User, self).save(*args, **kwargs)
+
+        # 업데이트
+        rv = super(User, self).save(*args, **kwargs)
+
+        return rv
+
     def is_valid_token(self, token):
         try:
             self.token_set.get(token=token)
@@ -131,6 +150,17 @@ class UserProfile(TimeStampedModel):
         null=True,
         blank=True,
         verbose_name=_('소개'),
+    )
+
+    policy_for_terms_agreed = AutoCreatedField(
+        null=True,
+        blank=True,
+        verbose_name=_('이용약관 동의일')
+    )
+    policy_for_privacy_agreed = AutoCreatedField(
+        null=True,
+        blank=True,
+        verbose_name=_('개인정보 취급방침 동의일')
     )
 
     extra = models.JSONField(

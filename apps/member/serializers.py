@@ -169,3 +169,15 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
                 raise PasscodeVerifyInvalidPasscode()
 
         return dict(token=user.get_valid_token(auto_generate=True).token)
+
+
+class UserProfileViewSerializer(ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = [
+            'introduce',
+            'policy_for_terms_agreed',
+            'policy_for_privacy_agreed',
+            'extra',
+        ]
+

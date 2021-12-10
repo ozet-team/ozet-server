@@ -13,4 +13,14 @@ urlpatterns = [
         views.UserPasscodeVerifyView.as_view(),
         name=views.UserPasscodeVerifyView.__name__,
     ),
+    path(
+        "me",
+        views.UserProfileView.as_view(),
+        name=views.UserProfileView.__name__,
+    ),
+    path(
+        "me/profile",
+        views.UserProfileView.as_view(),
+        name=views.UserProfileView.__name__,
+    ),
 ]
