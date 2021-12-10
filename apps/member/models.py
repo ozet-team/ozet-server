@@ -49,7 +49,7 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
         null=False,
         blank=False,
         default=False,
-        verbose_name=_('등록 여부')
+        verbose_name=_('등록 완료 여부')
     )
     is_active = models.BooleanField(
         null=False,
