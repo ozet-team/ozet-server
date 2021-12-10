@@ -188,10 +188,11 @@ class UserPasscodeVerify(TimeStampedModel):
         verbose_name=_('요청자 디바이스 UUID'),
     )
 
-    user = models.ManyToManyField(
+    user = models.ForeignKey(
         User,
         null=True,
         blank=True,
+        on_delete=models.CASCADE,
         related_name='auth_sms_set',
         verbose_name=_('인증되는 회원'),
     )
