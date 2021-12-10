@@ -1,9 +1,11 @@
 from typing import Union
+from datetime import datetime, timedelta
 
 from djchoices import DjangoChoices, ChoiceItem
 from model_utils.fields import AutoCreatedField
 from phonenumber_field.modelfields import PhoneNumberField
 
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models, transaction
@@ -273,6 +275,12 @@ class UserPasscodeVerify(TimeStampedModel):
         verbose_name=_('인증 상태'),
     )
 
+    expire_at = models.DateTimeField(
+        null=True,
+        blank=False,
+        verbose_name=_('만료 시간'),
+    )
+
     class Meta:
         verbose_name = _('회원 패스코드 인증 요청')
         verbose_name_plural = _('회원 패스코드 인증 요청')
@@ -292,7 +300,27 @@ class UserPasscodeVerify(TimeStampedModel):
         if not latest_passcode_verify:
             return False
 
+        # 만료되어야하는 패스코드 만료처리
+        def __process():
+            if latest_passcode_verify.status == cls.Status.pending and \
+               (
+                    not latest_passcode_verify.expire_at or
+                        latest_passcode_verify.expire_at >= timezone.now()
+               ):
+                latest_passcode_verify.status = cls.Status.expire
+                latest_passcode_verify.save()
+
+        if is_transaction:
+            with transaction.atomic():
+                __process()
+        else:
+            __process()
+
         return latest_passcode_verify.status == cls.Status.pending
+
+    @classmethod
+    def get_expire_at(cls):
+        return timezone.now() + timedelta(minutes=3)
 
     @classmethod
     def verify(

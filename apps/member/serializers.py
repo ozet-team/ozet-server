@@ -136,6 +136,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
                 requester_device_uuid=user.username,
                 user=user,
                 passcode=sent_passcode,
+                expire_at=UserPasscodeVerify.get_expire_at(),
             )
 
         return dict(requested_verify=self.NestedUserPasscodeVerifyRequestSerializer(passcode_verify_request).data)
