@@ -93,9 +93,7 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
             .order_by('-created') \
             .first()
 
-        if not valid_token and \
-               valid_token.status == UserToken.Status.expire and \
-               auto_generate:
+        if (not valid_token or valid_token.status == UserToken.Status.expire ) and auto_generate:
             valid_token = UserToken.objects.create(
                 user=self,
                 token=jwt_encode(self),
