@@ -80,7 +80,6 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
         db_table = 'member_user'
 
-    @property
     def get_latest_passcode_vertify(self):
         request_passcode_vertify = UserPasscodeVertify.objects \
             .filter(user=self) \
@@ -93,7 +92,7 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
         return self.__repr__()
 
     def __repr__(self):
-        return f'<{self._meta.verbose_name.title()}: {self.name}>'
+        return f'<{self._meta.verbose_name.title()}: {self.username}>'
 
 
 class UserProfile(TimeStampedModel):
@@ -201,6 +200,9 @@ class UserPasscodeVertify(TimeStampedModel):
     def is_pending(cls, user: User) -> bool:
         latest_passcode_vertify = user.get_latest_passcode_vertify()
 
+        if not latest_passcode_vertify:
+            return False
+
         return latest_passcode_vertify.status == cls.Status.pending
 
     @classmethod
@@ -213,7 +215,10 @@ class UserPasscodeVertify(TimeStampedModel):
         def __process():
             latest_passcode_vertify = user.get_latest_passcode_vertify()
 
-            if latest_passcode_vertify and latest_passcode_vertify.passcode == passcode:
+            if latest_passcode_vertify or latest_passcode_vertify.status != cls.Status.pending:
+                return False
+
+            if latest_passcode_vertify.passcode == passcode:
                 latest_passcode_vertify.status = cls.Status.vertified
                 latest_passcode_vertify.save()
 

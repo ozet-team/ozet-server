@@ -1,15 +1,27 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
+from phonenumbers import PhoneNumber
 from safedelete.managers import SafeDeleteManager
 
 
 class UserManager(BaseUserManager, SafeDeleteManager):
-    def create_user(self, username, name=None, email=None, password=None):
+    def create_user(
+            self,
+            username: str,
+            phone_number: PhoneNumber,
+            name: str = None,
+            email: str = None,
+            password: str = None
+    ):
         if not username:
             raise ValueError(_('아이디는 필수입니다.'))
 
+        if not phone_number:
+            raise ValueError(_('전화번호는 필수입니다.'))
+
         user = self.model(
             username=username,
+            phone_number=phone_number,
             name=None,
             email=None,
         )
@@ -26,6 +38,7 @@ class UserManager(BaseUserManager, SafeDeleteManager):
             user.set_unusable_password()
 
         user.save(using=self._db)
+
         return user
 
     def create_superuser(self, username, name, password):
