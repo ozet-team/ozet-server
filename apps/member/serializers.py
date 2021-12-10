@@ -1,6 +1,8 @@
 import random
+import uuid
 from http import HTTPStatus
 
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
 from rest_auth.serializers import JWTSerializer as BaseJWTSerializer
@@ -14,7 +16,7 @@ from utils.django.rest_framework.serializers import SimpleSerializer, ModelSeria
 from utils.naver.api import NaverCloudAPI
 
 from apps.member.exceptions import (
-    SMSSendError,
+    SMSSendError, PasscodeVertifyPending, PasscodeVertifyInvalidPasscode,
 )
 
 
@@ -47,10 +49,20 @@ class UserProfileSerializer(ModelSerializer):
 
 
 class UserPasscodeVertifyRequestSerializer(SimpleSerializer):
+    class NestedUserPasscodeVertifyRequestSerializer(ModelSerializer):
+        class Meta:
+            model = UserPasscodeVertify
+            fields = [
+                "requester_phone_number",
+                "requsster_device_uuid",
+                "status",
+            ]
+
     # Write Only
     phone_number = PhoneNumberField(required=True, allow_blank=False, allow_null=False, write_only=True)
 
     # Read Only
+    requested_passcode_vertify = NestedUserPasscodeVertifyRequestSerializer(read_only=True)
 
     # Both
 
@@ -79,7 +91,7 @@ class UserPasscodeVertifyRequestSerializer(SimpleSerializer):
         if res.status_code != HTTPStatus.ACCEPTED:
             raise SMSSendError()
 
-        return
+        return passcode
 
     def validate(self, data):
         return data
@@ -87,7 +99,32 @@ class UserPasscodeVertifyRequestSerializer(SimpleSerializer):
     def create(self, validated_data):
         requester_phone_number = validated_data['phone_number']
 
-        res = self.send_passcode_by_sms(requester_phone_number)
+        sended_passcode = self.send_passcode_by_sms(requester_phone_number)
+
+        # 사용자 인증
+        try:
+            user = User.objects.get(phone_number=requester_phone_number)
+        except User.DoesNotExist:
+            # Pre-SingUp
+            user = User.objects.create(
+                username=f'ozet_{uuid.uuid4()}',
+                email=None,
+                phone_number=requester_phone_number,
+                name=None,
+                is_registration=False
+            )
+
+        # 중복 인증
+        if UserPasscodeVertify.is_pending(user):
+            raise PasscodeVertifyPending()
+
+        with transaction.atomic():
+            passcode_vertify_request = UserPasscodeVertify.objects.create(
+                requester_phone_number=requester_phone_number,
+                requsster_device_uuid=user.username,
+                user=user,
+                passcode=sended_passcode,
+            )
 
         return validated_data
 
@@ -105,5 +142,13 @@ class UserPasscodeVertifySerializer(SimpleSerializer):
         return data
 
     def create(self, validated_data):
+        requester_phone_number = validated_data['phone_number']
+
+        user = User.objects.get(phone_number=requester_phone_number)
+
+        with transaction.atomic():
+            if not UserPasscodeVertify.vertify(user):
+                raise PasscodeVertifyInvalidPasscode()
+
         return validated_data
 

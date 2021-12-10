@@ -1,9 +1,11 @@
+from typing import Union
+
 from djchoices import DjangoChoices, ChoiceItem
 from phonenumber_field.modelfields import PhoneNumberField
 
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.db import models
+from django.db import models, transaction
 
 from apps.member.managers import UserManager
 from utils.django.models import SafeDeleteModel, TimeStampedModel
@@ -43,6 +45,12 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
     )
 
     # config
+    is_registration = models.BooleanField(
+        null=False,
+        blank=False,
+        default=False,
+        verbose_name=_('등록 여부')
+    )
     is_active = models.BooleanField(
         null=False,
         blank=False,
@@ -72,11 +80,20 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
         db_table = 'member_user'
 
+    @property
+    def get_latest_passcode_vertify(self):
+        request_passcode_vertify = UserPasscodeVertify.objects \
+            .filter(user=self) \
+            .order_by('-created') \
+            .first()
+
+        return request_passcode_vertify
+
     def __str__(self):
         return self.__repr__()
 
     def __repr__(self):
-        return f'<{self._meta.verbose_name.title()}: {self.nickname}>'
+        return f'<{self._meta.verbose_name.title()}: {self.name}>'
 
 
 class UserProfile(TimeStampedModel):
@@ -108,6 +125,12 @@ class UserProfile(TimeStampedModel):
         verbose_name_plural = _('회원 프로필 목록')
 
         db_table = 'member_user_profile'
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return f'<{self._meta.verbose_name.title()}: {self.user.name}>'
 
 
 class UserPasscodeVertify(TimeStampedModel):
@@ -167,3 +190,39 @@ class UserPasscodeVertify(TimeStampedModel):
         verbose_name_plural = _('회원 패스코드 인증 요청')
 
         db_table = 'member_user_passcode_vertify'
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return f'<{self._meta.verbose_name.title()}: {self.user.name}>'
+
+    @classmethod
+    def is_pending(cls, user: User) -> bool:
+        latest_passcode_vertify = user.get_latest_passcode_vertify()
+
+        return latest_passcode_vertify.status == cls.Status.pending
+
+    @classmethod
+    def vertify(
+            cls,
+            user: User,
+            passcode: Union[int, str],
+            is_transaction=True,
+    ) -> bool:
+        def __process():
+            latest_passcode_vertify = user.get_latest_passcode_vertify()
+
+            if latest_passcode_vertify and latest_passcode_vertify.passcode == passcode:
+                latest_passcode_vertify.status = cls.Status.vertified
+                latest_passcode_vertify.save()
+
+                return True
+
+            return False
+
+        if is_transaction:
+            with transaction.atomic():
+                return __process()
+        else:
+            return __process()
