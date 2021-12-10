@@ -9,9 +9,7 @@ class EmployeeTypeSerializer(serializers.ModelSerializer):
 
 
 class AnnouncementSerializer(serializers.ModelSerializer):
-    employ_types = EmployeeTypeSerializer(
-        source="employee_types", many=True, default=[]
-    )
+    employee_types = EmployeeTypeSerializer(many=True, default=[])
 
     class Meta:
         model = Announcement

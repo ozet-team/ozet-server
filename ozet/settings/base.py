@@ -9,11 +9,12 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+import datetime
+
 # fmt: off
 # flake8: noqa
 import os
 import sys
-import datetime
 from pathlib import Path
 
 import pymysql
@@ -166,6 +167,7 @@ TRIM_SLASH = True
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'utils.django.rest_framework.authentications.SwaggerTokenAuthentication',
         'utils.django.rest_framework.authentications.JSONWebTokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
