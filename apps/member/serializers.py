@@ -140,6 +140,7 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
     passcode = fields.CharField(required=True, allow_blank=False, allow_null=False, write_only=True)
 
     # Read Only
+    token = JWTSerializer(read_only=True)
 
     # Both
 
@@ -160,4 +161,9 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
             if not UserPasscodeVerify.verify(user, passcode, is_transaction=False):
                 raise PasscodeVerifyInvalidPasscode()
 
-        return validated_data
+        data = {
+            'user': user,
+            'token': f"JWT {str(uuid.uuid4()).replace('-', '')}"
+        }
+
+        return dict(token=data)

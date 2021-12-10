@@ -188,11 +188,10 @@ class UserPasscodeVerify(TimeStampedModel):
         verbose_name=_('요청자 디바이스 UUID'),
     )
 
-    user = models.OneToOneField(
+    user = models.ManyToManyField(
         User,
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
         related_name='auth_sms_set',
         verbose_name=_('인증되는 회원'),
     )
@@ -239,7 +238,7 @@ class UserPasscodeVerify(TimeStampedModel):
         def __process():
             latest_passcode_verify = user.get_latest_passcode_verify()
 
-            if latest_passcode_verify or latest_passcode_verify.status != cls.Status.pending:
+            if not latest_passcode_verify or latest_passcode_verify.status != cls.Status.pending:
                 return False
 
             if latest_passcode_verify.passcode == passcode:
