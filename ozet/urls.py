@@ -15,7 +15,7 @@ Including another URLconf
 """
 from apps.announcement import urls as announcement_urls
 from apps.member import urls as member_urls
-
+from commons.contrib.drf_spectacular import *  # noqa: F403, F401
 from django.conf import settings
 from django.contrib import admin
 from django.http import HttpResponse
