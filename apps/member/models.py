@@ -80,13 +80,13 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
         db_table = 'member_user'
 
-    def get_latest_passcode_vertify(self):
-        request_passcode_vertify = UserPasscodeVertify.objects \
+    def get_latest_passcode_verify(self):
+        request_passcode_verify = UserPasscodeVerify.objects \
             .filter(user=self) \
             .order_by('-created') \
             .first()
 
-        return request_passcode_vertify
+        return request_passcode_verify
 
     def __str__(self):
         return self.__repr__()
@@ -132,7 +132,31 @@ class UserProfile(TimeStampedModel):
         return f'<{self._meta.verbose_name.title()}: {self.user.name}>'
 
 
-class UserPasscodeVertify(TimeStampedModel):
+class UserToken(TimeStampedModel):
+    user = models.ForeignKey(
+        User,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='token_set',
+        verbose_name=_('회원'),
+    )
+    token = models.CharField(
+        max_length=255,
+        null=False,
+        blank=False,
+        verbose_name=_('토큰'),
+        unique=True,
+    )
+
+    class Meta:
+        verbose_name = _('회원 토큰')
+        verbose_name_plural = _('회원 토큰 목록')
+
+        db_table = 'member_user_token'
+
+
+class UserPasscodeVerify(TimeStampedModel):
     """
 
     Notes:
@@ -152,12 +176,12 @@ class UserPasscodeVertify(TimeStampedModel):
 
     """
     class Status(DjangoChoices):
-        vertified = ChoiceItem('used', label=_('완료된 검증'))
+        verified = ChoiceItem('used', label=_('완료된 검증'))
         pending = ChoiceItem('pending', label=_('검증 대기중'))
         expire = ChoiceItem('expire', label=_('만료 됨'))
 
     requester_phone_number = PhoneNumberField("요청자 전화번호", max_length=32)
-    requsster_device_uuid = models.CharField(
+    requester_device_uuid = models.CharField(
         max_length=100,
         null=False,
         blank=False,
@@ -188,7 +212,7 @@ class UserPasscodeVertify(TimeStampedModel):
         verbose_name = _('회원 패스코드 인증 요청')
         verbose_name_plural = _('회원 패스코드 인증 요청')
 
-        db_table = 'member_user_passcode_vertify'
+        db_table = 'member_user_passcode_verify'
 
     def __str__(self):
         return self.__repr__()
@@ -197,30 +221,30 @@ class UserPasscodeVertify(TimeStampedModel):
         return f'<{self._meta.verbose_name.title()}: {self.user.name}>'
 
     @classmethod
-    def is_pending(cls, user: User) -> bool:
-        latest_passcode_vertify = user.get_latest_passcode_vertify()
+    def is_pending(cls, user: User, is_transaction=True) -> bool:
+        latest_passcode_verify = user.get_latest_passcode_verify()
 
-        if not latest_passcode_vertify:
+        if not latest_passcode_verify:
             return False
 
-        return latest_passcode_vertify.status == cls.Status.pending
+        return latest_passcode_verify.status == cls.Status.pending
 
     @classmethod
-    def vertify(
+    def verify(
             cls,
             user: User,
             passcode: Union[int, str],
             is_transaction=True,
     ) -> bool:
         def __process():
-            latest_passcode_vertify = user.get_latest_passcode_vertify()
+            latest_passcode_verify = user.get_latest_passcode_verify()
 
-            if latest_passcode_vertify or latest_passcode_vertify.status != cls.Status.pending:
+            if latest_passcode_verify or latest_passcode_verify.status != cls.Status.pending:
                 return False
 
-            if latest_passcode_vertify.passcode == passcode:
-                latest_passcode_vertify.status = cls.Status.vertified
-                latest_passcode_vertify.save()
+            if latest_passcode_verify.passcode == passcode:
+                latest_passcode_verify.status = cls.Status.verified
+                latest_passcode_verify.save()
 
                 return True
 

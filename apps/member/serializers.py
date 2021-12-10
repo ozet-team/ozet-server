@@ -11,15 +11,15 @@ from rest_framework import serializers, fields
 from phonenumber_field.serializerfields import PhoneNumberField
 from phonenumber_field.phonenumber import PhoneNumber
 
-from apps.member.models import User, UserProfile, UserPasscodeVertify
+from apps.member.models import User, UserProfile, UserPasscodeVerify
 from utils.django.rest_framework.serializers import SimpleSerializer, ModelSerializer
 from utils.naver.api import NaverCloudAPI
 
 from apps.member.exceptions import (
     SMSSendError,
-    PasscodeVertifyPending,
-    PasscodeVertifyInvalidPasscode,
-    PasscodeVertifyDoesNotExist,
+    PasscodeVerifyPending,
+    PasscodeVerifyInvalidPasscode,
+    PasscodeVerifyDoesNotExist,
 )
 
 
@@ -51,10 +51,10 @@ class UserProfileSerializer(ModelSerializer):
         ]
 
 
-class UserPasscodeVertifyRequestSerializer(SimpleSerializer):
-    class NestedUserPasscodeVertifyRequestSerializer(ModelSerializer):
+class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
+    class NestedUserPasscodeVerifyRequestSerializer(ModelSerializer):
         class Meta:
-            model = UserPasscodeVertify
+            model = UserPasscodeVerify
             fields = [
                 "requester_phone_number",
                 "requsster_device_uuid",
@@ -65,7 +65,7 @@ class UserPasscodeVertifyRequestSerializer(SimpleSerializer):
     phone_number = PhoneNumberField(required=True, allow_blank=False, allow_null=False, write_only=True)
 
     # Read Only
-    requested_passcode_vertify = NestedUserPasscodeVertifyRequestSerializer(read_only=True)
+    requested_passcode_verify = NestedUserPasscodeVerifyRequestSerializer(read_only=True)
 
     # Both
 
@@ -117,13 +117,13 @@ class UserPasscodeVertifyRequestSerializer(SimpleSerializer):
                 )
 
         # 중복 인증
-        if UserPasscodeVertify.is_pending(user):
-            raise PasscodeVertifyPending()
+        if UserPasscodeVerify.is_pending(user):
+            raise PasscodeVerifyPending()
 
         sended_passcode = self.send_passcode_by_sms(requester_phone_number)
 
         with transaction.atomic():
-            passcode_vertify_request = UserPasscodeVertify.objects.create(
+            passcode_verify_request = UserPasscodeVerify.objects.create(
                 requester_phone_number=requester_phone_number,
                 requsster_device_uuid=user.username,
                 user=user,
@@ -133,7 +133,7 @@ class UserPasscodeVertifyRequestSerializer(SimpleSerializer):
         return validated_data
 
 
-class UserPasscodeVertifySerializer(SimpleSerializer):
+class UserPasscodeVerifySerializer(SimpleSerializer):
     # Write Only
     phone_number = PhoneNumberField(required=True, allow_blank=False, allow_null=False, write_only=True)
     passcode = fields.CharField(required=True, allow_blank=False, allow_null=False, write_only=True)
@@ -152,12 +152,11 @@ class UserPasscodeVertifySerializer(SimpleSerializer):
         user = User.objects.get(phone_number=requester_phone_number)
 
         # 유효 인증 존재 여부
-        if not UserPasscodeVertify.is_pending(user):
-            raise PasscodeVertifyDoesNotExist()
+        if not UserPasscodeVerify.is_pending(user):
+            raise PasscodeVerifyDoesNotExist()
 
         with transaction.atomic():
-            if not UserPasscodeVertify.vertify(user, passcode, is_transaction=False):
-                raise PasscodeVertifyInvalidPasscode()
+            if not UserPasscodeVerify.verify(user, passcode, is_transaction=False):
+                raise PasscodeVerifyInvalidPasscode()
 
         return validated_data
-

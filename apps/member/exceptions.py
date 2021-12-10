@@ -9,16 +9,16 @@ class SMSSendError(APIException):
     default_detail = _('문자 인증 발송에 실패했습니다.')
 
 
-class PasscodeVertifyPending(APIException):
+class PasscodeVerifyPending(APIException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_detail = _('이미 요청 대기중인 인증이 있습니다.')
 
 
-class PasscodeVertifyDoesNotExist(APIException):
+class PasscodeVerifyDoesNotExist(APIException):
     status_code = status.HTTP_401_UNAUTHORIZED
     default_detail = _('유효한 인증 요청이 존재하지 않습니다.')
 
 
-class PasscodeVertifyInvalidPasscode(APIException):
+class PasscodeVerifyInvalidPasscode(APIException):
     status_code = status.HTTP_401_UNAUTHORIZED
     default_detail = _('일치하지 않는 패스코드입니다.')

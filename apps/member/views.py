@@ -6,19 +6,19 @@ from apps.member import models
 from apps.member import serializers
 
 
-class UserPasscodeVertifyRequestView(CreateAPIView):
+class UserPasscodeVerifyRequestView(CreateAPIView):
     permission_classes = ()
-    serializer_class = serializers.UserPasscodeVertifyRequestSerializer
+    serializer_class = serializers.UserPasscodeVerifyRequestSerializer
 
     def post(self, request, *args, **kwargs):
-        return super(UserPasscodeVertifyRequestView, self).post(request, *args, **kwargs)
+        return super(UserPasscodeVerifyRequestView, self).post(request, *args, **kwargs)
 
 
-class UserPasscodeVertifyView(CreateAPIView):
+class UserPasscodeVerifyView(CreateAPIView):
     permission_classes = ()
-    serializer_class = serializers.UserPasscodeVertifySerializer
+    serializer_class = serializers.UserPasscodeVerifySerializer
 
     def post(self, request, *args, **kwargs):
-        return super(UserPasscodeVertifyView, self).post(request, *args, **kwargs)
+        return super(UserPasscodeVerifyView, self).post(request, *args, **kwargs)
 
 

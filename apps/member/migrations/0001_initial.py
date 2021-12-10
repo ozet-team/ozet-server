@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='UserPasscodeVertify',
+            name='UserPasscodeVerify',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': '회원 패스코드 인증 요청',
                 'verbose_name_plural': '회원 패스코드 인증 요청',
-                'db_table': 'member_user_passcode_vertify',
+                'db_table': 'member_user_passcode_verify',
             },
         ),
         migrations.AddIndex(
