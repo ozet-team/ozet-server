@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     #
     "rest_framework",
     "django_filters",
+    "drf_spectacular",
 
 ]
 
@@ -172,4 +173,9 @@ REST_FRAMEWORK = {
         'djangorestframework_camel_case.parser.CamelCaseMultiPartParser',
         'commons.contrib.rest_framework.parser.NoUnderscoreBeforeNumberCamelCaseJSONParser',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'POSTPROCESSING_HOOKS': [
+        'drf_spectacular.hooks.postprocess_schema_enums',
+        'drf_spectacular.contrib.djangorestframework_camel_case.camelize_serializer_fields',
+    ],
 }
