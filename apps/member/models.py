@@ -1,4 +1,3 @@
-from django.forms import JSONField
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
@@ -84,7 +83,7 @@ class UserProfile(TimeStampedModel):
         verbose_name=_('소개'),
     )
 
-    extra = JSONField(
+    extra = models.JSONField(
         null=True,
         blank=True,
         default=dict,
