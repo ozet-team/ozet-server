@@ -101,24 +101,24 @@ class UserPasscodeVertifyRequestSerializer(SimpleSerializer):
 
         sended_passcode = self.send_passcode_by_sms(requester_phone_number)
 
-        # 사용자 인증
-        try:
-            user = User.objects.get(phone_number=requester_phone_number)
-        except User.DoesNotExist:
-            # Pre-SingUp
-            user = User.objects.create(
-                username=f'ozet_{uuid.uuid4()}',
-                email=None,
-                phone_number=requester_phone_number,
-                name=None,
-                is_registration=False
-            )
-
-        # 중복 인증
-        if UserPasscodeVertify.is_pending(user):
-            raise PasscodeVertifyPending()
-
         with transaction.atomic():
+            # 사용자 인증
+            try:
+                user = User.objects.get(phone_number=requester_phone_number)
+            except User.DoesNotExist:
+                # Pre-SingUp
+                user = User.objects.create(
+                    username=f'ozet_{uuid.uuid4()}',
+                    email=None,
+                    phone_number=requester_phone_number,
+                    name=None,
+                )
+                user.save()
+
+            # 중복 인증
+            if UserPasscodeVertify.is_pending(user):
+                raise PasscodeVertifyPending()
+
             passcode_vertify_request = UserPasscodeVertify.objects.create(
                 requester_phone_number=requester_phone_number,
                 requsster_device_uuid=user.username,
