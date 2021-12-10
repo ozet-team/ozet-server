@@ -5,12 +5,12 @@ from django.urls import path
 urlpatterns = [
     path(
         "user/auth/passcode",
-        views.UserPasscodeVeritfyView.as_view(),
-        name=views.UserPasscodeVeritfyView.__name__,
+        views.UserPasscodeVertifyView.as_view(),
+        name=views.UserPasscodeVertifyView.__name__,
     ),
     path(
         "user/auth/passcode/request",
-        views.UserPasscodeVeritfyView.as_view(),
-        name=views.UserPasscodeVeritfyRequestView.__name__,
+        views.UserPasscodeVertifyView.as_view(),
+        name=views.UserPasscodeVertifyRequestView.__name__,
     ),
 ]

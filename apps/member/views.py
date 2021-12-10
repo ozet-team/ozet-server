@@ -18,11 +18,11 @@ class UserPasscodeVertifyRequestView(CreateAPIView):
         return super(UserPasscodeVertifyRequestView, self).post(request, *args, **kwargs)
 
 
-class UserPasscodeVeritfyView(CreateAPIView):
+class UserPasscodeVertifyView(CreateAPIView):
     permission_classes = ()
     serializer_class = serializers.UserPasscodeVertifySerializer
 
     def post(self, request, *args, **kwargs):
-        return super(UserPasscodeVeritfyView, self).post(request, *args, **kwargs)
+        return super(UserPasscodeVertifyView, self).post(request, *args, **kwargs)
 
 
