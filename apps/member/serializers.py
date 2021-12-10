@@ -1,6 +1,7 @@
 import random
 import uuid
 from http import HTTPStatus
+from rest_framework.response import Response
 
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
@@ -65,7 +66,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
     phone_number = PhoneNumberField(required=True, allow_blank=False, allow_null=False, write_only=True)
 
     # Read Only
-    requested_passcode_verify = NestedUserPasscodeVerifyRequestSerializer(read_only=True)
+    requested_verify = NestedUserPasscodeVerifyRequestSerializer(label=_('요청된 인증 상태'), read_only=True)
 
     # Both
 
@@ -130,7 +131,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
                 passcode=sent_passcode,
             )
 
-        return validated_data
+        return dict(requested_verify=self.NestedUserPasscodeVerifyRequestSerializer(passcode_verify_request).data)
 
 
 class UserPasscodeVerifySerializer(SimpleSerializer):
