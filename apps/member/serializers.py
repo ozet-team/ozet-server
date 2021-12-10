@@ -125,7 +125,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
         with transaction.atomic():
             passcode_verify_request = UserPasscodeVerify.objects.create(
                 requester_phone_number=requester_phone_number,
-                requsster_device_uuid=user.username,
+                requester_device_uuid=user.username,
                 user=user,
                 passcode=sended_passcode,
             )
