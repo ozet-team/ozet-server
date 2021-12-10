@@ -39,31 +39,31 @@ class JWTSerializer(BaseJWTSerializer):
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = [
+        fields = (
             "username",
             "email",
             "phone_number"
-        ]
+        )
 
 
 class UserProfileSerializer(ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = [
+        fields = (
             "introduce",
             "extra",
-        ]
+        )
 
 
 class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
     class NestedUserPasscodeVerifyRequestSerializer(ModelSerializer):
         class Meta:
             model = UserPasscodeVerify
-            fields = [
+            fields = (
                 "requester_phone_number",
                 "requester_device_uuid",
                 "status",
-            ]
+            )
 
     # Write Only
     phone_number = PhoneNumberField(required=True, allow_blank=False, allow_null=False, write_only=True)
@@ -172,20 +172,15 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
 
 
 class UserMeSerializer(ModelSerializer):
-    class NestedUserProfileSerializer(ModelSerializer):
+    class NestedProfileSerializer(ModelSerializer):
         class Meta:
             model = UserProfile
-            fields = [
+            fields = (
                 'introduce',
                 'policy_for_terms_agreed',
                 'policy_for_privacy_agreed',
                 'extra',
-            ]
-            read_only = [
-                'policy_for_terms_agreed',
-                'policy_for_privacy_agreed',
-                'extra',
-            ]
+            )
 
     class Meta:
         model = User
@@ -193,12 +188,11 @@ class UserMeSerializer(ModelSerializer):
             'username',
             'name',
             'email',
+            'profile',
             'phone_number',
         )
-        read_only = (
-            'username',
-            'phone_number',
-        )
+
+    profile = NestedProfileSerializer(flatten=True, read_only=True)
 
 
 class UserDetailsSerializer(ModelSerializer):

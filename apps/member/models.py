@@ -34,7 +34,7 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
     phone_number = PhoneNumberField(
         max_length=32,
-        null=False,
+        null=True,
         blank=False,
         db_index=True,
         unique=True,

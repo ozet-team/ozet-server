@@ -1,3 +1,5 @@
+from django.utils.functional import cached_property
+
 from rest_framework.generics import RetrieveAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -28,6 +30,11 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = serializers.UserMeSerializer
 
+    def __init__(self, *args, **kwargs):
+        self.http_method_names = [method for method in self.http_method_names if method != 'put']
+        super(UserMeView, self).__init__(*args, **kwargs)
+
+    @cached_property
     def get_object(self):
         if getattr(self, 'swagger_fake_view', False):
             return None
