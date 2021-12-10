@@ -11,7 +11,7 @@ from phonenumber_field.phonenumber import PhoneNumber
 
 from apps.member.models import User, UserProfile, UserPasscodeVertify
 from utils.django.rest_framework.serializers import SimpleSerializer, ModelSerializer
-from utils.naver.api import NaverCludeAPI
+from utils.naver.api import NaverCloudAPI
 
 from apps.member.exceptions import (
     SMSSendError,
@@ -74,7 +74,7 @@ class UserPasscodeVertifyRequestSerializer(SimpleSerializer):
         passcode = self.passcode_generate()
         message = f'[OZET] 인증번호: {passcode}\n인증번호를 입력해 주세요.'
 
-        res = NaverCludeAPI.send_sms(phone_number, None, message)
+        res = NaverCloudAPI.send_sms(phone_number, None, message)
         if res.status_code != HTTPStatus.ACCEPTED:
             raise SMSSendError()
 

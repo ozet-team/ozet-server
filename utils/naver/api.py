@@ -61,7 +61,7 @@ def make_signature(
     return siging_key
 
 
-class NaverCludeAPI(object):
+class NaverCloudAPI(object):
     @classmethod
     def send_sms(
             cls,
