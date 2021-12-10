@@ -1,3 +1,4 @@
+from django.forms import JSONField
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
@@ -47,7 +48,6 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-
     REQUIRED_FIELDS = ['nickname']
 
     class Meta:
@@ -57,3 +57,41 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
         indexes = [
             models.Index(fields=['deleted', 'is_active']),
         ]
+
+        db_table = 'member_user'
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return f'<{self._meta.verbose_name.title()}: {self.nickname}>'
+
+
+class UserProfile(TimeStampedModel):
+    user = models.OneToOneField(
+        User,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='profile',
+        verbose_name=_('회원'),
+    )
+    introduce = models.CharField(
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('소개'),
+    )
+
+    extra = JSONField(
+        null=True,
+        blank=True,
+        default=dict,
+        verbose_name=_('추가 정보'),
+    )
+
+    class Meta:
+        verbose_name = _('회원 프로필')
+        verbose_name_plural = _('회원 프로필 목록')
+        db_table = 'member_user_profile'
