@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 # flake8: noqa
 import os
 import sys
+import datetime
 from pathlib import Path
 
 import pymysql
@@ -53,9 +54,14 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     #
+    "apps.member",
     "apps.announcement",
     #
     "rest_framework",
+    'rest_framework.authtoken',
+    #
+    'rest_auth',
+    #
     "django_filters",
     "drf_spectacular",
 
@@ -91,7 +97,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "ozet.wsgi.application"
-
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -161,9 +166,11 @@ TRIM_SLASH = True
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # NOTE(찬혁): 공통 인증 authentication 필요
+        'utils.django.rest_framework.authentications.JSONWebTokenAuthentication',
     ],
-    'DEFAULT_PERMISSION_CLASSES': [],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
     'DEFAULT_RENDERER_CLASSES': (
         'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
         'djangorestframework_camel_case.render.CamelCaseBrowsableAPIRenderer',
@@ -178,4 +185,19 @@ REST_FRAMEWORK = {
         'drf_spectacular.hooks.postprocess_schema_enums',
         'drf_spectacular.contrib.djangorestframework_camel_case.camelize_serializer_fields',
     ],
+}
+
+# django-rest-auth
+# https://django-rest-auth.readthedocs.io/en/latest/
+REST_USE_JWT = True
+REST_SESSION_LOGIN = False
+REST_AUTH_SERIALIZERS = {
+    'JWT_SERIALIZER': 'apps.membere.serializers.JWTSerializer',
+}
+
+# django-rest-framework-jwt
+# https://getblimp.github.io/django-rest-framework-jwt/
+JWT_AUTH = {
+    'JWT_PAYLOAD_HANDLER': 'utils.django.rest_framework.handler.jwt_payload_handler',
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=15),
 }

@@ -22,7 +22,7 @@ def fake_response(i: int):
 
 
 class AnnouncementViewSet(ModelViewSet):
-    serializer_class = AnnouncementSerializer
+    serializer_class = 2
     queryset = ""
 
     def list(self, request, *args, **kwargs):
