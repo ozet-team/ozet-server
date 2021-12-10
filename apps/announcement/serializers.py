@@ -1,8 +1,18 @@
-from apps.announcement.models import Announcement
+from apps.announcement.models import Announcement, EmployeeType
 from rest_framework import serializers
 
 
+class EmployeeTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeType
+        fields = ["id", "name"]
+
+
 class AnnouncementSerializer(serializers.ModelSerializer):
+    employ_types = EmployeeTypeSerializer(
+        source="employee_types", many=True, default=[]
+    )
+
     class Meta:
         model = Announcement
         fields = [
