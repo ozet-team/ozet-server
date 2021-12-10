@@ -9,6 +9,8 @@ phonenumberslite==8.12.38
 
 # DB
 pymysql==1.0.2
+django-safedelete==1.1.1
+django-model-utils==4.2.0
 
 # WSGI
 gunicorn==20.1.0
