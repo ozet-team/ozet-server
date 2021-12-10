@@ -23,7 +23,7 @@ from apps.member.exceptions import (
     PasscodeVerifyPending,
     PasscodeVerifyInvalidPasscode,
     PasscodeVerifyDoesNotExist,
-    PasscodeVerifySignUpError,
+    PasscodeVerifySignUpError, PasscodeVerifyExpired,
 )
 
 
@@ -165,6 +165,10 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
         # 유효 인증 존재 여부
         if not UserPasscodeVerify.is_pending(user):
             raise PasscodeVerifyDoesNotExist()
+
+        # 기존 인증 만료 여부
+        if UserPasscodeVerify.is_expired(user):
+            raise PasscodeVerifyExpired()
 
         with transaction.atomic():
             if not UserPasscodeVerify.verify(user, passcode, is_transaction=False):

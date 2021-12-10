@@ -27,3 +27,9 @@ class PasscodeVerifyDoesNotExist(APIException):
 class PasscodeVerifyInvalidPasscode(APIException):
     status_code = status.HTTP_401_UNAUTHORIZED
     default_detail = _('일치하지 않는 패스코드입니다.')
+
+
+class PasscodeVerifyExpired(APIException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    default_detail = _('기존 인증 요청이 만료되었습니다. 다시 시도해주세요.')
+

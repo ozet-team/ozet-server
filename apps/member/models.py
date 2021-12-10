@@ -300,15 +300,19 @@ class UserPasscodeVerify(TimeStampedModel):
         if not latest_passcode_verify:
             return False
 
-        # 만료되어야하는 패스코드 만료처리
+        return latest_passcode_verify.status == cls.Status.pending
+
+    @classmethod
+    def is_expired(cls, user: User, is_transaction=True) -> bool:
+        latest_passcode_verify = user.get_latest_passcode_verify()
+
         def __process():
             if latest_passcode_verify.status == cls.Status.pending and \
                (
                     not latest_passcode_verify.expire_at or
                         latest_passcode_verify.expire_at <= timezone.now()
                ):
-                latest_passcode_verify.status = cls.Status.expire
-                latest_passcode_verify.save()
+                latest_passcode_verify.update(status=cls.Status.expire)
 
         if is_transaction:
             with transaction.atomic():
@@ -316,7 +320,7 @@ class UserPasscodeVerify(TimeStampedModel):
         else:
             __process()
 
-        return latest_passcode_verify.status == cls.Status.pending
+        return latest_passcode_verify.status == cls.Status.expire
 
     @classmethod
     def get_expire_at(cls):
@@ -329,22 +333,19 @@ class UserPasscodeVerify(TimeStampedModel):
             passcode: Union[int, str],
             is_transaction=True,
     ) -> bool:
-        def __process():
-            latest_passcode_verify = user.get_latest_passcode_verify()
+        latest_passcode_verify = user.get_latest_passcode_verify()
 
-            if not latest_passcode_verify or latest_passcode_verify.status != cls.Status.pending:
-                return False
-
-            if latest_passcode_verify.passcode == passcode:
-                latest_passcode_verify.status = cls.Status.verified
-                latest_passcode_verify.save()
-
-                return True
-
+        if not latest_passcode_verify or latest_passcode_verify.status != cls.Status.pending:
             return False
+
+        def __process():
+            if latest_passcode_verify.passcode == passcode:
+                latest_passcode_verify.update(status=cls.Status.verified)
 
         if is_transaction:
             with transaction.atomic():
-                return __process()
+                __process()
         else:
-            return __process()
+            __process()
+
+        return latest_passcode_verify.status == cls.Status.verified
