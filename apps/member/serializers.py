@@ -120,14 +120,14 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
         if UserPasscodeVerify.is_pending(user):
             raise PasscodeVerifyPending()
 
-        sended_passcode = self.send_passcode_by_sms(requester_phone_number)
+        sent_passcode = self.send_passcode_by_sms(requester_phone_number)
 
         with transaction.atomic():
             passcode_verify_request = UserPasscodeVerify.objects.create(
                 requester_phone_number=requester_phone_number,
                 requester_device_uuid=user.username,
                 user=user,
-                passcode=sended_passcode,
+                passcode=sent_passcode,
             )
 
         return validated_data
