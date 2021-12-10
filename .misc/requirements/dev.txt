@@ -87,6 +87,8 @@ py==1.10.0
     # via
     #   pytest
     #   pytest-forked
+pymysql==1.0.2
+    # via -r .misc/requirements/base.in
 pyparsing==2.4.7
     # via packaging
 pytest==6.2.4
