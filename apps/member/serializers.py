@@ -1,6 +1,8 @@
 import random
 import uuid
 from http import HTTPStatus
+
+from rest_auth.utils import jwt_encode
 from rest_framework.response import Response
 
 from django.db import transaction
@@ -12,7 +14,7 @@ from rest_framework import serializers, fields
 from phonenumber_field.serializerfields import PhoneNumberField
 from phonenumber_field.phonenumber import PhoneNumber
 
-from apps.member.models import User, UserProfile, UserPasscodeVerify
+from apps.member.models import User, UserProfile, UserPasscodeVerify, UserToken
 from utils.django.rest_framework.serializers import SimpleSerializer, ModelSerializer
 from utils.naver.api import NaverCloudAPI
 
@@ -21,6 +23,7 @@ from apps.member.exceptions import (
     PasscodeVerifyPending,
     PasscodeVerifyInvalidPasscode,
     PasscodeVerifyDoesNotExist,
+    PasscodeVerifySignUpError,
 )
 
 
@@ -117,6 +120,10 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
                     name=None,
                 )
 
+                token = user.get_valid_token(auto_generate=True)
+                if not user.is_valid_token(token):
+                    raise PasscodeVerifySignUpError()
+
         # 중복 인증
         if UserPasscodeVerify.is_pending(user):
             raise PasscodeVerifyPending()
@@ -163,7 +170,7 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
 
         data = {
             'user': user,
-            'token': f"JWT {str(uuid.uuid4()).replace('-', '')}"
+            'token': f"JWT {user.get_valid_token(auto_generate=True)}"
         }
 
         return dict(token=data)

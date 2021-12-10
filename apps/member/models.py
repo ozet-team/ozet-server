@@ -6,6 +6,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models, transaction
+from rest_auth.utils import jwt_encode
 
 from apps.member.managers import UserManager
 from utils.django.models import SafeDeleteModel, TimeStampedModel
@@ -80,6 +81,28 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
         db_table = 'member_user'
 
+    def is_valid_token(self, token):
+        try:
+            self.token_set.get(token=token)
+        except UserToken.DoesNotExist:
+            return False
+        return True
+
+    def get_valid_token(self, auto_generate=False):
+        valid_token = self.token_set.all() \
+            .order_by('-created') \
+            .first()
+
+        if not valid_token and \
+               valid_token.status == UserToken.Status.expire and \
+               auto_generate:
+            valid_token = UserToken.objects.create(
+                user=self,
+                token=jwt_encode(self),
+            )
+
+        return valid_token
+
     def get_latest_passcode_verify(self):
         request_passcode_verify = UserPasscodeVerify.objects \
             .filter(user=self) \
@@ -133,6 +156,10 @@ class UserProfile(TimeStampedModel):
 
 
 class UserToken(TimeStampedModel):
+    class Status(DjangoChoices):
+        available = ChoiceItem('used', label=_('유효함'))
+        expire = ChoiceItem('expire', label=_('만료됨'))
+
     user = models.ForeignKey(
         User,
         null=False,
@@ -147,6 +174,14 @@ class UserToken(TimeStampedModel):
         blank=False,
         verbose_name=_('토큰'),
         unique=True,
+    )
+    status = models.CharField(
+        null=False,
+        blank=False,
+        max_length=20,
+        default=Status.available,
+        choices=Status.choices,
+        verbose_name=_('유효 상태'),
     )
 
     class Meta:
@@ -178,7 +213,7 @@ class UserPasscodeVerify(TimeStampedModel):
     class Status(DjangoChoices):
         verified = ChoiceItem('used', label=_('완료된 검증'))
         pending = ChoiceItem('pending', label=_('검증 대기중'))
-        expire = ChoiceItem('expire', label=_('만료 됨'))
+        expire = ChoiceItem('expire', label=_('만료됨'))
 
     requester_phone_number = PhoneNumberField("요청자 전화번호", max_length=32)
     requester_device_uuid = models.CharField(

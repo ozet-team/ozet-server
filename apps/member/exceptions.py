@@ -9,6 +9,11 @@ class SMSSendError(APIException):
     default_detail = _('문자 인증 발송에 실패했습니다.')
 
 
+class PasscodeVerifySignUpError(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _('회원 정보 생성중에 문제가 생겼습니다.')
+
+
 class PasscodeVerifyPending(APIException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_detail = _('이미 요청 대기중인 인증이 있습니다.')
