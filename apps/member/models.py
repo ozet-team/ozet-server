@@ -1,6 +1,9 @@
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
-import uuid
+
+from apps.member.managers import UserManager
+from utils.django.models import SafeDeleteModel, TimeStampedModel
+
 
 # Create your models here.
 class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
@@ -27,12 +30,6 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
         unique=True,
         verbose_name=_('닉네임')
     )
-    picture = EFinderImageField(
-        null=False,
-        blank=False,
-        attachment_type='ChatieUserPicture',
-        verbose_name=_('사진')
-    )
     is_active = models.BooleanField(
         null=False,
         blank=False,
@@ -44,43 +41,6 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
         blank=False,
         default=False,
         verbose_name=_('어드민')
-    )
-    coin = models.PositiveIntegerField(
-        null=False,
-        blank=False,
-        default=0,
-        verbose_name=_('코인'),
-        help_text=_('[주의] 코인은 정산과 관련있기 떄문에 변경에 주의하세요!')
-    )
-
-    # Paid Tap
-    bronze_tap = models.PositiveIntegerField(
-        default=0,
-        blank=False,
-        null=False,
-        verbose_name=_('브론즈 탭'),
-        help_text=_('[주의] 정산과 관련있기 떄문에 변경에 주의하세요!')
-    )
-    silver_tap = models.PositiveIntegerField(
-        default=0,
-        blank=False,
-        null=False,
-        verbose_name=_('실버 탭'),
-        help_text=_('[주의] 정산과 관련있기 떄문에 변경에 주의하세요!')
-    )
-    gold_tap = models.PositiveIntegerField(
-        default=0,
-        blank=False,
-        null=False,
-        verbose_name=_('골드 탭'),
-        help_text=_('[주의] 정산과 관련있기 떄문에 변경에 주의하세요!')
-    )
-    donation_tap = models.PositiveIntegerField(
-        default=0,
-        blank=False,
-        null=False,
-        verbose_name=_('후원 탭'),
-        help_text=_('[주의] 정산과 관련있기 떄문에 변경에 주의하세요!')
     )
 
     objects = UserManager()
