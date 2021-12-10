@@ -54,6 +54,7 @@ class UserPasscodeVertifyRequestSerializer(SimpleSerializer):
 
     # Both
 
+    # noinspection PyMethodMayBeStatic
     def passcode_generate(self) -> int:
         """
             패스코드 6자리를 생성해서 반환
@@ -104,5 +105,5 @@ class UserPasscodeVertifySerializer(SimpleSerializer):
         return data
 
     def create(self, validated_data):
-        return {}
+        return validated_data
 
