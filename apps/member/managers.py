@@ -51,3 +51,6 @@ class UserManager(BaseUserManager, SafeDeleteManager):
         u.save(using=self._db)
 
         return u
+
+    def get_by_natural_key(self, username):
+        return self.get(username=username)

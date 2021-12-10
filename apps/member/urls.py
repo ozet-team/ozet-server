@@ -15,12 +15,7 @@ urlpatterns = [
     ),
     path(
         "me",
-        views.UserProfileView.as_view(),
-        name=views.UserProfileView.__name__,
-    ),
-    path(
-        "me/profile",
-        views.UserProfileView.as_view(),
-        name=views.UserProfileView.__name__,
+        views.UserMeView.as_view(),
+        name=views.UserMeView.__name__,
     ),
 ]

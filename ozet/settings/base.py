@@ -170,8 +170,8 @@ TRIM_SLASH = True
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'utils.django.rest_framework.authentications.SwaggerTokenAuthentication',
         'utils.django.rest_framework.authentications.JSONWebTokenAuthentication',
+        'utils.django.rest_framework.authentications.SwaggerTokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -192,12 +192,17 @@ REST_FRAMEWORK = {
     ],
 }
 
+# Authentication
+# https://docs.djangoproject.com/ko/2.1/topics/auth/customizing/#substituting-a-custom-user-model
+AUTH_USER_MODEL = 'member.User'
+
 # django-rest-auth
 # https://django-rest-auth.readthedocs.io/en/latest/
 REST_USE_JWT = True
 REST_SESSION_LOGIN = False
 REST_AUTH_SERIALIZERS = {
-    'JWT_SERIALIZER': 'apps.membere.serializers.JWTSerializer',
+    'USER_DETAILS_SERIALIZER': 'apps.member.serializers.UserDetailsSerializer',
+    'JWT_SERIALIZER': 'apps.member.serializers.JWTSerializer',
 }
 
 # django-rest-framework-jwt

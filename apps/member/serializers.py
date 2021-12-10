@@ -15,7 +15,6 @@ from phonenumber_field.serializerfields import PhoneNumberField
 from phonenumber_field.phonenumber import PhoneNumber
 
 from apps.member.models import User, UserProfile, UserPasscodeVerify, UserToken
-from utils.django.rest_framework.mixins import UserContextMixin
 from utils.django.rest_framework.serializers import SimpleSerializer, ModelSerializer
 from utils.naver.api import NaverCloudAPI
 
@@ -172,13 +171,65 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
         return dict(token=user.get_valid_token(auto_generate=True).token)
 
 
-class UserProfileViewSerializer(UserContextMixin, ModelSerializer):
+class UserMeSerializer(ModelSerializer):
+    class NestedUserProfileSerializer(ModelSerializer):
+        class Meta:
+            model = UserProfile
+            fields = [
+                'introduce',
+                'policy_for_terms_agreed',
+                'policy_for_privacy_agreed',
+                'extra',
+            ]
+            read_only = [
+                'policy_for_terms_agreed',
+                'policy_for_privacy_agreed',
+                'extra',
+            ]
+
     class Meta:
-        model = UserProfile
+        model = User
         fields = [
-            'introduce',
-            'policy_for_terms_agreed',
-            'policy_for_privacy_agreed',
-            'extra',
+            'username',
+            'name',
+            'email',
+            'phone_number',
         ]
+        read_only = [
+            'username',
+            'phone_number',
+        ]
+
+
+class UserDetailsSerializer(ModelSerializer):
+    class NestedProfileSerializer(ModelSerializer):
+        class Meta:
+            model = UserProfile
+            fields = (
+                'introduce',
+            )
+            read_only_fields = (
+                'introduce',
+            )
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'email',
+            'username',
+            'name',
+            'phone_number',
+        )
+        read_only_fields = (
+            'id',
+            'email',
+            'username',
+            'name',
+            'created',
+            'profile',
+            'phone_number',
+        )
+
+    profile = NestedProfileSerializer(flatten=True, read_only=True)
 
