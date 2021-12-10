@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     #
     'rest_auth',
     #
+    'corsheaders',
+    #
     "django_filters",
     "drf_spectacular",
 
@@ -70,6 +72,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -203,3 +206,14 @@ JWT_AUTH = {
     'JWT_PAYLOAD_HANDLER': 'utils.django.rest_framework.handler.jwt_payload_handler',
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=15),
 }
+
+# django-cors-headers
+if DEBUG:
+    CORS_ORIGIN_ALLOW_ALL = True
+else:
+    CORS_ORIGIN_WHITELIST = [
+        'http://127.0.0.1:3000',
+        'http://localhost:3000'
+    ]
+
+CORS_ALLOW_CREDENTIALS = True
