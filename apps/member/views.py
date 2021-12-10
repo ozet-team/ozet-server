@@ -15,7 +15,7 @@ class UserPasscodeVertifyRequestView(CreateAPIView):
         @TODO 네이버 SMS 요청
         """
 
-        return None
+        return super(UserPasscodeVertifyRequestView, self).post(request, *args, **kwargs)
 
 
 class UserPasscodeVeritfyView(CreateAPIView):
@@ -23,6 +23,6 @@ class UserPasscodeVeritfyView(CreateAPIView):
     serializer_class = serializers.UserPasscodeVertifySerializer
 
     def post(self, request, *args, **kwargs):
-        return None
+        return super(UserPasscodeVeritfyView, self).post(request, *args, **kwargs)
 
 

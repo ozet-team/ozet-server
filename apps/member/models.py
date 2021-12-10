@@ -29,10 +29,10 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
     )
 
     phone_number = PhoneNumberField(
-        "전화번호",
+        max_length=32,
         null=False,
         blank=False,
-        max_length=32
+        verbose_name=_("전화번호"),
     )
 
     name = models.CharField(
@@ -106,6 +106,7 @@ class UserProfile(TimeStampedModel):
     class Meta:
         verbose_name = _('회원 프로필')
         verbose_name_plural = _('회원 프로필 목록')
+
         db_table = 'member_user_profile'
 
 
@@ -164,4 +165,5 @@ class UserPasscodeVertify(TimeStampedModel):
     class Meta:
         verbose_name = _('회원 패스코드 인증 요청')
         verbose_name_plural = _('회원 패스코드 인증 요청')
+
         db_table = 'member_user_passcode_vertify'
