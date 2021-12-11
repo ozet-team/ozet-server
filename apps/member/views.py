@@ -168,6 +168,7 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
                     "email": "kimhair@hair.com",
                     "phoneNumber": "+821057809397",
                     "introduce": "나는 개쩌는 헤어 디자이너",
+                    "profileImage": "https://ozet-bucket.s3.ap-northeast-2.amazonaws.com/media/user/profile/5/20211212_25522567",
                     "policyForTermsAgreed": "2021-12-11T07:47:33.336Z",
                     "policyForPrivacyAgreed": "2021-12-11T07:47:33.336Z",
                 },
@@ -193,6 +194,7 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
                     "email": "kimhair@hair.com",
                     "phoneNumber": "+821057809397",
                     "introduce": "나는 업데이트 된 더욱 개쩌는 헤어 디자이너",
+                    "profileImage": "https://ozet-bucket.s3.ap-northeast-2.amazonaws.com/media/user/profile/5/20211212_25522567",
                     "policyForTermsAgreed": "2021-12-11T07:47:33.336Z",
                     "policyForPrivacyAgreed": "2021-12-11T07:47:33.336Z",
                 },
@@ -206,7 +208,8 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
                 value={
                     "name": "김헤어",
                     "email": "kimhair@hair.com",
-                    "introduce": "내가 바로 개쩌는 헤어 디자이너"
+                    "introduce": "내가 바로 개쩌는 헤어 디자이너",
+                    "profileImage": "https://ozet-bucket.s3.ap-northeast-2.amazonaws.com/media/user/profile/5/20211212_25522567",
                 },
             ),
         ],
