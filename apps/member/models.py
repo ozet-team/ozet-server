@@ -1,5 +1,7 @@
+import os
 from typing import Union
 from datetime import datetime, timedelta
+from random import randint
 
 from djchoices import DjangoChoices, ChoiceItem
 from model_utils.fields import AutoCreatedField
@@ -13,6 +15,14 @@ from rest_auth.utils import jwt_encode
 
 from apps.member.managers import UserManager
 from utils.django.models import SafeDeleteModel, TimeStampedModel
+
+
+def upload_image(instance: any, filename: str):
+    filename_base, filename_ext = os.path.splitext(filename)
+
+    root_dir = 'user/profile/'
+
+    return f"root_dir/{instance.id}/{datetime.now().strftime('%Y%m%d')}_{str(randint(10000000, 99999999))}"
 
 
 # Create your models here.
@@ -148,6 +158,13 @@ class UserProfile(TimeStampedModel):
         related_name='profile',
         verbose_name=_('회원'),
     )
+
+    profile_image = models.ImageField(
+        upload_to=upload_image,
+        editable=True,
+        null=True
+    )
+
     introduce = models.CharField(
         max_length=250,
         default=None,

@@ -92,6 +92,8 @@ nodeenv==1.6.0
     # via pre-commit
 phonenumberslite==8.12.38
     # via -r .misc/requirements/base.in
+pillow==8.4.0
+    # via -r .misc/requirements/base.in
 platformdirs==2.4.0
     # via virtualenv
 pre-commit==2.16.0
