@@ -181,9 +181,9 @@ REST_FRAMEWORK = {
         'djangorestframework_camel_case.render.CamelCaseBrowsableAPIRenderer',
     ),
     'DEFAULT_PARSER_CLASSES': (
+        'commons.contrib.rest_framework.parser.NoUnderscoreBeforeNumberCamelCaseJSONParser',
         'djangorestframework_camel_case.parser.CamelCaseFormParser',
         'djangorestframework_camel_case.parser.CamelCaseMultiPartParser',
-        'commons.contrib.rest_framework.parser.NoUnderscoreBeforeNumberCamelCaseJSONParser',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'POSTPROCESSING_HOOKS': [

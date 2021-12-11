@@ -9,7 +9,7 @@ class SMSSendError(APIException):
     default_detail = _('문자 인증 발송에 실패했습니다.')
 
 
-class PasscodeVerifySignUpError(APIException):
+class UserSignUpError(APIException):
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     default_detail = _('회원 정보 생성중에 문제가 생겼습니다.')
 
@@ -32,9 +32,4 @@ class PasscodeVerifyInvalidPasscode(APIException):
 class PasscodeVerifyExpired(APIException):
     status_code = status.HTTP_401_UNAUTHORIZED
     default_detail = _('기존 인증 요청이 만료되었습니다. 다시 시도해주세요.')
-
-
-class UserAlreadyUsedEmail(APIException):
-    status_code = status.HTTP_400_BAD_REQUEST
-    default_detail = _('이미 사용중인 이메일입니다.')
 

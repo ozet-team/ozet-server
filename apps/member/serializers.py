@@ -3,6 +3,7 @@ import random
 import uuid
 from http import HTTPStatus
 
+from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
 from rest_auth.utils import jwt_encode
 from rest_framework.response import Response
 
@@ -25,7 +26,8 @@ from apps.member.exceptions import (
     PasscodeVerifyPending,
     PasscodeVerifyInvalidPasscode,
     PasscodeVerifyDoesNotExist,
-    PasscodeVerifySignUpError, PasscodeVerifyExpired, UserAlreadyUsedEmail,
+    UserSignUpError,
+    PasscodeVerifyExpired,
 )
 
 
@@ -58,7 +60,7 @@ class UserProfileSerializer(ModelSerializer):
 
 
 class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
-    class NestedUserPasscodeVerifyRequestSerializer(ModelSerializer):
+    class NestedUserPasscodeVerifySerializer(ModelSerializer):
         class Meta:
             model = UserPasscodeVerify
             fields = (
@@ -72,7 +74,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
     phone_number = PhoneNumberField(required=True, allow_blank=False, allow_null=False, write_only=True)
 
     # Read Only
-    requested_verify = NestedUserPasscodeVerifyRequestSerializer(label=_("요청된 인증 상태"), read_only=True)
+    requested_verify = NestedUserPasscodeVerifySerializer(label=_("요청된 인증 상태"), read_only=True)
 
     # Both
 
@@ -127,7 +129,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
 
                     token = user.get_valid_token(auto_generate=True)
                     if not user.is_valid_token(token.decode("utf-8")):
-                        raise PasscodeVerifySignUpError()
+                        raise UserSignUpError()
             except IntegrityError as e:
                 message = str(e)
                 # 삭제 계정 복구
@@ -136,7 +138,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
                     user, _ = User.objects.update_or_create(phone_number=requester_phone_number)
 
         if not user:
-            raise PasscodeVerifySignUpError()
+            raise UserSignUpError()
 
         # 중복 인증
         if UserPasscodeVerify.is_pending(user):
@@ -153,7 +155,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
                 expire_at=UserPasscodeVerify.get_expire_at(),
             )
 
-        return dict(requested_verify=self.NestedUserPasscodeVerifyRequestSerializer(passcode_verify_request).data)
+        return dict(requested_verify=self.NestedUserPasscodeVerifySerializer(passcode_verify_request).data)
 
 
 class UserPasscodeVerifySerializer(SimpleSerializer):
@@ -198,12 +200,10 @@ class UserMeSerializer(ModelSerializer):
                 "introduce",
                 "policy_for_terms_agreed",
                 "policy_for_privacy_agreed",
-                "extra",
             )
             read_only_fields = (
                 "policy_for_terms_agreed",
                 "policy_for_privacy_agreed",
-                "extra",
             )
 
     class Meta:
@@ -311,4 +311,3 @@ class UserDetailsSerializer(ModelSerializer):
         )
 
     profile = NestedProfileSerializer(flatten=True, read_only=True)
-
