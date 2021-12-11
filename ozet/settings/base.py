@@ -219,21 +219,22 @@ AWS_ACCESS_KEY_ID = "AKIAWXCSGYGYL3SVFF4G"
 AWS_SECRET_ACCESS_KEY = "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"
 
 AWS_REGION = 'ap-northeast-2'
-AWS_STORAGE_BUCKET_NAME = 'ozet-service-bucket'
+AWS_STORAGE_BUCKET_NAME = 'ozet-bucket'
 
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com'
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
+AWS_LOCATION = 'service'
 
-AWS_DEFAULT_ACL = 'private'
-AWS_LOCATION = 'static'
+MEDIAFILES_LOCATION = 'media'
+STATICFILES_LOCATION = 'static'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024000000  # value in bytes 1 GB here
 FILE_UPLOAD_MAX_MEMORY_SIZE = 1024000000  # value in bytes 1 GB here
 
-DEFAULT_FILE_STORAGE = 'commons.contrib.storages.S3DefaultStorage'
-STATICFILES_STORAGE = 'commons.contrib.storages.S3StaticStorage'
+DEFAULT_FILE_STORAGE = 'ozet.storages.S3DefaultStorage'
+STATICFILES_STORAGE = 'ozet.storages.S3StaticStorage'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
