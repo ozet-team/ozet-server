@@ -14,7 +14,7 @@ urlpatterns = [
         name=views.UserPasscodeVerifyView.__name__,
     ),
     path(
-        "me",
+        "user/me",
         views.UserMeView.as_view(),
         name=views.UserMeView.__name__,
     ),

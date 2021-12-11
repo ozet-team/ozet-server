@@ -131,6 +131,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
             except IntegrityError as e:
                 message = str(e)
                 # 삭제 계정 복구
+                # @TODO: 이미 탈퇴한 회원이 전화번호를 바꾸고 새로운 사람이 가입할 경우에 대한 처리가 필요함
                 if 'Duplicate' in message and 'member_user_phone_number' in message:
                     user, _ = User.objects.update_or_create(phone_number=requester_phone_number)
 
