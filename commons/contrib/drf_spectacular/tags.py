@@ -1,2 +1,2 @@
-USER = 'user'
-PASSCODE = 'passcode'
+USER = 'USER-@UR'
+PASSCODE = 'PASSCODE-@PS'
