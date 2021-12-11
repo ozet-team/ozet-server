@@ -18,6 +18,9 @@ gunicorn==20.1.0
 uvicorn==0.15.0
 whitenoise==5.3.0
 
+# Admin
+django-suit==2.0a1
+
 # DRF
 djangorestframework==3.12.4
 django-rest-auth==0.9.5

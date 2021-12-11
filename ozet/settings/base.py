@@ -37,8 +37,12 @@ if DEBUG:
     ALLOWED_HOSTS = ["*"]
 else:
     ALLOWED_HOSTS = [
-        "api-staging.luxquad.com",
-        "api.luxquad.com",
+        "api.ozet.app",
+        "api-staging.ozet.app",
+        "hybrid.ozet.app",
+        "hybrid-staging.ozet.app",
+        "web.ozet.app",
+        "web-staging.ozet.app",
         "localhost",
         "127.0.0.1",
     ]
@@ -46,6 +50,8 @@ else:
 # Application definition
 
 INSTALLED_APPS = [
+    "suit",
+    #
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -237,9 +243,4 @@ DEFAULT_FILE_STORAGE = 'ozet.storages.S3MediaStorage'
 
 STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/'
 STATICFILES_STORAGE = 'ozet.storages.S3StaticStorage'
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
-]
-
 
