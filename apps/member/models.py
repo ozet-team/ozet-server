@@ -107,6 +107,18 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
         return rv
 
+    @property
+    def is_staff(self):
+        return self.is_admin
+
+    # noinspection PyMethodMayBeStatic
+    def has_perm(self, perm, obj=None):
+        return True
+
+    # noinspection PyMethodMayBeStatic
+    def has_module_perms(self, app_label):
+        return True
+
     def is_valid_token(self, token):
         try:
             self.token_set.get(token=token)

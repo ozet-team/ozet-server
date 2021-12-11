@@ -41,11 +41,11 @@ class UserManager(BaseUserManager, SafeDeleteManager):
 
         return user
 
-    def create_superuser(self, username, phone_number, email, name, password):
+    def create_superuser(self, username, name, password):
         u = self.create_user(username=username,
-                             phone_number=phone_number,
+                             phone_number="+821010100000",
                              name=name,
-                             email=email,
+                             email="ozet@ozet.com",
                              password=password)
         u.is_admin = True
         u.is_registration = True

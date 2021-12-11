@@ -225,7 +225,6 @@ AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
-AWS_LOCATION = 'service'
 
 MEDIAFILES_LOCATION = 'media'
 STATICFILES_LOCATION = 'static'
@@ -233,14 +232,14 @@ STATICFILES_LOCATION = 'static'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024000000  # value in bytes 1 GB here
 FILE_UPLOAD_MAX_MEMORY_SIZE = 1024000000  # value in bytes 1 GB here
 
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIAFILES_LOCATION}/'
 DEFAULT_FILE_STORAGE = 'ozet.storages.S3DefaultStorage'
+
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/'
 STATICFILES_STORAGE = 'ozet.storages.S3StaticStorage'
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
-# STATIC_ROOT = os.path.join(BASE_DIR, "static")
-# STATIC_URL = "/static/"
-STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+
+
