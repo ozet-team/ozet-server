@@ -24,7 +24,6 @@ pymysql.install_as_MySQLdb()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -43,7 +42,6 @@ else:
         "localhost",
         "127.0.0.1",
     ]
-
 
 # Application definition
 
@@ -138,7 +136,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -152,16 +149,13 @@ USE_L10N = True
 
 USE_TZ = False
 
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 APPEND_SLASH = True
 TRIM_SLASH = True
-
 
 # DRF
 REST_FRAMEWORK = {
@@ -235,8 +229,8 @@ AWS_S3_OBJECT_PARAMETERS = {
 AWS_DEFAULT_ACL = 'private'
 AWS_LOCATION = 'static'
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 1024000000 # value in bytes 1 GB here
-FILE_UPLOAD_MAX_MEMORY_SIZE = 1024000000
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1024000000  # value in bytes 1 GB here
+FILE_UPLOAD_MAX_MEMORY_SIZE = 1024000000  # value in bytes 1 GB here
 
 DEFAULT_FILE_STORAGE = 'commons.contrib.storages.S3DefaultStorage'
 STATICFILES_STORAGE = 'commons.contrib.storages.S3StaticStorage'
