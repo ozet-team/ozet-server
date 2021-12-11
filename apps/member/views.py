@@ -167,7 +167,9 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         return super(UserMeView, self).patch(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.USER]
+        tags=[api_tags.USER],
+        summary="회원 정보 삭제 API",
+        description="회원 정보 삭제 API 입니다. @JWT",
     )
     def delete(self, request, *args, **kwargs):
         return super(UserMeView, self).delete(request, *args, **kwargs)
