@@ -5,6 +5,7 @@ from http import HTTPStatus
 
 from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
 from rest_auth.utils import jwt_encode
+from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
 from django.db import transaction
@@ -45,6 +46,7 @@ class UserSerializer(ModelSerializer):
         model = User
         fields = (
             "username",
+            "name",
             "email",
             "phone_number"
         )
@@ -140,6 +142,10 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
         if not user:
             raise UserSignUpError()
 
+        # 기존 인증 만료 여부
+        if UserPasscodeVerify.is_expired(user):
+            pass
+
         # 중복 인증
         if UserPasscodeVerify.is_pending(user):
             raise PasscodeVerifyPending()
@@ -159,11 +165,22 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
 
 
 class UserPasscodeVerifySerializer(SimpleSerializer):
+    class NestedUserSerializer(ModelSerializer):
+        class Meta:
+            model = User
+            fields = (
+                "username",
+                "name",
+                "email",
+                "phone_number"
+            )
+
     # Write Only
     phone_number = PhoneNumberField(required=True, allow_blank=False, allow_null=False, write_only=True)
     passcode = fields.CharField(required=True, allow_blank=False, allow_null=False, write_only=True)
 
     # Read Only
+    user = NestedUserSerializer(read_only=True)
     token = fields.CharField(read_only=True)
 
     # Both
@@ -177,19 +194,60 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
 
         user = User.objects.get(phone_number=requester_phone_number)
 
-        # 유효 인증 존재 여부
-        if not UserPasscodeVerify.is_pending(user):
-            raise PasscodeVerifyDoesNotExist()
-
         # 기존 인증 만료 여부
         if UserPasscodeVerify.is_expired(user):
             raise PasscodeVerifyExpired()
+
+        # 유효 인증 존재 여부
+        if not UserPasscodeVerify.is_pending(user):
+            raise PasscodeVerifyDoesNotExist()
 
         with transaction.atomic():
             if not UserPasscodeVerify.verify(user, passcode, is_transaction=False):
                 raise PasscodeVerifyInvalidPasscode()
 
-        return dict(token=user.get_valid_token(auto_generate=True).token)
+        return dict(user=user, token=user.get_valid_token(auto_generate=True).token)
+
+
+class UserPasscodeVerifyPassSerializer(SimpleSerializer):
+    class NestedUserSerializer(ModelSerializer):
+        class Meta:
+            model = User
+            fields = (
+                "username",
+                "name",
+                "email",
+                "phone_number"
+            )
+
+    # Write Only
+    user_id = fields.IntegerField(required=True, write_only=True)
+
+    # Read Only
+    user = UserSerializer(read_only=True)
+    token = fields.CharField(read_only=True)
+
+    # Both
+
+    def validate(self, data):
+        data = super(UserPasscodeVerifyPassSerializer, self).validate(data)
+        user_id = data['user_id']
+
+        user = User.objects.filter(id=user_id, is_active=True).first()
+        if not user:
+            raise NotFound()
+
+        data['user'] = user
+        data['token'] = user.get_valid_token().token
+
+        return data
+
+    def create(self, validated_data):
+        user = validated_data.get('user')
+        token = validated_data.get('token')
+
+        return dict(user=user, token=token)
+
 
 
 class UserMeSerializer(ModelSerializer):
@@ -311,3 +369,5 @@ class UserDetailsSerializer(ModelSerializer):
         )
 
     profile = NestedProfileSerializer(flatten=True, read_only=True)
+
+

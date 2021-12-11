@@ -9,7 +9,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.member import models
 from apps.member import serializers
-from utils.django.rest_framework.mixins import UserContextMixin
+from apps.member.models import User
+from utils.django.rest_framework.mixins import UserContextMixin, QuerySerializerMixin
 
 from commons.contrib.drf_spectacular import tags as api_tags
 
@@ -69,7 +70,13 @@ class UserPasscodeVerifyView(CreateAPIView):
                 summary="패스코드 인증 요청 성공",
                 name="201",
                 value={
-                    "token": ""
+                    "user": {
+                        "username": "ozet_d16066f09b594276bb7d9628e5ea1564",
+                        "name": "김헤어",
+                        "email": "kimhair@hair.com",
+                        "phoneNumber": "+821057809397"
+                    },
+                    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo5LCJ1c2VybmF..",
                 },
             ),
             OpenApiExample(
@@ -87,6 +94,37 @@ class UserPasscodeVerifyView(CreateAPIView):
     )
     def post(self, request, *args, **kwargs):
         return super(UserPasscodeVerifyView, self).post(request, *args, **kwargs)
+
+
+class UserPasscodeVerifyPassView(QuerySerializerMixin, CreateAPIView):
+    permission_classes = ()
+    serializer_class = serializers.UserPasscodeVerifyPassSerializer
+    query_serializer_class = serializers.UserPasscodeVerifyPassSerializer
+
+    @extend_schema(
+        tags=[api_tags.PASSCODE],
+        summary="패스코드 강제 성공 API @DEBUG",
+        description="패스코드 성공했다고 가정하고 바로 JWT를 발행합니다.",
+        responses=serializers.UserPasscodeVerifyPassSerializer,
+        examples=[
+            OpenApiExample(
+                response_only=True,
+                summary="패스코드 강제 성공 API @DEBUG",
+                name="201",
+                value={
+                    "user": {
+                        "username": "ozet_d16066f09b594276bb7d9628e5ea1564",
+                        "name": "김헤어",
+                        "email": "kimhair@hair.com",
+                        "phoneNumber": "+821057809397"
+                    },
+                    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo5LCJ1c2VybmF..",
+                },
+            ),
+        ],
+    )
+    def post(self, request, *args, **kwargs):
+        return super(UserPasscodeVerifyPassView, self).post(request, *args, **kwargs)
 
 
 class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
@@ -173,4 +211,3 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
     )
     def delete(self, request, *args, **kwargs):
         return super(UserMeView, self).delete(request, *args, **kwargs)
-

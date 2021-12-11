@@ -24,3 +24,38 @@ class UserContextMixin(APIView):
             context['user'] = self.user
 
         return context
+
+
+class QuerySerializerMixin(object):
+    query_serializer_class = None
+
+    def get_query_serializer_class(self):
+        assert self.query_serializer_class is not None, (
+            "'%s' should either include a `query_serializer_class` attribute, "
+            "or override the `get_query_serializer_class()` method."
+            % self.__class__.__name__
+        )
+
+        return self.query_serializer_class
+
+    def get_query_serializer_context(self):
+        """
+        Extra context provided to the serializer class.
+        """
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
+
+    def get_query_serializer(self, *args, **kwargs):
+        serializer_class = self.get_query_serializer_class()
+        kwargs['context'] = self.get_query_serializer_context()
+
+        return serializer_class(*args, **kwargs)
+
+    def validate_query_params(self):
+        serializer = self.get_query_serializer(data=self.request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        return serializer.validated_data
