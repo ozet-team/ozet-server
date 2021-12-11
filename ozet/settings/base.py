@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     #
+    "storages",
+    #
     "apps.member",
     "apps.announcement",
     #
@@ -151,11 +153,6 @@ USE_L10N = True
 USE_TZ = False
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATIC_URL = "/static/"
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -222,3 +219,33 @@ else:
     ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Storage
+AWS_ACCESS_KEY_ID = "AKIAWXCSGYGYL3SVFF4G"
+AWS_SECRET_ACCESS_KEY = "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"
+
+AWS_REGION = 'ap-northeast-2'
+AWS_STORAGE_BUCKET_NAME = 'ozet-service-bucket'
+
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+AWS_DEFAULT_ACL = 'private'
+AWS_LOCATION = 'static'
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1024000000 # value in bytes 1 GB here
+FILE_UPLOAD_MAX_MEMORY_SIZE = 1024000000
+
+DEFAULT_FILE_STORAGE = 'commons.contrib.storages.S3DefaultStorage'
+STATICFILES_STORAGE = 'commons.contrib.storages.S3StaticStorage'
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
+# STATIC_URL = "/static/"
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
