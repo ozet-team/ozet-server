@@ -57,7 +57,13 @@ class UserProfileSerializer(ModelSerializer):
         model = UserProfile
         fields = (
             "introduce",
-            "extra",
+            "profile_image",
+            "policy_for_terms_agreed",
+            "policy_for_privacy_agreed",
+        )
+        read_only_fields = (
+            "policy_for_terms_agreed",
+            "policy_for_privacy_agreed",
         )
 
 
@@ -249,13 +255,13 @@ class UserPasscodeVerifyPassSerializer(SimpleSerializer):
         return dict(user=user, token=token)
 
 
-
 class UserMeSerializer(ModelSerializer):
     class NestedProfileSerializer(ModelSerializer):
         class Meta:
             model = UserProfile
             fields = (
                 "introduce",
+                "profile_image",
                 "policy_for_terms_agreed",
                 "policy_for_privacy_agreed",
             )
@@ -342,9 +348,13 @@ class UserDetailsSerializer(ModelSerializer):
             model = UserProfile
             fields = (
                 "introduce",
+                "profile_image",
+                "policy_for_terms_agreed",
+                "policy_for_privacy_agreed",
             )
             read_only_fields = (
-                "introduce",
+                "policy_for_terms_agreed",
+                "policy_for_privacy_agreed",
             )
 
     class Meta:
