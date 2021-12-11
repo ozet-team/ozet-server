@@ -33,8 +33,7 @@ WORKDIR /app
 RUN DJANGO_SETTINGS_MODULE=ozet.settings.live python manage.py migrate
 
 # Static
-RUN mkdir static && \
-    DJANGO_SETTINGS_MODULE=ozet.settings.live python manage.py collectstatic --noinput
+# RUN DJANGO_SETTINGS_MODULE=ozet.settings.live python manage.py collectstatic --noinput
 
 EXPOSE 8080
 
