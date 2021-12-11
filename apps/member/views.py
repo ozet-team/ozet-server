@@ -121,6 +121,16 @@ class UserPasscodeVerifyPassView(QuerySerializerMixin, CreateAPIView):
                     "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo5LCJ1c2VybmF..",
                 },
             ),
+            OpenApiExample(
+                request_only=True,
+                response_only=False,
+                name="요청 바디 예시",
+                summary="요청 바디 예시",
+                description="",
+                value={
+                    "user_id": "9",
+                },
+            ),
         ],
     )
     def post(self, request, *args, **kwargs):
