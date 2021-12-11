@@ -41,9 +41,11 @@ class UserManager(BaseUserManager, SafeDeleteManager):
 
         return user
 
-    def create_superuser(self, username, name, password):
+    def create_superuser(self, username, phone_number, email, name, password):
         u = self.create_user(username=username,
+                             phone_number=phone_number,
                              name=name,
+                             email=email,
                              password=password)
         u.is_admin = True
         u.is_registration = True

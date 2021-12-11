@@ -1,3 +1,4 @@
+import re
 import random
 import uuid
 from http import HTTPStatus
@@ -6,6 +7,7 @@ from rest_auth.utils import jwt_encode
 from rest_framework.response import Response
 
 from django.db import transaction
+from django.db import IntegrityError
 from django.utils.translation import gettext_lazy as _
 
 from rest_auth.serializers import JWTSerializer as BaseJWTSerializer
@@ -23,7 +25,7 @@ from apps.member.exceptions import (
     PasscodeVerifyPending,
     PasscodeVerifyInvalidPasscode,
     PasscodeVerifyDoesNotExist,
-    PasscodeVerifySignUpError, PasscodeVerifyExpired,
+    PasscodeVerifySignUpError, PasscodeVerifyExpired, UserAlreadyUsedEmail,
 )
 
 
@@ -106,24 +108,34 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
 
     def create(self, validated_data):
         requester_phone_number = validated_data["phone_number"]
+        user = None
 
-        # 사용자 인증
+        # 회원 검증
         try:
             user = User.objects.get(phone_number=requester_phone_number)
         except User.DoesNotExist:
-            with transaction.atomic():
-                # Pre-SignUp
-                username = f"ozet_{str(uuid.uuid4()).replace('-', '')}"
-                user = User.objects.create_user(
-                    username=username,
-                    email=None,
-                    phone_number=requester_phone_number,
-                    name=None,
-                )
+            try:
+                with transaction.atomic():
+                    # Pre-SignUp
+                    username = f"ozet_{str(uuid.uuid4()).replace('-', '')}"
+                    user = User.objects.update_or_create(
+                        username=username,
+                        email=None,
+                        phone_number=requester_phone_number,
+                        name=None,
+                    )
 
-                token = user.get_valid_token(auto_generate=True)
-                if not user.is_valid_token(token.decode("utf-8")):
-                    raise PasscodeVerifySignUpError()
+                    token = user.get_valid_token(auto_generate=True)
+                    if not user.is_valid_token(token.decode("utf-8")):
+                        raise PasscodeVerifySignUpError()
+            except IntegrityError as e:
+                message = str(e)
+                # 삭제 계정 복구
+                if 'Duplicate' in message and 'member_user_phone_number' in message:
+                    user, _ = User.objects.update_or_create(phone_number=requester_phone_number)
+
+        if not user:
+            raise PasscodeVerifySignUpError()
 
         # 중복 인증
         if UserPasscodeVerify.is_pending(user):
@@ -187,7 +199,7 @@ class UserMeSerializer(ModelSerializer):
                 "policy_for_privacy_agreed",
                 "extra",
             )
-            read_only = (
+            read_only_fields = (
                 "policy_for_terms_agreed",
                 "policy_for_privacy_agreed",
                 "extra",
@@ -202,13 +214,67 @@ class UserMeSerializer(ModelSerializer):
             "profile",
             "phone_number",
         )
-        read_only = (
+        read_only_fields = (
             "username",
             "phone_number",
-            "profile",
         )
 
     profile = NestedProfileSerializer(flatten=True, read_only=True)
+
+    # noinspection PyMethodMayBeStatic
+    def validate_name(self, value):
+        if len(value) > 8:
+            raise serializers.ValidationError(_('이름은 최대 8글자입니다.'))
+
+        # 한글 / 영어 / 숫자
+        result = re.match('[가-힣|a-z|A-Z|0-9]+', value)
+        if not result or result.group() != value:
+            raise serializers.ValidationError(_('이름은 한글/영어/숫자 조합만 가능합니다.'))
+
+        return value
+
+    def update(self, instance, validated_data):
+        user_profile = instance.profile
+
+        with transaction.atomic():
+            """
+            User Profile Update
+            """
+            update_fields = []
+
+            # introduce
+            old_introduce = user_profile.introduce
+            new_introduce = validated_data.get('profile', {}).get('introduce', old_introduce)
+            if old_introduce != new_introduce:
+                user_profile.introduce = new_introduce
+                update_fields.append('introduce')
+
+            if update_fields:
+                user_profile.save(update_fields=update_fields)
+
+            """
+            User Update
+            """
+            update_fields = []
+
+            # name
+            old_name = instance.name
+            new_name = validated_data.get('name', old_name)
+            if old_name != new_name:
+                instance.name = new_name
+                update_fields.append('name')
+
+            # email
+            old_email = instance.email
+            new_email = validated_data.get('email', old_email)
+            if old_email != new_email:
+                instance.email = new_email
+                update_fields.append('email')
+
+            if update_fields:
+                instance.save(update_fields=update_fields)
+
+        return instance
 
 
 class UserDetailsSerializer(ModelSerializer):
@@ -229,6 +295,8 @@ class UserDetailsSerializer(ModelSerializer):
             "email",
             "username",
             "name",
+            "created",
+            "profile",
             "phone_number",
         )
         read_only_fields = (
