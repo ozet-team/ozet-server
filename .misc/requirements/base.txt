@@ -61,6 +61,8 @@ django-safedelete==1.1.1
     # via -r .misc/requirements/base.in
 django-storages==1.12.3
     # via -r .misc/requirements/base.in
+django-suit==2.0a1
+    # via -r .misc/requirements/base.in
 djangorestframework==3.12.4
     # via
     #   -r .misc/requirements/base.in
