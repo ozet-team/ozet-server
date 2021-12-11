@@ -1,6 +1,6 @@
 import os
-import datetime
-import random
+from random import randint
+from datetime import datetime
 
 
 def profile_image_upload(instance: any, filename: str):

@@ -17,7 +17,7 @@ from apps.member.managers import UserManager
 from apps.member import storages
 from utils.django.models import SafeDeleteModel, TimeStampedModel
 
-\
+
 # Create your models here.
 class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
     # info
@@ -244,6 +244,12 @@ class UserToken(TimeStampedModel):
 
         db_table = 'member_user_token'
 
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return f'<{self._meta.verbose_name.title()}: {self.token}>'
+
 
 class UserPasscodeVerify(TimeStampedModel):
     """
@@ -313,7 +319,7 @@ class UserPasscodeVerify(TimeStampedModel):
         return self.__repr__()
 
     def __repr__(self):
-        return f'<{self._meta.verbose_name.title()}: {self.user.name}>'
+        return f'<{self._meta.verbose_name.title()}: {self.user.phone_number}>'
 
     @classmethod
     def is_pending(cls, user: User, is_transaction=True) -> bool:

@@ -233,7 +233,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 1024000000  # value in bytes 1 GB here
 FILE_UPLOAD_MAX_MEMORY_SIZE = 1024000000  # value in bytes 1 GB here
 
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIAFILES_LOCATION}/'
-DEFAULT_FILE_STORAGE = 'ozet.storages.S3DefaultStorage'
+DEFAULT_FILE_STORAGE = 'ozet.storages.S3MediaStorage'
 
 STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/'
 STATICFILES_STORAGE = 'ozet.storages.S3StaticStorage'
