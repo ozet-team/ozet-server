@@ -14,17 +14,10 @@ from django.db import models, transaction
 from rest_auth.utils import jwt_encode
 
 from apps.member.managers import UserManager
+from apps.member import storages
 from utils.django.models import SafeDeleteModel, TimeStampedModel
 
-
-def upload_image(instance: any, filename: str):
-    filename_base, filename_ext = os.path.splitext(filename)
-
-    root_dir = 'user/profile/'
-
-    return f"root_dir/{instance.id}/{datetime.now().strftime('%Y%m%d')}_{str(randint(10000000, 99999999))}"
-
-
+\
 # Create your models here.
 class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
     # info
@@ -126,7 +119,7 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
             .order_by('-created') \
             .first()
 
-        if (not valid_token or valid_token.status == UserToken.Status.expire ) and auto_generate:
+        if (not valid_token or valid_token.status == UserToken.Status.expire) and auto_generate:
             valid_token = UserToken.objects.create(
                 user=self,
                 token=jwt_encode(self),
@@ -160,7 +153,7 @@ class UserProfile(TimeStampedModel):
     )
 
     profile_image = models.ImageField(
-        upload_to=upload_image,
+        upload_to=storages.profile_image_upload,
         editable=True,
         null=True
     )
