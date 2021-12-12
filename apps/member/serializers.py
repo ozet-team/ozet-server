@@ -257,6 +257,8 @@ class UserPasscodeVerifyPassSerializer(SimpleSerializer):
 
 class UserMeSerializer(ModelSerializer):
     class NestedProfileSerializer(ModelSerializer):
+        profile_image = serializers.ImageField(use_url=True)
+
         class Meta:
             model = UserProfile
             fields = (
@@ -317,6 +319,15 @@ class UserMeSerializer(ModelSerializer):
             if update_fields:
                 user_profile.save(update_fields=update_fields)
 
+            old_profile_image = user_profile.profile_image
+            new_profile_image = validated_data.get('profile', {}).get('profile_image', old_introduce)
+            if old_profile_image != new_profile_image:
+                user_profile.profile_image = new_profile_image
+                update_fields.append('profile_image')
+
+            if update_fields:
+                user_profile.save(update_fields=update_fields)
+
             """
             User Update
             """
@@ -344,6 +355,8 @@ class UserMeSerializer(ModelSerializer):
 
 class UserDetailsSerializer(ModelSerializer):
     class NestedProfileSerializer(ModelSerializer):
+        profile_image = serializers.ImageField(use_url=True)
+
         class Meta:
             model = UserProfile
             fields = (
