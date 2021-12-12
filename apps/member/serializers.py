@@ -212,6 +212,11 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
             if not UserPasscodeVerify.verify(user, passcode, is_transaction=False):
                 raise PasscodeVerifyInvalidPasscode()
 
+            # 유저 SingUp 완료 처리
+            if not user.is_registration:
+                user.is_registration = True
+                user.save(update_fields=['is_registration'])
+
         return dict(user=user, token=user.get_valid_token(auto_generate=True).token)
 
 
