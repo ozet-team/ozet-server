@@ -173,15 +173,6 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
 
 class UserProfile(TimeStampedModel):
-    user = models.OneToOneField(
-        User,
-        null=False,
-        blank=False,
-        on_delete=models.CASCADE,
-        related_name='profile',
-        verbose_name=_('회원'),
-    )
-
     profile_image = models.ImageField(
         upload_to=storages.profile_image_upload,
         editable=True,
@@ -223,6 +214,16 @@ class UserProfile(TimeStampedModel):
         verbose_name=_('추가 정보'),
     )
 
+    # Related
+    user = models.OneToOneField(
+        User,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='profile',
+        verbose_name=_('회원'),
+    )
+
     class Meta:
         verbose_name = _('회원 프로필')
         verbose_name_plural = _('회원 프로필 목록')
@@ -234,6 +235,40 @@ class UserProfile(TimeStampedModel):
 
     def __repr__(self):
         return f'<{self._meta.verbose_name.title()}: {self.user.name}>'
+
+
+class UserSNS(TimeStampedModel):
+    username = models.CharField(
+        max_length=50,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('SNS'),
+    )
+
+    url = models.CharField(
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('URL'),
+    )
+
+    # Related
+    user_profile = models.ForeignKey(
+        UserProfile,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='sns_set',
+        verbose_name=_('회원 프로필'),
+    )
+
+    class Meta:
+        verbose_name = _('회원 SNS')
+        verbose_name_plural = _('회원 SNS 목록')
+
+        db_table = 'member_user_profile_sns'
 
 
 class UserToken(TimeStampedModel):

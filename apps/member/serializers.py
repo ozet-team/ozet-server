@@ -18,7 +18,7 @@ from rest_framework import serializers, fields
 from phonenumber_field.serializerfields import PhoneNumberField
 from phonenumber_field.phonenumber import PhoneNumber
 
-from apps.member.models import User, UserProfile, UserPasscodeVerify, UserToken
+from apps.member.models import User, UserProfile, UserPasscodeVerify, UserToken, UserSNS
 from utils.django.rest_framework.serializers import SimpleSerializer, ModelSerializer
 from utils.naver.api import NaverCloudAPI
 
@@ -265,7 +265,16 @@ class UserPasscodeVerifyPassSerializer(SimpleSerializer):
 
 class UserMeSerializer(ModelSerializer):
     class NestedProfileSerializer(ModelSerializer):
+        class NestedSNSSerializer(ModelSerializer):
+            class Meta:
+                model = UserSNS
+                fields = (
+                    "username",
+                    "url",
+                )
+
         profile_image = serializers.ImageField(use_url=True)
+        sns_set = NestedSNSSerializer(flatten=True)
 
         class Meta:
             model = UserProfile
@@ -275,6 +284,7 @@ class UserMeSerializer(ModelSerializer):
                 "address",
                 "policy_for_terms_agreed",
                 "policy_for_privacy_agreed",
+                "sns_set",
             )
             read_only_fields = (
                 "policy_for_terms_agreed",
@@ -297,7 +307,7 @@ class UserMeSerializer(ModelSerializer):
             "phone_number",
         )
 
-    profile = NestedProfileSerializer(flatten=True, read_only=True)
+    profile = NestedProfileSerializer(flatten=True)
 
     # noinspection PyMethodMayBeStatic
     def validate_name(self, value):
@@ -313,6 +323,7 @@ class UserMeSerializer(ModelSerializer):
 
     def update(self, instance, validated_data):
         user_profile = instance.profile
+        user_sns = user_profile.sns_set
 
         with transaction.atomic():
             """
