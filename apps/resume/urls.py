@@ -6,16 +6,21 @@ from django.urls import path
 
 urlpatterns = [
     path(
-        "user/resume",
+        "user/resume/<str:code>",
         views.UserResumeDetailView.as_view(),
         name=views.UserResumeDetailView.__name__,
+    ),
+    path(
+        "user/resume",
+        views.UserResumeListView.as_view(),
+        name=views.UserResumeListView.__name__,
     ),
 ]
 
 if settings.DEBUG:
     debug_urlpatterns = [
         path(
-            "resume/<str:code>",
+            "user/resume/<str:code>/pass",
             views.ResumeDetailView.as_view(),
             name=views.ResumeDetailView.__name__,
         ),
