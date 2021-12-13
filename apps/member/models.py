@@ -20,6 +20,10 @@ from utils.django.models import SafeDeleteModel, TimeStampedModel
 
 # Create your models here.
 class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
+    class Gender(DjangoChoices):
+        male = ChoiceItem('MALE', _('남자'))
+        female = ChoiceItem('FEMALE', _('여자'))
+
     # info
     username = models.CharField(
         max_length=200,
@@ -51,6 +55,20 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
         null=True,
         blank=False,
         verbose_name=_('이름')
+    )
+
+    birthday = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name=_('생일')
+    )
+
+    gender = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        choices=Gender.choices,
+        verbose_name=_('성별'),
     )
 
     # config
@@ -177,6 +195,14 @@ class UserProfile(TimeStampedModel):
         null=True,
         blank=True,
         verbose_name=_('소개'),
+    )
+
+    address = models.CharField(
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('주소'),
     )
 
     policy_for_terms_agreed = AutoCreatedField(

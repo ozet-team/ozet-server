@@ -48,7 +48,9 @@ class UserSerializer(ModelSerializer):
             "username",
             "name",
             "email",
-            "phone_number"
+            "phone_number",
+            "birthday",
+            "gender",
         )
 
 
@@ -58,6 +60,7 @@ class UserProfileSerializer(ModelSerializer):
         fields = (
             "introduce",
             "profile_image",
+            "address",
             "policy_for_terms_agreed",
             "policy_for_privacy_agreed",
         )
@@ -178,7 +181,7 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
                 "username",
                 "name",
                 "email",
-                "phone_number"
+                "phone_number",
             )
 
     # Write Only
@@ -269,6 +272,7 @@ class UserMeSerializer(ModelSerializer):
             fields = (
                 "introduce",
                 "profile_image",
+                "address",
                 "policy_for_terms_agreed",
                 "policy_for_privacy_agreed",
             )
@@ -285,6 +289,8 @@ class UserMeSerializer(ModelSerializer):
             "email",
             "profile",
             "phone_number",
+            "birthday",
+            "gender",
         )
         read_only_fields = (
             "username",
