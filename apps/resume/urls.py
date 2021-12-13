@@ -15,7 +15,7 @@ urlpatterns = [
 if settings.DEBUG:
     debug_urlpatterns = [
         path(
-            "resume/<str: code>",
+            "resume/<str:code>",
             views.ResumeDetailView.as_view(),
             name=views.ResumeDetailView.__name__,
         ),
