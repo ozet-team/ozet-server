@@ -174,6 +174,16 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
                     "profileImage": "https://ozet-bucket.s3.ap-northeast-2.amazonaws.com/media/user/profile/5/20211212_25522567",
                     "policyForTermsAgreed": "2021-12-11T07:47:33.336Z",
                     "policyForPrivacyAgreed": "2021-12-11T07:47:33.336Z",
+                    "snsList": [
+                        {
+                            "username": "@bart_not_found",
+                            "url": "https://instagram.com/bart_not_found",
+                        },
+                        {
+                            "username": "@bart_not_found",
+                            "url": "https://twitter.com/bart_not_found",
+                        }
+                    ],
                 },
             ),
         ],
@@ -196,11 +206,23 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
                     "name": "김헤어",
                     "email": "kimhair@hair.com",
                     "phoneNumber": "+821057809397",
+                    "birthday": "1997-7-12",
+                    "gender": "male",
                     "introduce": "나는 업데이트 된 더욱 개쩌는 헤어 디자이너",
                     "address": "경기도 성남시 불라불라",
                     "profileImage": "https://ozet-bucket.s3.ap-northeast-2.amazonaws.com/media/user/profile/5/20211212_25522567",
                     "policyForTermsAgreed": "2021-12-11T07:47:33.336Z",
                     "policyForPrivacyAgreed": "2021-12-11T07:47:33.336Z",
+                    "snsList": [
+                        {
+                            "username": "@bart_not_found",
+                            "url": "https://instagram.com/bart_not_found",
+                        },
+                        {
+                            "username": "@bart_not_found",
+                            "url": "https://twitter.com/bart_not_found",
+                        }
+                    ],
                 },
             ),
             OpenApiExample(
@@ -215,6 +237,16 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
                     "introduce": "내가 바로 개쩌는 헤어 디자이너",
                     "address": "경기도 여주시 불라불라",
                     "profileImage": "https://ozet-bucket.s3.ap-northeast-2.amazonaws.com/media/user/profile/5/20211212_25522567",
+                    "snsList": [
+                        {
+                            "username": "@bart_not_found",
+                            "url": "https://instagram.com/bart_not_found",
+                        },
+                        {
+                            "username": "@bart_not_found",
+                            "url": "https://twitter.com/bart_not_found",
+                        }
+                    ],
                 },
             ),
         ],
