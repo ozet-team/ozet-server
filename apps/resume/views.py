@@ -89,7 +89,7 @@ class ResumeDetailView(UserContextMixin, RetrieveAPIView):
     @extend_schema(
         tags=[api_tags.USER, api_tags.RESUME],
         summary="특정 이력서 가져오기 API",
-        description="특정 이력서 가져오기 API 입니다. @JWT",
+        description="특정 이력서 가져오기 API 입니다. @DEBUG",
         responses=serializers.UserMeSerializer,
         examples=[
             OpenApiExample(
