@@ -240,7 +240,6 @@ class MilitaryService(TimeStampedModel):
         max_length=250,
         null=True,
         blank=True,
-        choices=Position.choices,
         verbose_name=_('면제사유'),
     )
 
