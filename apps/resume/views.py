@@ -63,7 +63,7 @@ class ResumeCareerDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
             .all()
 
     @extend_schema(
-        tags=[api_tags.RESUME],
+        tags=[api_tags.RESUME_CAREER],
         summary="회원 커리어 가져오기 API",
         description="회원 커리어 가져오기 API 입니다. @JWT",
         responses=serializers.CareerSerializer,
@@ -72,7 +72,7 @@ class ResumeCareerDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         return super(ResumeCareerDetailView, self).get(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.RESUME],
+        tags=[api_tags.RESUME_CAREER],
         summary="회원 커리어 업데이트 API",
         description="회원 커리어 업데이트 API 입니다. @JWT",
         responses=serializers.CareerSerializer,
@@ -81,7 +81,7 @@ class ResumeCareerDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         return super(ResumeCareerDetailView, self).patch(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.USER],
+        tags=[api_tags.RESUME_CAREER],
         summary="회원 커리어 삭제 API",
         description="회원 커리어 삭제 API 입니다. @JWT",
     )
@@ -107,7 +107,7 @@ class ResumeCareerListView(UserContextMixin, ListCreateAPIView):
             .all()
 
     @extend_schema(
-        tags=[api_tags.RESUME],
+        tags=[api_tags.RESUME_CAREER],
         summary="회원 커리어 가져오기 API",
         description="회원 커리어 가져오기 API 입니다. @JWT",
         responses=serializers.CareerSerializer,
@@ -116,7 +116,7 @@ class ResumeCareerListView(UserContextMixin, ListCreateAPIView):
         return super(ResumeCareerListView, self).get(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.RESUME],
+        tags=[api_tags.RESUME_CAREER],
         summary="회원 커리어 추가 API",
         description="회원 커리어 추가 API 입니다. @JWT",
         responses=serializers.CareerSerializer,
@@ -146,7 +146,7 @@ class ResumeCertificateDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView
             .all()
 
     @extend_schema(
-        tags=[api_tags.RESUME],
+        tags=[api_tags.RESUME_CERTIFICATE],
         summary="회원 자격증 가져오기 API",
         description="회원 자격증 가져오기 API 입니다. @JWT",
         responses=serializers.CareerSerializer,
@@ -155,7 +155,7 @@ class ResumeCertificateDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView
         return super(ResumeCertificateDetailView, self).get(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.RESUME],
+        tags=[api_tags.RESUME_CERTIFICATE],
         summary="회원 자격증 업데이트 API",
         description="회원 자격증 업데이트 API 입니다. @JWT",
         responses=serializers.CareerSerializer,
@@ -164,7 +164,7 @@ class ResumeCertificateDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView
         return super(ResumeCertificateDetailView, self).patch(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.USER],
+        tags=[api_tags.RESUME_CERTIFICATE],
         summary="회원 자격증 삭제 API",
         description="회원 자격증 삭제 API 입니다. @JWT",
     )
@@ -190,7 +190,7 @@ class ResumeCertificateListView(UserContextMixin, ListCreateAPIView):
             .all()
 
     @extend_schema(
-        tags=[api_tags.RESUME],
+        tags=[api_tags.RESUME_CERTIFICATE],
         summary="회원 자격증 목록 가져오기 API",
         description="회원 자격증 목록 가져오기 API 입니다. @JWT",
         responses=serializers.CareerSerializer,
@@ -199,7 +199,7 @@ class ResumeCertificateListView(UserContextMixin, ListCreateAPIView):
         return super(ResumeCertificateListView, self).get(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.RESUME],
+        tags=[api_tags.RESUME_CERTIFICATE],
         summary="회원 자격증 추가 API",
         description="회원 자격증 추가 API 입니다. @JWT",
         responses=serializers.CareerSerializer,
@@ -229,7 +229,7 @@ class ResumeAcademicBackgroundDetailView(UserContextMixin, RetrieveUpdateDestroy
             .all()
 
     @extend_schema(
-        tags=[api_tags.RESUME],
+        tags=[api_tags.RESUME_ACADEMIC],
         summary="회원 학력 가져오기 API",
         description="회원 학력 가져오기 API 입니다. @JWT",
         responses=serializers.CareerSerializer,
@@ -238,7 +238,7 @@ class ResumeAcademicBackgroundDetailView(UserContextMixin, RetrieveUpdateDestroy
         return super(ResumeAcademicBackgroundDetailView, self).get(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.RESUME],
+        tags=[api_tags.RESUME_ACADEMIC],
         summary="회원 학력 업데이트 API",
         description="회원 학력 업데이트 API 입니다. @JWT",
         responses=serializers.CareerSerializer,
@@ -247,7 +247,7 @@ class ResumeAcademicBackgroundDetailView(UserContextMixin, RetrieveUpdateDestroy
         return super(ResumeAcademicBackgroundDetailView, self).patch(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.USER],
+        tags=[api_tags.RESUME_ACADEMIC],
         summary="회원 학력 삭제 API",
         description="회원 학력 삭제 API 입니다. @JWT",
     )
@@ -273,7 +273,7 @@ class ResumeAcademicBackgroundListView(UserContextMixin, ListCreateAPIView):
         super(ResumeAcademicBackgroundListView, self).__init__(*args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.RESUME],
+        tags=[api_tags.RESUME_ACADEMIC],
         summary="회원 학력 목록 가져오기 API",
         description="회원 학력 목록 가져오기 API 입니다. @JWT",
         responses=serializers.CareerSerializer,
@@ -282,7 +282,7 @@ class ResumeAcademicBackgroundListView(UserContextMixin, ListCreateAPIView):
         return super(ResumeAcademicBackgroundListView, self).get(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.RESUME],
+        tags=[api_tags.RESUME_ACADEMIC],
         summary="회원 학력 추가 API",
         description="회원 학력 추가 API 입니다. @JWT",
         responses=serializers.CareerSerializer,
@@ -309,7 +309,7 @@ class ResumeMilitaryServiceView(UserContextMixin, RetrieveUpdateAPIView):
         super(ResumeMilitaryServiceView, self).__init__(*args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.RESUME],
+        tags=[api_tags.RESUME_MILITARY],
         summary="회원 병역 가져오기 API",
         description="회원 병역 가져오기 API 입니다. @JWT",
         responses=serializers.CareerSerializer,
@@ -318,7 +318,7 @@ class ResumeMilitaryServiceView(UserContextMixin, RetrieveUpdateAPIView):
         return super(ResumeMilitaryServiceView, self).get(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.RESUME],
+        tags=[api_tags.RESUME_MILITARY],
         summary="회원 병역 업데이트 API",
         description="회원 병역 업데이트 API 입니다. @JWT",
         responses=serializers.CareerSerializer,

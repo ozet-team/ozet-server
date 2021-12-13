@@ -283,7 +283,7 @@ class UserMeSNSDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
             .all()
 
     @extend_schema(
-        tags=[api_tags.USER],
+        tags=[api_tags.USER_SNS],
         summary="회원 SNS 정보 가져오기 API",
         description="회원 SNS 정보 가져오기 API 입니다. @JWT",
         responses=serializers.UserMeSerializer,
@@ -304,7 +304,7 @@ class UserMeSNSDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         return super(UserMeSNSDetailView, self).get(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.USER],
+        tags=[api_tags.USER_SNS],
         summary="회원 SNS 정보 업데이트 API",
         description="회원 SNS 정보 업데이트 API 입니다. @JWT",
         responses=serializers.UserMeSerializer,
@@ -336,7 +336,7 @@ class UserMeSNSDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         return super(UserMeSNSDetailView, self).patch(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.USER],
+        tags=[api_tags.USER_SNS],
         summary="회원 SNS 정보 삭제 API",
         description="회원 SNS 정보 삭제 API 입니다. @JWT",
     )
@@ -358,7 +358,7 @@ class UserMeSNSListView(UserContextMixin, ListCreateAPIView):
             .all()
 
     @extend_schema(
-        tags=[api_tags.USER],
+        tags=[api_tags.USER_SNS],
         summary="회원 SNS 정보 목록 가져오기 API",
         description="회원 SNS 정보 가져오기 API 입니다. @JWT",
         responses=serializers.UserMeSerializer,
@@ -367,7 +367,7 @@ class UserMeSNSListView(UserContextMixin, ListCreateAPIView):
         return super(UserMeSNSListView, self).get(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.USER],
+        tags=[api_tags.USER_SNS],
         summary="회원 SNS 정보 추가 API",
         description="회원 SNS 정보 추가 API 입니다. @JWT",
         responses=serializers.UserMeSerializer,
