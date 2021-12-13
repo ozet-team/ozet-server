@@ -274,7 +274,7 @@ class UserMeSerializer(ModelSerializer):
                 )
 
         profile_image = serializers.ImageField(use_url=True)
-        sns_set = NestedSNSSerializer(flatten=True)
+        sns_list = NestedSNSSerializer(source='sns_set', many=True)
 
         class Meta:
             model = UserProfile
@@ -284,7 +284,7 @@ class UserMeSerializer(ModelSerializer):
                 "address",
                 "policy_for_terms_agreed",
                 "policy_for_privacy_agreed",
-                "sns_set",
+                "sns_list",
             )
             read_only_fields = (
                 "policy_for_terms_agreed",
