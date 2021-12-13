@@ -18,7 +18,7 @@ from utils.django.models import SafeDeleteModel, TimeStampedModel
 
 
 class Resume(TimeStampedModel):
-    # info
+    # Info
     extra = models.JSONField(
         null=True,
         blank=True,

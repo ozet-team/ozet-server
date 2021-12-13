@@ -24,7 +24,7 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
         male = ChoiceItem('MALE', _('남자'))
         female = ChoiceItem('FEMALE', _('여자'))
 
-    # info
+    # Info
     username = models.CharField(
         max_length=200,
         null=True,
@@ -173,7 +173,7 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
 
 class UserProfile(TimeStampedModel):
-    # info
+    # Info
     profile_image = models.ImageField(
         upload_to=storages.profile_image_upload,
         editable=True,
@@ -253,6 +253,14 @@ class UserSNS(TimeStampedModel):
         null=True,
         blank=True,
         verbose_name=_('URL'),
+    )
+
+    token = models.CharField(
+        max_length=255,
+        null=True,
+        blank=False,
+        verbose_name=_('토큰'),
+        unique=True,
     )
 
     # Related
