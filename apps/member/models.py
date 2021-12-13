@@ -167,7 +167,8 @@ class UserProfile(TimeStampedModel):
     profile_image = models.ImageField(
         upload_to=storages.profile_image_upload,
         editable=True,
-        null=True
+        null=True,
+        verbose_name=_('프로필 이미지 파일'),
     )
 
     introduce = models.CharField(
