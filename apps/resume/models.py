@@ -257,7 +257,7 @@ class MilitaryService(TimeStampedModel):
     )
 
     # Related
-    resume = models.ForeignKey(
+    resume = models.OneToOneField(
         Resume,
         null=False,
         blank=False,
