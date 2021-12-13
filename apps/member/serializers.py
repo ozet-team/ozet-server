@@ -269,6 +269,7 @@ class UserMeSerializer(ModelSerializer):
             class Meta:
                 model = UserSNS
                 fields = (
+                    "id",
                     "username",
                     "url",
                 )
@@ -323,7 +324,6 @@ class UserMeSerializer(ModelSerializer):
 
     def update(self, instance, validated_data):
         user_profile = instance.profile
-        user_sns = user_profile.sns_set
 
         with transaction.atomic():
             """
@@ -338,14 +338,19 @@ class UserMeSerializer(ModelSerializer):
                 user_profile.introduce = new_introduce
                 update_fields.append('introduce')
 
-            if update_fields:
-                user_profile.save(update_fields=update_fields)
-
+            # profile_image
             old_profile_image = user_profile.profile_image
             new_profile_image = validated_data.get('profile', {}).get('profile_image', old_introduce)
             if old_profile_image != new_profile_image:
                 user_profile.profile_image = new_profile_image
                 update_fields.append('profile_image')
+
+            # address
+            old_address = user_profile.address
+            new_address = validated_data.get('profile', {}).get('address', old_address)
+            if old_address != new_address:
+                user_profile.address = new_address
+                update_fields.append('address')
 
             if update_fields:
                 user_profile.save(update_fields=update_fields)
@@ -369,10 +374,62 @@ class UserMeSerializer(ModelSerializer):
                 instance.email = new_email
                 update_fields.append('email')
 
+            # gender
+            old_gender = instance.gender
+            new_gender = validated_data.get('gender', old_gender)
+            if old_gender != new_gender:
+                instance.gender = new_gender
+                update_fields.append('gender')
+
+            # birthday
+            old_birthday = instance.birthday
+            new_birthday = validated_data.get('birthday', old_birthday)
+            if old_birthday != new_birthday:
+                instance.birthday = new_birthday
+                update_fields.append('birthday')
+
             if update_fields:
                 instance.save(update_fields=update_fields)
 
         return instance
+
+
+class UserSNSDetailSerializer(ModelSerializer):
+    class Meta:
+        model = UserSNS
+        fields = (
+            "id",
+            "username",
+            "url",
+        )
+
+
+class UserSNSListSerializer(ModelSerializer):
+    class Meta:
+        model = UserSNS
+        fields = (
+            "id",
+            "username",
+            "url",
+        )
+
+    def validate(self, data):
+        return data
+
+    def create(self, validated_data):
+        user = self.context['user']
+
+        username = validated_data['username']
+        url = validated_data['url']
+
+        with transaction.atomic():
+            new_sns = UserSNS.objects.create(
+                username=username,
+                url=url,
+                user_profile=user.profile,
+            )
+
+        return new_sns
 
 
 class UserDetailsSerializer(ModelSerializer):

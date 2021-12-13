@@ -20,6 +20,16 @@ urlpatterns = [
         views.UserMeView.as_view(),
         name=views.UserMeView.__name__,
     ),
+    path(
+        "user/me/sns",
+        views.UserMeSNSListView.as_view(),
+        name=views.UserMeSNSListView.__name__,
+    ),
+    path(
+        "user/me/sns/<int:id>",
+        views.UserMeSNSDetailView.as_view(),
+        name=views.UserMeSNSDetailView.__name__,
+    ),
 ]
 
 if settings.DEBUG:
