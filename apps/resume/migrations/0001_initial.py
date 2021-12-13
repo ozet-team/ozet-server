@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': '이력서',
                 'verbose_name_plural': '이력서 목록',
-                'db_table': 'resume_resume',
+                'db_table': 'member_user_resume',
             },
         ),
     ]
