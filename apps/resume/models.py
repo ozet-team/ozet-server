@@ -19,21 +19,6 @@ from utils.django.models import SafeDeleteModel, TimeStampedModel
 
 class Resume(TimeStampedModel):
     # info
-    title = models.CharField(
-        max_length=250,
-        default=None,
-        null=True,
-        blank=True,
-        verbose_name=_('이력서 이름'),
-    )
-
-    pdf = models.FileField(
-        upload_to=storages.resume_pdf_upload,
-        editable=True,
-        null=False,
-        verbose_name=_('이력서 파일'),
-    )
-
     extra = models.JSONField(
         null=True,
         blank=True,
@@ -41,19 +26,18 @@ class Resume(TimeStampedModel):
         verbose_name=_('추가 정보'),
     )
 
-    # Fo
-    user = models.ForeignKey(
+    # Related
+    user = models.OneToOneField(
         User,
         null=False,
         blank=False,
         on_delete=models.CASCADE,
-        related_name='resume_set',
+        related_name='resume',
         verbose_name=_('회원'),
     )
 
     class Meta:
         verbose_name = _('이력서')
-        verbose_name_plural = _('이력서 목록')
 
         db_table = 'member_user_resume'
 
@@ -61,4 +45,234 @@ class Resume(TimeStampedModel):
         return self.__repr__()
 
     def __repr__(self):
-        return f'<{self._meta.verbose_name.title()}: {self.title.name}>'
+        return f'<{self._meta.verbose_name.title()}: {self.user.name}>'
+
+
+class Career(TimeStampedModel):
+    class Position(DjangoChoices):
+        staff = ChoiceItem('STAFF', _('스탭(인턴)'))
+        manager = ChoiceItem('MANAGER', _('매니저'))
+        designer = ChoiceItem('DESIGNER', _('디자이너'))
+        director = ChoiceItem('DIRECTOR', _('원장'))
+
+    # Info
+    company = models.CharField(
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('회사'),
+    )
+
+    position = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        choices=Position.choices,
+        verbose_name=_('직급'),
+    )
+
+    join_at = models.DateTimeField(
+        null=False,
+        blank=False,
+        verbose_name=_('입사일'),
+    )
+
+    quit_at = models.DateTimeField(
+        null=True,
+        blank=False,
+        verbose_name=_('퇴사일'),
+    )
+
+    # Related
+    resume = models.ForeignKey(
+        Resume,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='resume',
+        verbose_name=_('회원'),
+    )
+
+    class Meta:
+        verbose_name = _('이력서')
+
+        db_table = 'member_user_resume_career'
+
+    @property
+    def is_working(self):
+        return not self.quit_at
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return f'<{self._meta.verbose_name.title()}: {self.resume.user.name}>'
+
+
+class Certificate(TimeStampedModel):
+    # Info
+    name = models.CharField(
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('이름'),
+    )
+
+    vendor = models.CharField(
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('발급기관'),
+    )
+
+    certificate_at = models.DateTimeField(
+        null=False,
+        blank=False,
+        verbose_name=_('취득일'),
+    )
+
+    # Related
+    resume = models.ForeignKey(
+        Resume,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='certificate',
+        verbose_name=_('회원'),
+    )
+
+    class Meta:
+        verbose_name = _('이력서')
+
+        db_table = 'member_user_resume_certificate'
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return f'<{self._meta.verbose_name.title()}: {self.resume.user.name}>'
+
+
+class AcademicBackground(TimeStampedModel):
+    # Info
+    name = models.CharField(
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('학교명'),
+    )
+
+    department = models.CharField(
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('학과명'),
+    )
+
+    location = models.CharField(
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('소재지'),
+    )
+
+    join_at = models.DateTimeField(
+        null=False,
+        blank=False,
+        verbose_name=_('입사일'),
+    )
+
+    quit_at = models.DateTimeField(
+        null=True,
+        blank=False,
+        verbose_name=_('퇴사일'),
+    )
+
+    # Related
+    resume = models.ForeignKey(
+        Resume,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='academic',
+        verbose_name=_('회원'),
+    )
+
+    class Meta:
+        verbose_name = _('이력서')
+
+        db_table = 'member_user_resume_academic'
+
+    @property
+    def is_attending(self):
+        return not self.quit_at
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return f'<{self._meta.verbose_name.title()}: {self.resume.user.name}>'
+
+
+class MilitaryService(TimeStampedModel):
+    class Position(DjangoChoices):
+        not_applicable = ChoiceItem('NA', _('해당없음'))
+        exemption = ChoiceItem('EXEMPTION', _('면제'))
+        unfinished = ChoiceItem('UNFINISHED', _('미필'))
+        finished = ChoiceItem('FINISHED', _('군필'))
+
+    # Info
+    service = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        choices=Position.choices,
+        verbose_name=_('병역'),
+    )
+
+    exemption_reason = models.CharField(
+        max_length=250,
+        null=True,
+        blank=True,
+        choices=Position.choices,
+        verbose_name=_('면제사유'),
+    )
+
+    join_at = models.DateTimeField(
+        null=False,
+        blank=False,
+        verbose_name=_('입사일'),
+    )
+
+    quit_at = models.DateTimeField(
+        null=False,
+        blank=False,
+        verbose_name=_('퇴사일'),
+    )
+
+    # Related
+    resume = models.ForeignKey(
+        Resume,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='military',
+        verbose_name=_('회원'),
+    )
+
+    class Meta:
+        verbose_name = _('이력서')
+
+        db_table = 'member_user_resume_military'
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return f'<{self._meta.verbose_name.title()}: {self.resume.user.name}>'

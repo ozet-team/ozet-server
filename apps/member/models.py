@@ -173,6 +173,7 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
 
 class UserProfile(TimeStampedModel):
+    # info
     profile_image = models.ImageField(
         upload_to=storages.profile_image_upload,
         editable=True,
