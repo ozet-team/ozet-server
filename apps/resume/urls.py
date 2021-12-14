@@ -11,12 +11,12 @@ urlpatterns = [
         name=views.ResumeDetailView.__name__,
     ),
     path(
-        "user/me/resume/career",
+        "user/me/resume/careers",
         views.ResumeCareerListView.as_view(),
         name=views.ResumeCareerListView.__name__,
     ),
     path(
-        "user/me/resume/career/<int:id>",
+        "user/me/resume/careers/<int:id>",
         views.ResumeCareerDetailView.as_view(),
         name=views.ResumeCareerDetailView.__name__,
     ),
@@ -26,17 +26,17 @@ urlpatterns = [
         name=views.ResumeCertificateListView.__name__,
     ),
     path(
-        "user/me/resume/certificate/<int:id>",
+        "user/me/resume/certificates/<int:id>",
         views.ResumeCertificateDetailView.as_view(),
         name=views.ResumeCertificateDetailView.__name__,
     ),
     path(
-        "user/me/resume/academic",
+        "user/me/resume/academics",
         views.ResumeAcademicBackgroundListView.as_view(),
         name=views.ResumeAcademicBackgroundListView.__name__,
     ),
     path(
-        "user/me/resume/academic/<int:id>",
+        "user/me/resume/academics/<int:id>",
         views.ResumeAcademicBackgroundDetailView.as_view(),
         name=views.ResumeAcademicBackgroundDetailView.__name__,
     ),

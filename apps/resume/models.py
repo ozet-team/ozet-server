@@ -84,6 +84,14 @@ class Career(TimeStampedModel):
         verbose_name=_('퇴사일'),
     )
 
+    worked_on = models.CharField(
+        max_length=500,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('업무 내용'),
+    )
+
     # Related
     resume = models.ForeignKey(
         Resume,
@@ -125,7 +133,7 @@ class Certificate(TimeStampedModel):
         default=None,
         null=True,
         blank=True,
-        verbose_name=_('발급기관'),
+        verbose_name=_('발급 기관'),
     )
 
     certificate_at = models.DateTimeField(
@@ -166,7 +174,7 @@ class AcademicBackground(TimeStampedModel):
         verbose_name=_('학교명'),
     )
 
-    department = models.CharField(
+    major = models.CharField(
         max_length=250,
         default=None,
         null=True,
