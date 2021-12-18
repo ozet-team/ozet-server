@@ -29,3 +29,4 @@ class Announcement(models.Model):
         related_name="announcements",
     )
     description = models.TextField("상세내용", null=True, blank=True)
+    external_id = models.IntegerField("외부 ID", null=True)
