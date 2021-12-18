@@ -18,7 +18,7 @@ from rest_framework import serializers, fields
 from phonenumber_field.serializerfields import PhoneNumberField
 from phonenumber_field.phonenumber import PhoneNumber
 
-from apps.member.models import User, UserProfile, UserPasscodeVerify, UserToken
+from apps.member.models import User, UserProfile, UserPasscodeVerify, UserToken, UserSNS
 from utils.django.rest_framework.serializers import SimpleSerializer, ModelSerializer
 from utils.naver.api import NaverCloudAPI
 
@@ -48,7 +48,9 @@ class UserSerializer(ModelSerializer):
             "username",
             "name",
             "email",
-            "phone_number"
+            "phone_number",
+            "birthday",
+            "gender",
         )
 
 
@@ -58,6 +60,7 @@ class UserProfileSerializer(ModelSerializer):
         fields = (
             "introduce",
             "profile_image",
+            "address",
             "policy_for_terms_agreed",
             "policy_for_privacy_agreed",
         )
@@ -178,7 +181,7 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
                 "username",
                 "name",
                 "email",
-                "phone_number"
+                "phone_number",
             )
 
     # Write Only
@@ -262,15 +265,27 @@ class UserPasscodeVerifyPassSerializer(SimpleSerializer):
 
 class UserMeSerializer(ModelSerializer):
     class NestedProfileSerializer(ModelSerializer):
+        class NestedSNSSerializer(ModelSerializer):
+            class Meta:
+                model = UserSNS
+                fields = (
+                    "id",
+                    "username",
+                    "url",
+                )
+
         profile_image = serializers.ImageField(use_url=True)
+        sns_list = NestedSNSSerializer(source='sns_set', many=True)
 
         class Meta:
             model = UserProfile
             fields = (
                 "introduce",
                 "profile_image",
+                "address",
                 "policy_for_terms_agreed",
                 "policy_for_privacy_agreed",
+                "sns_list",
             )
             read_only_fields = (
                 "policy_for_terms_agreed",
@@ -285,13 +300,15 @@ class UserMeSerializer(ModelSerializer):
             "email",
             "profile",
             "phone_number",
+            "birthday",
+            "gender",
         )
         read_only_fields = (
             "username",
             "phone_number",
         )
 
-    profile = NestedProfileSerializer(flatten=True, read_only=True)
+    profile = NestedProfileSerializer(flatten=True)
 
     # noinspection PyMethodMayBeStatic
     def validate_name(self, value):
@@ -321,14 +338,19 @@ class UserMeSerializer(ModelSerializer):
                 user_profile.introduce = new_introduce
                 update_fields.append('introduce')
 
-            if update_fields:
-                user_profile.save(update_fields=update_fields)
-
+            # profile_image
             old_profile_image = user_profile.profile_image
             new_profile_image = validated_data.get('profile', {}).get('profile_image', old_introduce)
             if old_profile_image != new_profile_image:
                 user_profile.profile_image = new_profile_image
                 update_fields.append('profile_image')
+
+            # address
+            old_address = user_profile.address
+            new_address = validated_data.get('profile', {}).get('address', old_address)
+            if old_address != new_address:
+                user_profile.address = new_address
+                update_fields.append('address')
 
             if update_fields:
                 user_profile.save(update_fields=update_fields)
@@ -352,10 +374,62 @@ class UserMeSerializer(ModelSerializer):
                 instance.email = new_email
                 update_fields.append('email')
 
+            # gender
+            old_gender = instance.gender
+            new_gender = validated_data.get('gender', old_gender)
+            if old_gender != new_gender:
+                instance.gender = new_gender
+                update_fields.append('gender')
+
+            # birthday
+            old_birthday = instance.birthday
+            new_birthday = validated_data.get('birthday', old_birthday)
+            if old_birthday != new_birthday:
+                instance.birthday = new_birthday
+                update_fields.append('birthday')
+
             if update_fields:
                 instance.save(update_fields=update_fields)
 
         return instance
+
+
+class UserSNSDetailSerializer(ModelSerializer):
+    class Meta:
+        model = UserSNS
+        fields = (
+            "id",
+            "username",
+            "url",
+        )
+
+
+class UserSNSListSerializer(ModelSerializer):
+    class Meta:
+        model = UserSNS
+        fields = (
+            "id",
+            "username",
+            "url",
+        )
+
+    def validate(self, data):
+        return data
+
+    def create(self, validated_data):
+        user = self.context['user']
+
+        username = validated_data['username']
+        url = validated_data['url']
+
+        with transaction.atomic():
+            new_sns = UserSNS.objects.create(
+                username=username,
+                url=url,
+                user_profile=user.profile,
+            )
+
+        return new_sns
 
 
 class UserDetailsSerializer(ModelSerializer):

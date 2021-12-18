@@ -20,7 +20,11 @@ from utils.django.models import SafeDeleteModel, TimeStampedModel
 
 # Create your models here.
 class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
-    # info
+    class Gender(DjangoChoices):
+        male = ChoiceItem('MALE', _('남자'))
+        female = ChoiceItem('FEMALE', _('여자'))
+
+    # Info
     username = models.CharField(
         max_length=200,
         null=True,
@@ -51,6 +55,20 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
         null=True,
         blank=False,
         verbose_name=_('이름')
+    )
+
+    birthday = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name=_('생일')
+    )
+
+    gender = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        choices=Gender.choices,
+        verbose_name=_('성별'),
     )
 
     # config
@@ -155,19 +173,12 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
 
 class UserProfile(TimeStampedModel):
-    user = models.OneToOneField(
-        User,
-        null=False,
-        blank=False,
-        on_delete=models.CASCADE,
-        related_name='profile',
-        verbose_name=_('회원'),
-    )
-
+    # Info
     profile_image = models.ImageField(
         upload_to=storages.profile_image_upload,
         editable=True,
-        null=True
+        null=True,
+        verbose_name=_('프로필 이미지 파일'),
     )
 
     introduce = models.CharField(
@@ -176,6 +187,14 @@ class UserProfile(TimeStampedModel):
         null=True,
         blank=True,
         verbose_name=_('소개'),
+    )
+
+    address = models.CharField(
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('주소'),
     )
 
     policy_for_terms_agreed = AutoCreatedField(
@@ -196,6 +215,16 @@ class UserProfile(TimeStampedModel):
         verbose_name=_('추가 정보'),
     )
 
+    # Related
+    user = models.OneToOneField(
+        User,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='profile',
+        verbose_name=_('회원'),
+    )
+
     class Meta:
         verbose_name = _('회원 프로필')
         verbose_name_plural = _('회원 프로필 목록')
@@ -207,6 +236,48 @@ class UserProfile(TimeStampedModel):
 
     def __repr__(self):
         return f'<{self._meta.verbose_name.title()}: {self.user.name}>'
+
+
+class UserSNS(TimeStampedModel):
+    username = models.CharField(
+        max_length=50,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('SNS'),
+    )
+
+    url = models.CharField(
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('URL'),
+    )
+
+    token = models.CharField(
+        max_length=255,
+        null=True,
+        blank=False,
+        verbose_name=_('토큰'),
+        unique=True,
+    )
+
+    # Related
+    user_profile = models.ForeignKey(
+        UserProfile,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='sns_set',
+        verbose_name=_('회원 프로필'),
+    )
+
+    class Meta:
+        verbose_name = _('회원 SNS')
+        verbose_name_plural = _('회원 SNS 목록')
+
+        db_table = 'member_user_profile_sns'
 
 
 class UserToken(TimeStampedModel):
