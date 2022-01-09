@@ -302,13 +302,22 @@ class UserMeSerializer(ModelSerializer):
             "phone_number",
             "birthday",
             "gender",
+            "carrier",
         )
         read_only_fields = (
             "username",
             "phone_number",
+            "carrier",
         )
 
     profile = NestedProfileSerializer(flatten=True)
+    career = serializers.SerializerMethodField(label=_('경력'), read_only=True)
+
+    # noinspection PyMethodMayBeStatic
+    def get_career(self, obj):
+        careers = obj.resume.career_set
+
+        return ''
 
     # noinspection PyMethodMayBeStatic
     def validate_name(self, value):
@@ -471,5 +480,3 @@ class UserDetailsSerializer(ModelSerializer):
         )
 
     profile = NestedProfileSerializer(flatten=True, read_only=True)
-
-

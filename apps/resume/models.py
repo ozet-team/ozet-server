@@ -98,7 +98,7 @@ class Career(TimeStampedModel):
         null=False,
         blank=False,
         on_delete=models.CASCADE,
-        related_name='resume',
+        related_name='career_set',
         verbose_name=_('회원'),
     )
 
@@ -148,7 +148,7 @@ class Certificate(TimeStampedModel):
         null=False,
         blank=False,
         on_delete=models.CASCADE,
-        related_name='certificate',
+        related_name='certificate_set',
         verbose_name=_('회원'),
     )
 
@@ -208,7 +208,7 @@ class AcademicBackground(TimeStampedModel):
         null=False,
         blank=False,
         on_delete=models.CASCADE,
-        related_name='academic',
+        related_name='academic_set',
         verbose_name=_('회원'),
     )
 
@@ -269,7 +269,7 @@ class MilitaryService(TimeStampedModel):
         null=False,
         blank=False,
         on_delete=models.CASCADE,
-        related_name='military',
+        related_name='military_set',
         verbose_name=_('회원'),
     )
 
