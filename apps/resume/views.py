@@ -9,18 +9,20 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 
 from apps.resume import models
 from apps.resume import serializers
-from apps.resume.models import Career, Certificate, AcademicBackground, MilitaryService
+from apps.resume.models import Career, Certificate, AcademicBackground, MilitaryService, Resume
 from utils.django.rest_framework.mixins import UserContextMixin, QuerySerializerMixin
 
 from commons.contrib.drf_spectacular import tags as api_tags
 
 
-class ResumeDetailView(UserContextMixin, ListAPIView, UpdateAPIView):
+class ResumeDetailView(UserContextMixin, RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = serializers.ResumeSerializer
 
-    def get_queryset(self):
-        return [self.user.resume]
+    def get_object(self):
+        resume = Resume.objects.get_or_create(user_id=self.user.id)
+
+        return resume
 
     def __init__(self, *args, **kwargs):
         self.http_method_names = [method for method in self.http_method_names if method != "put"]
@@ -294,17 +296,14 @@ class ResumeAcademicBackgroundListView(UserContextMixin, ListCreateAPIView):
         return super(ResumeAcademicBackgroundListView, self).post(request, *args, **kwargs)
 
 
-class ResumeMilitaryServiceView(UserContextMixin, ListAPIView, UpdateAPIView):
+class ResumeMilitaryServiceView(UserContextMixin, RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = serializers.MilitaryServiceSerializer
 
-    def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return MilitaryService.objects.none()
+    def get_object(self):
+        military = MilitaryService.objects.get_or_create(resume_id=self.user.resume.id)
 
-        return MilitaryService.objects \
-            .filter(resume_id=self.user.resume.id) \
-            .all()
+        return military
 
     def __init__(self, *args, **kwargs):
         self.http_method_names = [method for method in self.http_method_names if method != "put"]

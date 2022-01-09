@@ -40,6 +40,24 @@ class Resume(TimeStampedModel):
 
         db_table = 'member_user_resume'
 
+    def save(self, *args, **kwargs):
+        if not self.id:
+            rv = super(Resume, self).save(*args, **kwargs)
+            military = MilitaryService.objects.create(
+
+            )
+
+            return rv
+
+        old_instance = Resume.objects.filter(id=self.id).first()
+        if not old_instance:
+            return super(Resume, self).save(*args, **kwargs)
+
+        # 업데이트
+        rv = super(Resume, self).save(*args, **kwargs)
+
+        return rv
+
     def __str__(self):
         return self.__repr__()
 
@@ -191,7 +209,7 @@ class AcademicBackground(TimeStampedModel):
 
     join_at = models.DateTimeField(
         null=False,
-        blank=False,
+        blank=True,
         verbose_name=_('입사일'),
     )
 
@@ -251,15 +269,15 @@ class MilitaryService(TimeStampedModel):
     )
 
     join_at = models.DateTimeField(
-        null=False,
-        blank=False,
-        verbose_name=_('입사일'),
+        null=True,
+        blank=True,
+        verbose_name=_('입대일'),
     )
 
     quit_at = models.DateTimeField(
-        null=False,
-        blank=False,
-        verbose_name=_('퇴사일'),
+        null=True,
+        blank=True,
+        verbose_name=_('전역일'),
     )
 
     # Related
@@ -271,6 +289,7 @@ class MilitaryService(TimeStampedModel):
         related_name='military',
         verbose_name=_('회원'),
     )
+
 
     class Meta:
         verbose_name = _('이력서')

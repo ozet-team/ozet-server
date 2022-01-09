@@ -17,7 +17,7 @@ from rest_framework_jwt.utils import jwt_decode_handler
 
 from apps.member.managers import UserManager
 from apps.member import storages
-from apps.resume.models import Resume
+from apps.resume.models import Resume, MilitaryService
 from utils.django.models import SafeDeleteModel, TimeStampedModel
 
 
@@ -117,7 +117,7 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
                                        policy_for_terms_agreed=self.created,
                                        policy_for_privacy_agreed=self.created)
 
-            Resume.objects.create(user=self)
+            resume = Resume.objects.create(user_id=self.id)
 
             return rv
 
