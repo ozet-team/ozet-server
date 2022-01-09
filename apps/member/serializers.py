@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import jwt
 import re
 import random
@@ -312,6 +314,7 @@ class UserMeSerializer(ModelSerializer):
             "career",
         )
 
+
     profile = NestedProfileSerializer(flatten=True)
     career = serializers.SerializerMethodField(label=_('경력'), read_only=True)
 
@@ -327,10 +330,13 @@ class UserMeSerializer(ModelSerializer):
         for career in careers:
             duration = career.quit_at - career.join_at
 
-            if career.type in career_summary:
-                career_summary['career.type'] += duration
+            if  duration <= timedelta(30):
+                continue
+
+            if career.position in career_summary:
+                career_summary[career.position] += duration.days
             else:
-                career_summary['career.type'] = duration
+                career_summary[career.position] = duration.days
 
         return career_summary
 
