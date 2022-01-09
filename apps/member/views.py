@@ -278,7 +278,7 @@ class UserMeSNSDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
             return UserSNS.objects.none()
 
         return UserSNS.objects \
-            .filter(user_profile_id=self.user.profile.id) \
+            .filter(resume_id=self.user.resume.id) \
             .order_by('-id') \
             .all()
 
@@ -353,7 +353,7 @@ class UserMeSNSListView(UserContextMixin, ListCreateAPIView):
             return UserSNS.objects.none()
 
         return UserSNS.objects \
-            .filter(user_profile_id=self.user.profile.id) \
+            .filter(resume_id=self.user.resume.id) \
             .order_by('-id') \
             .all()
 

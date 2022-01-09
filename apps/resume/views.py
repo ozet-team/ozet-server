@@ -61,7 +61,7 @@ class ResumeCareerDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
             return Career.objects.none()
 
         return Career.objects \
-            .filter(user_profile_id=self.user.profile.id) \
+            .filter(resume_id=self.user.resume.id) \
             .order_by('-join_at') \
             .all()
 
@@ -105,7 +105,7 @@ class ResumeCareerListView(UserContextMixin, ListCreateAPIView):
             return Career.objects.none()
 
         return Career.objects \
-            .filter(user_profile_id=self.user.profile.id) \
+            .filter(resume_id=self.user.resume.id) \
             .order_by('-join_at') \
             .all()
 
@@ -144,7 +144,7 @@ class ResumeCertificateDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView
             return Certificate.objects.none()
 
         return Certificate.objects \
-            .filter(user_profile_id=self.user.profile.id) \
+            .filter(resume_id=self.user.resume.id) \
             .order_by('-certificate_at') \
             .all()
 
@@ -188,7 +188,7 @@ class ResumeCertificateListView(UserContextMixin, ListCreateAPIView):
             return Certificate.objects.none()
 
         return Certificate.objects \
-            .filter(user_profile_id=self.user.profile.id) \
+            .filter(resume_id=self.user.resume.id) \
             .order_by('-join_at') \
             .all()
 
@@ -227,7 +227,7 @@ class ResumeAcademicBackgroundDetailView(UserContextMixin, RetrieveUpdateDestroy
             return AcademicBackground.objects.none()
 
         return AcademicBackground.objects \
-            .filter(user_profile_id=self.user.profile.id) \
+            .filter(resume_id=self.user.resume.id) \
             .order_by('-join_at') \
             .all()
 
@@ -267,7 +267,7 @@ class ResumeAcademicBackgroundListView(UserContextMixin, ListCreateAPIView):
             return AcademicBackground.objects.none()
 
         return AcademicBackground.objects \
-            .filter(user_profile_id=self.user.profile.id) \
+            .filter(resume_id=self.user.resume.id) \
             .order_by('-join_at') \
             .all()
 
@@ -303,7 +303,7 @@ class ResumeMilitaryServiceView(UserContextMixin, RetrieveUpdateAPIView):
             return MilitaryService.objects.none()
 
         return MilitaryService.objects \
-            .filter(user_profile_id=self.user.profile.id) \
+            .filter(resume_id=self.user.resume.id) \
             .order_by('-join_at') \
             .all()
 
