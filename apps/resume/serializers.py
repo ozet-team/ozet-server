@@ -46,6 +46,7 @@ class CertificateSerializer(ModelSerializer):
     class Meta:
         model = Certificate
         fields = (
+            'name',
             'vendor',
             'certificate_at',
         )

@@ -189,7 +189,7 @@ class ResumeCertificateListView(UserContextMixin, ListCreateAPIView):
 
         return Certificate.objects \
             .filter(resume_id=self.user.resume.id) \
-            .order_by('-join_at') \
+            .order_by('-certificate_at') \
             .all()
 
     @extend_schema(
@@ -294,7 +294,7 @@ class ResumeAcademicBackgroundListView(UserContextMixin, ListCreateAPIView):
         return super(ResumeAcademicBackgroundListView, self).post(request, *args, **kwargs)
 
 
-class ResumeMilitaryServiceView(UserContextMixin, RetrieveUpdateAPIView):
+class ResumeMilitaryServiceView(UserContextMixin, ListAPIView, UpdateAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = serializers.MilitaryServiceSerializer
 
@@ -304,7 +304,6 @@ class ResumeMilitaryServiceView(UserContextMixin, RetrieveUpdateAPIView):
 
         return MilitaryService.objects \
             .filter(resume_id=self.user.resume.id) \
-            .order_by('-join_at') \
             .all()
 
     def __init__(self, *args, **kwargs):
