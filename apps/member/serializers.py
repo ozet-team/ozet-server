@@ -1,3 +1,4 @@
+import jwt
 import re
 import random
 import uuid
@@ -19,6 +20,7 @@ from phonenumber_field.serializerfields import PhoneNumberField
 from phonenumber_field.phonenumber import PhoneNumber
 
 from apps.member.models import User, UserProfile, UserPasscodeVerify, UserToken, UserSNS
+from apps.resume.models import Career
 from utils.django.rest_framework.serializers import SimpleSerializer, ModelSerializer
 from utils.naver.api import NaverCloudAPI
 
@@ -252,7 +254,7 @@ class UserPasscodeVerifyPassSerializer(SimpleSerializer):
             raise NotFound()
 
         data['user'] = user
-        data['token'] = user.get_valid_token().token
+        data['token'] = user.get_valid_token(auto_generate=True).token
 
         return data
 
@@ -302,12 +304,12 @@ class UserMeSerializer(ModelSerializer):
             "phone_number",
             "birthday",
             "gender",
-            "carrier",
+            "career",
         )
         read_only_fields = (
             "username",
             "phone_number",
-            "carrier",
+            "career",
         )
 
     profile = NestedProfileSerializer(flatten=True)
@@ -315,9 +317,22 @@ class UserMeSerializer(ModelSerializer):
 
     # noinspection PyMethodMayBeStatic
     def get_career(self, obj):
-        careers = obj.resume.career_set
+        resume = obj.resume
+        careers = resume.career_set.all()
 
-        return ''
+        position_list = Career.Position.choices
+
+        career_summary = dict()
+
+        for career in careers:
+            duration = career.quit_at - career.join_at
+
+            if career.type in career_summary:
+                career_summary['career.type'] += duration
+            else:
+                career_summary['career.type'] = duration
+
+        return career_summary
 
     # noinspection PyMethodMayBeStatic
     def validate_name(self, value):

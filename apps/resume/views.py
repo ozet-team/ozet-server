@@ -16,8 +16,11 @@ from commons.contrib.drf_spectacular import tags as api_tags
 
 
 class ResumeDetailView(UserContextMixin, RetrieveUpdateAPIView):
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    permission_classes = (IsAuthenticated, )
     serializer_class = serializers.ResumeSerializer
+
+    def get_queryset(self):
+        return self.user.resume
 
     def __init__(self, *args, **kwargs):
         self.http_method_names = [method for method in self.http_method_names if method != "put"]

@@ -3,6 +3,7 @@ from typing import Union
 from datetime import datetime, timedelta
 from random import randint
 
+import jwt
 from djchoices import DjangoChoices, ChoiceItem
 from model_utils.fields import AutoCreatedField
 from phonenumber_field.modelfields import PhoneNumberField
@@ -12,9 +13,11 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models, transaction
 from rest_auth.utils import jwt_encode
+from rest_framework_jwt.utils import jwt_decode_handler
 
 from apps.member.managers import UserManager
 from apps.member import storages
+from apps.resume.models import Resume
 from utils.django.models import SafeDeleteModel, TimeStampedModel
 
 
@@ -114,6 +117,8 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
                                        policy_for_terms_agreed=self.created,
                                        policy_for_privacy_agreed=self.created)
 
+            Resume.objects.create(user=self)
+
             return rv
 
         old_instance = User.objects.filter(id=self.id).first()
@@ -144,16 +149,44 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
             return False
         return True
 
-    def get_valid_token(self, auto_generate=False):
+    def refresh_token(self, is_transaction=True):
+        def _process():
+            self.token_set.all().update(status=UserToken.Status.expire)
+
+            return UserToken.objects.create(
+                user=self,
+                token=jwt_encode(self),
+            )
+
+        if is_transaction:
+            with transaction.atomic():
+                return _process()
+
+        return _process()
+
+    def get_valid_token(self, auto_generate=False, is_transaction=True):
+
         valid_token = self.token_set.all() \
             .order_by('-created') \
             .first()
 
-        if (not valid_token or valid_token.status == UserToken.Status.expire) and auto_generate:
-            valid_token = UserToken.objects.create(
-                user=self,
-                token=jwt_encode(self),
-            )
+        try:
+            payload = jwt_decode_handler(valid_token.token)
+        except jwt.ExpiredSignature:
+            payload = None
+        except jwt.DecodeError:
+            payload = None
+        except jwt.InvalidTokenError:
+            payload = None
+
+
+        if auto_generate and ( \
+            not valid_token or \
+            not payload or \
+            valid_token.status == UserToken.Status.expire
+        ):
+            valid_token = self.refresh_token(is_transaction)
+
 
         return valid_token
 

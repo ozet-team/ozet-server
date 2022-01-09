@@ -12,7 +12,6 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models, transaction
 from rest_auth.utils import jwt_encode
 
-from apps.member.models import User
 from apps.resume import storages
 from utils.django.models import SafeDeleteModel, TimeStampedModel
 
@@ -28,7 +27,7 @@ class Resume(TimeStampedModel):
 
     # Related
     user = models.OneToOneField(
-        User,
+        'member.User',
         null=False,
         blank=False,
         on_delete=models.CASCADE,
