@@ -25,25 +25,76 @@ from utils.django.rest_framework.serializers import SimpleSerializer, ModelSeria
 class CareerSerializer(ModelSerializer):
     class Meta:
         model = Career
-        fields = "__all__"
+        fields = (
+            'company',
+            'position',
+            'join_at',
+            'quit_at',
+            'worked_on',
+        )
+
+        read_only_fields = ()
+
+    def create(self, validated_data):
+        user = self.context['user']
+        career = Career.objects.create(resume=user.resume, **validated_data)
+
+        return career
 
 
 class CertificateSerializer(ModelSerializer):
     class Meta:
         model = Certificate
-        fields = "__all__"
+        fields = (
+            'vendor',
+            'certificate_at',
+        )
+
+        read_only_fields = ()
+
+    def create(self, validated_data):
+        user = self.context['user']
+        certificate = Certificate.objects.create(resume=user.resume, **validated_data)
+
+        return certificate
 
 
 class AcademicBackgroundSerializer(ModelSerializer):
     class Meta:
         model = AcademicBackground
-        fields = "__all__"
+        fields = (
+            'major',
+            'location',
+            'join_at',
+            'quit_at',
+        )
+
+        read_only_fields = ()
+
+    def create(self, validated_data):
+        user = self.context['user']
+        academic_background = AcademicBackground.objects.create(resume=user.resume, **validated_data)
+
+        return academic_background
 
 
 class MilitaryServiceSerializer(ModelSerializer):
     class Meta:
         model = MilitaryService
-        fields = "__all__"
+        fields = (
+            'service',
+            'exemption_reason',
+            'join_at',
+            'quit_at',
+        )
+
+        read_only_fields = ()
+
+    def create(self, validated_data):
+        user = self.context['user']
+        military_service = MilitaryService.objects.create(resume=user.resume, **validated_data)
+
+        return military_service
 
 
 class ResumeSerializer(ModelSerializer):
