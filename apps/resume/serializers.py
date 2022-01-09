@@ -107,7 +107,7 @@ class ResumeSerializer(ModelSerializer):
             "military",
         )
 
-    career = CareerSerializer(many=True)
-    certificate = CertificateSerializer(many=True)
-    academic = AcademicBackgroundSerializer(many=True)
+    career = CareerSerializer(many=True, source='career_set')
+    certificate = CertificateSerializer(many=True, source='certificate_set')
+    academic = AcademicBackgroundSerializer(many=True, source='academic_set')
     military = MilitaryServiceSerializer()

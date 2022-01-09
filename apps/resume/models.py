@@ -268,7 +268,7 @@ class MilitaryService(TimeStampedModel):
         null=False,
         blank=False,
         on_delete=models.CASCADE,
-        related_name='military_set',
+        related_name='military',
         verbose_name=_('회원'),
     )
 

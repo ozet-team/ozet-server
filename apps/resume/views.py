@@ -2,7 +2,7 @@ from django.utils.functional import cached_property
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView, UpdateAPIView
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -15,12 +15,12 @@ from utils.django.rest_framework.mixins import UserContextMixin, QuerySerializer
 from commons.contrib.drf_spectacular import tags as api_tags
 
 
-class ResumeDetailView(UserContextMixin, RetrieveUpdateAPIView):
+class ResumeDetailView(UserContextMixin, ListAPIView, UpdateAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = serializers.ResumeSerializer
 
     def get_queryset(self):
-        return self.user.resume
+        return [self.user.resume]
 
     def __init__(self, *args, **kwargs):
         self.http_method_names = [method for method in self.http_method_names if method != "put"]
