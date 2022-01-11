@@ -89,13 +89,13 @@ class Career(TimeStampedModel):
         verbose_name=_('직급'),
     )
 
-    join_at = models.DateTimeField(
+    join_at = models.DateField(
         null=False,
         blank=False,
         verbose_name=_('입사일'),
     )
 
-    quit_at = models.DateTimeField(
+    quit_at = models.DateField(
         null=True,
         blank=False,
         verbose_name=_('퇴사일'),
@@ -153,7 +153,7 @@ class Certificate(TimeStampedModel):
         verbose_name=_('발급 기관'),
     )
 
-    certificate_at = models.DateTimeField(
+    certificate_at = models.DateField(
         null=False,
         blank=False,
         verbose_name=_('취득일'),
@@ -207,13 +207,13 @@ class AcademicBackground(TimeStampedModel):
         verbose_name=_('소재지'),
     )
 
-    join_at = models.DateTimeField(
+    join_at = models.DateField(
         null=False,
         blank=True,
         verbose_name=_('입사일'),
     )
 
-    quit_at = models.DateTimeField(
+    quit_at = models.DateField(
         null=True,
         blank=False,
         verbose_name=_('퇴사일'),
@@ -268,13 +268,13 @@ class MilitaryService(TimeStampedModel):
         verbose_name=_('면제사유'),
     )
 
-    join_at = models.DateTimeField(
+    join_at = models.DateField(
         null=True,
         blank=True,
         verbose_name=_('입대일'),
     )
 
-    quit_at = models.DateTimeField(
+    quit_at = models.DateField(
         null=True,
         blank=True,
         verbose_name=_('전역일'),
