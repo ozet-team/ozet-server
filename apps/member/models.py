@@ -149,9 +149,12 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
             return False
         return True
 
-    def refresh_token(self, is_transaction=True):
+    def refresh_token(self, token_type: ChoiceItem, is_transaction=True):
         def _process():
-            self.token_set.all().update(status=UserToken.Status.expire)
+            self.token_set.all().update(
+                status=UserToken.Status.expire,
+                type=token_type
+            )
 
             return UserToken.objects.create(
                 user=self,
@@ -164,9 +167,9 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
         return _process()
 
-    def get_valid_token(self, auto_generate=False, is_transaction=True):
-
-        valid_token = self.token_set.all() \
+    def get_valid_token(self, token_type: ChoiceItem, auto_generate=False, is_transaction=True):
+        valid_token = self.token_set \
+            .filter(type=token_type) \
             .order_by('-created') \
             .first()
 
@@ -185,7 +188,7 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
             not payload or \
             valid_token.status == UserToken.Status.expire
         ):
-            valid_token = self.refresh_token(is_transaction)
+            valid_token = self.refresh_token(token_type, is_transaction)
 
 
         return valid_token
@@ -318,6 +321,10 @@ class UserToken(TimeStampedModel):
         available = ChoiceItem('used', label=_('유효함'))
         expire = ChoiceItem('expire', label=_('만료됨'))
 
+    class Type(DjangoChoices):
+        refresh = ChoiceItem('refresh', label=_('REFRESH'))
+        access = ChoiceItem('access', label=_('ACCESS'))
+
     user = models.ForeignKey(
         User,
         null=False,
@@ -332,6 +339,14 @@ class UserToken(TimeStampedModel):
         blank=False,
         verbose_name=_('토큰'),
         unique=True,
+    )
+    type = models.CharField(
+        null=False,
+        blank=False,
+        max_length=20,
+        default=Type.access,
+        choices=Type.choices,
+        verbose_name=_('토큰 형태'),
     )
     status = models.CharField(
         null=False,

@@ -39,6 +39,16 @@ if settings.DEBUG:
             views.UserPasscodeVerifyPassView.as_view(),
             name=views.UserPasscodeVerifyPassView.__name__,
         ),
+        path(
+            "auth/login",
+            views.UserTokenLoginView.as_view(),
+            name=views.UserTokenLoginView.__name__,
+        ),
+        path(
+            "auth/token/refresh",
+            views.UserTokenRefreshView.as_view(),
+            name=views.UserTokenRefreshView.__name__,
+        ),
     ]
 
-    urlpatterns.append(*debug_urlpatterns)
+    urlpatterns += debug_urlpatterns

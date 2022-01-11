@@ -397,3 +397,31 @@ class UserMeSNSListView(UserContextMixin, ListCreateAPIView):
     )
     def post(self, request, *args, **kwargs):
         return super(UserMeSNSListView, self).post(request, *args, **kwargs)
+
+
+class UserTokenLoginView(CreateAPIView):
+    permission_classes = ()
+    serializer_class = serializers.UserTokenLoginSerializer
+
+    @extend_schema(
+        tags=[api_tags.AUTH],
+        summary="토큰 로그인 API @DEBUG",
+        description="토큰 로그인 API 입니다.",
+        responses=serializers.UserTokenLoginSerializer,
+    )
+    def post(self, request, *args, **kwargs):
+        return super(UserTokenLoginView, self).post(request, *args, **kwargs)
+
+
+class UserTokenRefreshView(UserContextMixin, CreateAPIView):
+    permission_classes = ()
+    serializer_class = serializers.UserTokenRefreshSerializer
+
+    @extend_schema(
+        tags=[api_tags.AUTH],
+        summary="토큰 새로고침 API @DEBUG",
+        description="토큰 새로고침 API 입니다.",
+        responses=serializers.UserTokenRefreshSerializer,
+    )
+    def post(self, request, *args, **kwargs):
+        return super(UserTokenRefreshView, self).post(request, *args, **kwargs)

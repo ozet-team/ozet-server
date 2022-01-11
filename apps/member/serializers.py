@@ -142,7 +142,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
                         name=None,
                     )
 
-                    token = user.get_valid_token(auto_generate=True)
+                    token = user.get_valid_token(UserToken.Type.access, auto_generate=True, is_transaction=False)
                     if not user.is_valid_token(token.decode("utf-8")):
                         raise UserSignUpError()
             except IntegrityError as e:
@@ -224,20 +224,10 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
                 user.is_registration = True
                 user.save(update_fields=['is_registration'])
 
-        return dict(user=user, token=user.get_valid_token(auto_generate=True).token)
+        return dict(user=user, token=user.get_valid_token(UserToken.Type.access, auto_generate=True).token)
 
 
 class UserPasscodeVerifyPassSerializer(SimpleSerializer):
-    class NestedUserSerializer(ModelSerializer):
-        class Meta:
-            model = User
-            fields = (
-                "username",
-                "name",
-                "email",
-                "phone_number"
-            )
-
     # Write Only
     user_id = fields.IntegerField(required=True, write_only=True)
 
@@ -256,7 +246,7 @@ class UserPasscodeVerifyPassSerializer(SimpleSerializer):
             raise NotFound()
 
         data['user'] = user
-        data['token'] = user.get_valid_token(auto_generate=True).token
+        data['token'] = user.get_valid_token(UserToken.Type.access, auto_generate=True).token
 
         return data
 
@@ -501,3 +491,63 @@ class UserDetailsSerializer(ModelSerializer):
         )
 
     profile = NestedProfileSerializer(flatten=True, read_only=True)
+
+
+class UserTokenLoginSerializer(SimpleSerializer):
+    # Write Only
+    user_id = fields.IntegerField(required=True, write_only=True)
+
+    # Read Only
+    user = UserSerializer(read_only=True)
+    token = fields.CharField(read_only=True)
+
+    # Both
+
+    def validate(self, data):
+        data = super(UserTokenLoginSerializer, self).validate(data)
+        user_id = data['user_id']
+
+        user = User.objects.filter(id=user_id, is_active=True).first()
+        if not user:
+            raise NotFound()
+
+        data['user'] = user
+        data['access_token'] = user.get_valid_token(UserToken.Type.access, auto_generate=True).token
+        data['refresh_token'] = user.get_valid_token(UserToken.Type.refresh, auto_generate=True).token
+
+        return data
+
+    def create(self, validated_data):
+        user = validated_data.get('user')
+        access_token = validated_data.get('access_token')
+        refresh_token = validated_data.get('refresh_token')
+
+        return dict(user=user, access_token=access_token, refresh_token=refresh_token)
+
+
+class UserTokenRefreshSerializer(SimpleSerializer):
+    # Write Only
+    refresh_token = serializers.CharField(write_only=True)
+
+    # Read Only
+    access_token = serializers.SerializerMethodField(read_only=True)
+
+    # Both
+
+    def validate(self, data):
+        data = super(UserTokenRefreshSerializer, self).validate(data)
+        user_id = data['user_id']
+
+        user = User.objects.filter(id=user_id, is_active=True).first()
+        if not user:
+            raise NotFound()
+
+        data['user'] = user
+        data['access_token'] = user.get_valid_token(UserToken.Type.access, auto_generate=True).token
+
+        return data
+
+    def create(self, validated_data):
+        access_token = validated_data.get('access_token')
+
+        return dict(access_token=access_token)
