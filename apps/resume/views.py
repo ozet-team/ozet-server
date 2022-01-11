@@ -2,7 +2,12 @@ from django.utils.functional import cached_property
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView, UpdateAPIView
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateAPIView,
+    RetrieveUpdateDestroyAPIView,
+    RetrieveAPIView,
+)
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -15,7 +20,7 @@ from utils.django.rest_framework.mixins import UserContextMixin, QuerySerializer
 from commons.contrib.drf_spectacular import tags as api_tags
 
 
-class ResumeDetailView(UserContextMixin, RetrieveUpdateAPIView):
+class ResumeDetailView(UserContextMixin, RetrieveAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = serializers.ResumeSerializer
 
@@ -36,15 +41,6 @@ class ResumeDetailView(UserContextMixin, RetrieveUpdateAPIView):
     )
     def get(self, request, *args, **kwargs):
         return super(ResumeDetailView, self).get(request, *args, **kwargs)
-
-    @extend_schema(
-        tags=[api_tags.RESUME],
-        summary="회원 이력서 업데이트 API",
-        description="회원 이력서 업데이트 API 입니다. @JWT",
-        responses=serializers.ResumeSerializer,
-    )
-    def patch(self, request, *args, **kwargs):
-        return super(ResumeDetailView, self).patch(request, *args, **kwargs)
 
 
 class ResumeCareerDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
