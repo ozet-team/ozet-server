@@ -413,7 +413,7 @@ class UserTokenLoginView(CreateAPIView):
         return super(UserTokenLoginView, self).post(request, *args, **kwargs)
 
 
-class UserTokenRefreshView(UserContextMixin, CreateAPIView):
+class UserTokenRefreshView(CreateAPIView):
     permission_classes = ()
     serializer_class = serializers.UserTokenRefreshSerializer
 

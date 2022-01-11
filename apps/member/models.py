@@ -167,21 +167,42 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
         return _process()
 
-    def get_valid_token(self, token_type: ChoiceItem, auto_generate=False, is_transaction=True):
+    def get_valid_token(
+            self,
+            token_type: ChoiceItem,
+            auto_generate=False,
+            is_transaction=True,
+            is_jwt_handle_self=False
+    ):
+        """
+        유효한 토큰을 가져옴
+
+        Args:
+            token_type: 토큰 형태
+            auto_generate: 유효하지 않을 경우 재생성 여부
+            is_transaction: 트랜잭션 atomic 처리 여부
+            is_jwt_handle_self: jwt 에러를 직접 헨들링 할지에 대한 여부
+
+        Returns:
+            valid_token: 유효한 토큰
+        """
         valid_token = self.token_set \
             .filter(type=token_type) \
             .order_by('-created') \
             .first()
 
-        try:
-            payload = jwt_decode_handler(valid_token.token)
-        except jwt.ExpiredSignature:
-            payload = None
-        except jwt.DecodeError:
-            payload = None
-        except jwt.InvalidTokenError:
-            payload = None
-
+        if valid_token:
+            if is_jwt_handle_self:
+                payload = jwt_decode_handler(valid_token.token)
+            else:
+                try:
+                    payload = jwt_decode_handler(valid_token.token)
+                except jwt.ExpiredSignature:
+                    payload = None
+                except jwt.DecodeError:
+                    payload = None
+                except jwt.InvalidTokenError:
+                    payload = None
 
         if auto_generate and ( \
             not valid_token or \

@@ -10,6 +10,7 @@ from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
 from rest_auth.utils import jwt_encode
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
+from rest_framework_jwt.utils import jwt_decode_handler
 
 from django.db import transaction
 from django.db import IntegrityError
@@ -499,7 +500,8 @@ class UserTokenLoginSerializer(SimpleSerializer):
 
     # Read Only
     user = UserSerializer(read_only=True)
-    token = fields.CharField(read_only=True)
+    access_token = fields.CharField(read_only=True)
+    refresh_token = fields.CharField(read_only=True)
 
     # Both
 
@@ -522,7 +524,7 @@ class UserTokenLoginSerializer(SimpleSerializer):
         access_token = validated_data.get('access_token')
         refresh_token = validated_data.get('refresh_token')
 
-        return dict(user=user, access_token=access_token, refresh_token=refresh_token)
+        return dict(access_token=access_token, refresh_token=refresh_token)
 
 
 class UserTokenRefreshSerializer(SimpleSerializer):
@@ -530,15 +532,19 @@ class UserTokenRefreshSerializer(SimpleSerializer):
     refresh_token = serializers.CharField(write_only=True)
 
     # Read Only
-    access_token = serializers.SerializerMethodField(read_only=True)
+    access_token = fields.CharField(read_only=True)
 
     # Both
 
     def validate(self, data):
         data = super(UserTokenRefreshSerializer, self).validate(data)
-        user_id = data['user_id']
+        refresh_token = data['refresh_token']
 
-        user = User.objects.filter(id=user_id, is_active=True).first()
+        payload = jwt_decode_handler(refresh_token)
+        if not payload:
+            raise NotFound()
+
+        user = User.objects.filter(id=payload['user_id'], is_active=True).first()
         if not user:
             raise NotFound()
 
