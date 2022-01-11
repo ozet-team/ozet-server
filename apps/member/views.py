@@ -154,7 +154,7 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
     @extend_schema(
         tags=[api_tags.USER],
         summary="회원 정보 가져오기 API",
-        description="회원 정보 가져오기 API 입니다. @JWT",
+        description="회원 정보 가져오기 API 입니다. @IsAuthenticated",
         responses=serializers.UserMeSerializer,
         examples=[
             OpenApiExample(
@@ -193,7 +193,7 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
     @extend_schema(
         tags=[api_tags.USER],
         summary="회원 정보 업데이트 API",
-        description="회원 정보 업데이트 API 입니다. @JWT",
+        description="회원 정보 업데이트 API 입니다. @IsAuthenticated",
         responses=serializers.UserMeSerializer,
         examples=[
             OpenApiExample(
@@ -256,7 +256,7 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
     @extend_schema(
         tags=[api_tags.USER],
         summary="회원 정보 삭제 API",
-        description="회원 정보 삭제 API 입니다. @JWT",
+        description="회원 정보 삭제 API 입니다. @IsAuthenticated",
     )
     def delete(self, request, *args, **kwargs):
         return super(UserMeView, self).delete(request, *args, **kwargs)
@@ -285,7 +285,7 @@ class UserMeSNSDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
     @extend_schema(
         tags=[api_tags.USER_SNS],
         summary="회원 SNS 정보 가져오기 API",
-        description="회원 SNS 정보 가져오기 API 입니다. @JWT",
+        description="회원 SNS 정보 가져오기 API 입니다. @IsAuthenticated",
         responses=serializers.UserMeSerializer,
         examples=[
             OpenApiExample(
@@ -306,7 +306,7 @@ class UserMeSNSDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
     @extend_schema(
         tags=[api_tags.USER_SNS],
         summary="회원 SNS 정보 업데이트 API",
-        description="회원 SNS 정보 업데이트 API 입니다. @JWT",
+        description="회원 SNS 정보 업데이트 API 입니다. @IsAuthenticated",
         responses=serializers.UserMeSerializer,
         examples=[
             OpenApiExample(
@@ -338,7 +338,7 @@ class UserMeSNSDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
     @extend_schema(
         tags=[api_tags.USER_SNS],
         summary="회원 SNS 정보 삭제 API",
-        description="회원 SNS 정보 삭제 API 입니다. @JWT",
+        description="회원 SNS 정보 삭제 API 입니다. @IsAuthenticated",
     )
     def delete(self, request, *args, **kwargs):
         return super(UserMeSNSDetailView, self).delete(request, *args, **kwargs)
@@ -360,7 +360,7 @@ class UserMeSNSListView(UserContextMixin, ListCreateAPIView):
     @extend_schema(
         tags=[api_tags.USER_SNS],
         summary="회원 SNS 정보 목록 가져오기 API",
-        description="회원 SNS 정보 가져오기 API 입니다. @JWT",
+        description="회원 SNS 정보 가져오기 API 입니다. @IsAuthenticated",
         responses=serializers.UserMeSerializer,
     )
     def get(self, request, *args, **kwargs):
@@ -369,7 +369,7 @@ class UserMeSNSListView(UserContextMixin, ListCreateAPIView):
     @extend_schema(
         tags=[api_tags.USER_SNS],
         summary="회원 SNS 정보 추가 API",
-        description="회원 SNS 정보 추가 API 입니다. @JWT",
+        description="회원 SNS 정보 추가 API 입니다. @IsAuthenticated",
         responses=serializers.UserMeSerializer,
         examples=[
             OpenApiExample(
