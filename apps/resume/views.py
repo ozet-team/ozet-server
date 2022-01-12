@@ -25,7 +25,7 @@ class ResumeDetailView(UserContextMixin, RetrieveAPIView):
     serializer_class = serializers.ResumeSerializer
 
     def get_object(self):
-        resume = Resume.objects.get_or_create(user_id=self.user.id)
+        resume, is_created = Resume.objects.get_or_create(user_id=self.user.id)
 
         return resume
 
@@ -297,7 +297,7 @@ class ResumeMilitaryServiceView(UserContextMixin, RetrieveUpdateAPIView):
     serializer_class = serializers.MilitaryServiceSerializer
 
     def get_object(self):
-        military = MilitaryService.objects.get_or_create(resume_id=self.user.resume.id)
+        military, is_created = MilitaryService.objects.get_or_create(resume_id=self.user.resume.id)
 
         return military
 

@@ -316,7 +316,7 @@ class UserMeSerializer(ModelSerializer):
 
         position_list = Career.Position.choices
 
-        career_summary = dict()
+        career_summary = list()
 
         for career in careers:
             duration = career.quit_at - career.join_at
@@ -324,10 +324,7 @@ class UserMeSerializer(ModelSerializer):
             if  duration <= timedelta(30):
                 continue
 
-            if career.position in career_summary:
-                career_summary[career.position] += duration.days
-            else:
-                career_summary[career.position] = duration.days
+            career_summary.append(dict(position=career.position, duration=duration.days))
 
         return career_summary
 
