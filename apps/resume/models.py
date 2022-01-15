@@ -43,9 +43,7 @@ class Resume(TimeStampedModel):
     def save(self, *args, **kwargs):
         if not self.id:
             rv = super(Resume, self).save(*args, **kwargs)
-            military = MilitaryService.objects.create(
-
-            )
+            MilitaryService.objects.create(resume_id=self.id)
 
             return rv
 

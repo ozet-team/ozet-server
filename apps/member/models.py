@@ -113,11 +113,12 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
     def save(self, *args, **kwargs):
         if not self.id:
             rv = super(User, self).save(*args, **kwargs)
-            UserProfile.objects.create(user=self,
+
+            UserProfile.objects.create(user_id=self.id,
                                        policy_for_terms_agreed=self.created,
                                        policy_for_privacy_agreed=self.created)
 
-            resume = Resume.objects.create(user_id=self.id)
+            Resume.objects.create(user_id=self.id)
 
             return rv
 
@@ -156,10 +157,13 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
                 type=token_type
             )
 
-            return UserToken.objects.create(
-                user=self,
+            user_token = UserToken.objects.create(
+                user_id=self.id,
                 token=jwt_encode(self),
+                type=token_type
             )
+
+            return user_token
 
         if is_transaction:
             with transaction.atomic():
@@ -473,6 +477,9 @@ class UserPasscodeVerify(TimeStampedModel):
     @classmethod
     def is_expired(cls, user: User, is_transaction=True) -> bool:
         latest_passcode_verify = user.get_latest_passcode_verify()
+
+        if latest_passcode_verify is None:
+            return True
 
         def __process():
             if latest_passcode_verify.status == cls.Status.pending and \

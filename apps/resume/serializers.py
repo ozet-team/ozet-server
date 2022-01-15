@@ -64,6 +64,7 @@ class AcademicBackgroundSerializer(ModelSerializer):
     class Meta:
         model = AcademicBackground
         fields = (
+            'name',
             'major',
             'location',
             'join_at',

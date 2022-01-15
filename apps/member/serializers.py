@@ -136,7 +136,7 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
                 with transaction.atomic():
                     # Pre-SignUp
                     username = f"ozet_{str(uuid.uuid4()).replace('-', '')}"
-                    user = User.objects.update_or_create(
+                    user = User.objects.create(
                         username=username,
                         email=None,
                         phone_number=requester_phone_number,
@@ -144,8 +144,9 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
                     )
 
                     token = user.get_valid_token(UserToken.Type.access, auto_generate=True, is_transaction=False)
-                    if not user.is_valid_token(token.decode("utf-8")):
+                    if not user.is_valid_token(token):
                         raise UserSignUpError()
+
             except IntegrityError as e:
                 message = str(e)
                 # 삭제 계정 복구
