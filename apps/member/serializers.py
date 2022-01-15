@@ -143,10 +143,6 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
                         name=None,
                     )
 
-                    token = user.get_valid_token(UserToken.Type.access, auto_generate=True, is_transaction=False)
-                    if not user.is_valid_token(token):
-                        raise UserSignUpError()
-
             except IntegrityError as e:
                 message = str(e)
                 # 삭제 계정 복구
@@ -155,6 +151,10 @@ class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
                     user, _ = User.objects.update_or_create(phone_number=requester_phone_number)
 
         if not user:
+            raise UserSignUpError()
+
+        user_token = user.get_valid_token(UserToken.Type.access, auto_generate=True)
+        if not user_token or not user.is_valid_token(user_token.token):
             raise UserSignUpError()
 
         # 기존 인증 만료 여부
