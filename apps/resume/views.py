@@ -42,6 +42,37 @@ class ResumeDetailView(UserContextMixin, RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         return super(ResumeDetailView, self).get(request, *args, **kwargs)
 
+class ResumeDetailPDFView(UserContextMixin, RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = serializers.ResumePDFSerializer
+
+    def get_object(self):
+        resume, is_created = Resume.objects.get_or_create(user_id=self.user.id)
+
+        return resume
+
+    def __init__(self, *args, **kwargs):
+        self.http_method_names = [method for method in self.http_method_names if method != "put"]
+        super(ResumeDetailPDFView, self).__init__(*args, **kwargs)
+
+    @extend_schema(
+        tags=[api_tags.RESUME],
+        summary="회원 이력서 PDF 가져오기 API",
+        description="회원 이력서 PDF 가져오기 API 입니다. @IsAuthenticated",
+        responses=serializers.ResumePDFSerializer,
+    )
+    def get(self, request, *args, **kwargs):
+        return super(ResumeDetailPDFView, self).get(request, *args, **kwargs)
+
+    @extend_schema(
+        tags=[api_tags.RESUME],
+        summary="회원 이력서 PDF 업데이트 API",
+        description="회원 이력서 PDF 업데이트 API 입니다. @IsAuthenticated",
+        responses=serializers.ResumePDFSerializer,
+    )
+    def patch(self, request, *args, **kwargs):
+        return super(ResumeDetailPDFView, self).patch(request, *args, **kwargs)
+
 
 class ResumeCareerDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated, )

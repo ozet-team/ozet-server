@@ -11,6 +11,11 @@ urlpatterns = [
         name=views.ResumeDetailView.__name__,
     ),
     path(
+        "user/me/resume/pdf",
+        views.ResumeDetailPDFView.as_view(),
+        name=views.ResumeDetailPDFView.__name__,
+    ),
+    path(
         "user/me/resume/careers",
         views.ResumeCareerListView.as_view(),
         name=views.ResumeCareerListView.__name__,
