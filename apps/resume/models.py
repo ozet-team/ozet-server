@@ -25,6 +25,14 @@ class Resume(TimeStampedModel):
         verbose_name=_('추가 정보'),
     )
 
+    pdf_file = models.FileField(
+        upload_to=storages.resume_pdf_upload,
+        editable=True,
+        null=True,
+        verbose_name=_('프로필 이미지 파일'),
+    )
+
+
     # Related
     user = models.OneToOneField(
         'member.User',
