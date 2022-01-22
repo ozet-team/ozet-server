@@ -188,6 +188,7 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
                 "name",
                 "email",
                 "phone_number",
+                "is_registration"
             )
 
     # Write Only
@@ -220,11 +221,6 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
         with transaction.atomic():
             if not UserPasscodeVerify.verify(user, passcode, is_transaction=False):
                 raise PasscodeVerifyInvalidPasscode()
-
-            # 유저 SingUp 완료 처리
-            if not user.is_registration:
-                user.is_registration = True
-                user.save(update_fields=['is_registration'])
 
         return dict(user=user, token=user.get_valid_token(UserToken.Type.access, auto_generate=True).token)
 
@@ -299,11 +295,13 @@ class UserMeSerializer(ModelSerializer):
             "birthday",
             "gender",
             "career",
+            "is_registration",
         )
         read_only_fields = (
             "username",
             "phone_number",
             "career",
+            "is_registration",
         )
 
 
@@ -409,6 +407,11 @@ class UserMeSerializer(ModelSerializer):
 
             if update_fields:
                 instance.save(update_fields=update_fields)
+
+            # 유저 SingUp 완료 처리
+            if not instance.is_registration:
+                instance.is_registration = True
+                instance.save(update_fields=['is_registration'])
 
         return instance
 
