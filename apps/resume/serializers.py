@@ -103,6 +103,7 @@ class ResumeSerializer(ModelSerializer):
     class Meta:
         model = Resume
         fields = (
+            "id",
             "career",
             "certificate",
             "academic",
@@ -114,9 +115,11 @@ class ResumeSerializer(ModelSerializer):
     academic = AcademicBackgroundSerializer(many=True, source='academic_set')
     military = MilitaryServiceSerializer()
 
+
 class ResumePDFSerializer(ModelSerializer):
     class Meta:
         model = Resume
         fields = (
+            "id",
             "pdf_file",
         )

@@ -141,7 +141,12 @@ class ResumeCareerListView(UserContextMixin, ListCreateAPIView):
     @extend_schema(
         tags=[api_tags.RESUME_CAREER],
         summary="회원 커리어 가져오기 API",
-        description="회원 커리어 가져오기 API 입니다. @IsAuthenticated",
+        description="회원 커리어 가져오기 API 입니다. @IsAuthenticated"
+                    "* **Position**\n"
+                    "    * **STAFF** - 스탭(인턴)\n"
+                    "    * **MANAGER** - 매니저\n"
+                    "    * **DESIGNER** - 디자이너\n"
+                    "    * **DIRECTOR** - 원장",
         responses=serializers.CareerSerializer,
     )
     def get(self, request, *args, **kwargs):
@@ -150,7 +155,12 @@ class ResumeCareerListView(UserContextMixin, ListCreateAPIView):
     @extend_schema(
         tags=[api_tags.RESUME_CAREER],
         summary="회원 커리어 추가 API",
-        description="회원 커리어 추가 API 입니다. @IsAuthenticated",
+        description="회원 커리어 추가 API 입니다. @IsAuthenticated"
+                    "* **Position**\n"
+                    "    * **STAFF** - 스탭(인턴)\n"
+                    "    * **MANAGER** - 매니저\n"
+                    "    * **DESIGNER** - 디자이너\n"
+                    "    * **DIRECTOR** - 원장",
         responses=serializers.CareerSerializer,
     )
     def post(self, request, *args, **kwargs):
@@ -339,7 +349,12 @@ class ResumeMilitaryServiceView(UserContextMixin, RetrieveUpdateAPIView):
     @extend_schema(
         tags=[api_tags.RESUME_MILITARY],
         summary="회원 병역 가져오기 API",
-        description="회원 병역 가져오기 API 입니다. @IsAuthenticated",
+        description="회원 병역 가져오기 API 입니다. @IsAuthenticated\n"
+                    "* **Service Status**\n"
+                    "    * **NA** - 해당없음\n"
+                    "    * **EXEMPTION** - 면제\n"
+                    "    * **UNFINISHED** - 미필\n"
+                    "    * **FINISHED** - 군필",
         responses=serializers.MilitaryServiceSerializer,
     )
     def get(self, request, *args, **kwargs):
@@ -348,7 +363,12 @@ class ResumeMilitaryServiceView(UserContextMixin, RetrieveUpdateAPIView):
     @extend_schema(
         tags=[api_tags.RESUME_MILITARY],
         summary="회원 병역 업데이트 API",
-        description="회원 병역 업데이트 API 입니다. @IsAuthenticated",
+        description="회원 병역 업데이트 API 입니다. @IsAuthenticated"
+                    "* **Service Status**\n"
+                    "    * **NA** - 해당없음\n"
+                    "    * **EXEMPTION** - 면제\n"
+                    "    * **UNFINISHED** - 미필\n"
+                    "    * **FINISHED** - 군필",
         responses=serializers.MilitaryServiceSerializer,
     )
     def patch(self, request, *args, **kwargs):

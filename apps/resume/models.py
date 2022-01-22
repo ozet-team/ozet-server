@@ -252,7 +252,7 @@ class AcademicBackground(TimeStampedModel):
 
 
 class MilitaryService(TimeStampedModel):
-    class Position(DjangoChoices):
+    class Status(DjangoChoices):
         not_applicable = ChoiceItem('NA', _('해당없음'))
         exemption = ChoiceItem('EXEMPTION', _('면제'))
         unfinished = ChoiceItem('UNFINISHED', _('미필'))
@@ -263,7 +263,7 @@ class MilitaryService(TimeStampedModel):
         max_length=20,
         null=True,
         blank=True,
-        choices=Position.choices,
+        choices=Status.choices,
         verbose_name=_('병역'),
     )
 
