@@ -26,6 +26,7 @@ class CareerSerializer(ModelSerializer):
     class Meta:
         model = Career
         fields = (
+            'id',
             'company',
             'position',
             'join_at',
@@ -46,6 +47,7 @@ class CertificateSerializer(ModelSerializer):
     class Meta:
         model = Certificate
         fields = (
+            'id',
             'name',
             'vendor',
             'certificate_at',
@@ -64,6 +66,7 @@ class AcademicBackgroundSerializer(ModelSerializer):
     class Meta:
         model = AcademicBackground
         fields = (
+            'id',
             'name',
             'major',
             'location',
@@ -84,6 +87,7 @@ class MilitaryServiceSerializer(ModelSerializer):
     class Meta:
         model = MilitaryService
         fields = (
+            'id',
             'service',
             'exemption_reason',
             'join_at',
