@@ -141,7 +141,7 @@ class ResumeCareerListView(UserContextMixin, ListCreateAPIView):
     @extend_schema(
         tags=[api_tags.RESUME_CAREER],
         summary="회원 커리어 가져오기 API",
-        description="회원 커리어 가져오기 API 입니다. @IsAuthenticated"
+        description="회원 커리어 가져오기 API 입니다. @IsAuthenticated\n"
                     "* **Position**\n"
                     "    * **STAFF** - 스탭(인턴)\n"
                     "    * **MANAGER** - 매니저\n"
@@ -155,7 +155,7 @@ class ResumeCareerListView(UserContextMixin, ListCreateAPIView):
     @extend_schema(
         tags=[api_tags.RESUME_CAREER],
         summary="회원 커리어 추가 API",
-        description="회원 커리어 추가 API 입니다. @IsAuthenticated"
+        description="회원 커리어 추가 API 입니다. @IsAuthenticated\n"
                     "* **Position**\n"
                     "    * **STAFF** - 스탭(인턴)\n"
                     "    * **MANAGER** - 매니저\n"
