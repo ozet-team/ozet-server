@@ -363,7 +363,7 @@ class ResumeMilitaryServiceView(UserContextMixin, RetrieveUpdateAPIView):
     @extend_schema(
         tags=[api_tags.RESUME_MILITARY],
         summary="회원 병역 업데이트 API",
-        description="회원 병역 업데이트 API 입니다. @IsAuthenticated"
+        description="회원 병역 업데이트 API 입니다. @IsAuthenticated\n"
                     "* **Service Status**\n"
                     "    * **NA** - 해당없음\n"
                     "    * **EXEMPTION** - 면제\n"
