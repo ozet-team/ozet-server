@@ -1,4 +1,4 @@
-from apps.announcement.models import Announcement
+from apps.announcement.models import Announcement, Bookmark
 from django_filters.rest_framework import FilterSet, filters
 
 
@@ -11,3 +11,9 @@ class AnnouncementFilterSet(FilterSet):
     class Meta:
         model = Announcement
         fields = ["employee_types", "pay_types"]
+
+
+class BookmarkFilterSet(FilterSet):
+    class Meta:
+        model = Bookmark
+        fields = ["user_id"]

@@ -46,8 +46,6 @@ class Announcement(models.Model):
     expire_type = models.CharField("마감 타입", max_length=2, choices=ExpireType.choices)
     expired_datetime = models.DateTimeField("마감일", null=True, blank=True)
     working_hour = models.CharField("업무시간", max_length=128)
-    # working_hour_start = models.DateTimeField("업무 시작시간")
-    # working_hour_end = models.DateTimeField("업무 종료시간")
     pay_type = models.CharField("급여 종류", max_length=2, choices=PayType.choices)
     pay_amount = models.PositiveIntegerField("급여량")
     employee_types = models.ManyToManyField(
@@ -56,3 +54,16 @@ class Announcement(models.Model):
     )
     description = models.TextField("상세내용", null=True, blank=True)
     external_id = models.IntegerField("외부 ID", null=True, db_index=True)
+
+
+class Bookmark(models.Model):
+    user = models.ForeignKey(
+        "member.User",
+        on_delete=models.CASCADE,
+        related_name="bookmark_set",
+    )
+    announcement = models.ForeignKey(
+        Announcement,
+        on_delete=models.CASCADE,
+        related_name="bookmark_set",
+    )
