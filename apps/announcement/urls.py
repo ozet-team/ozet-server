@@ -10,9 +10,11 @@ urlpatterns = [
         "announcements/<int:pk>/",
         views.AnnouncementViewSet.as_view({"get": "retrieve"}),
     ),
-    path("bookmarks/", views.BookmarkViewSet.as_view({"get": "list"})),
+    path(
+        "bookmarks/", views.BookmarkViewSet.as_view({"get": "list", "post": "create"})
+    ),
     path(
         "bookmarks/<int:pk>/",
-        views.BookmarkViewSet.as_view({"post": "create", "delete": "destroy"}),
+        views.BookmarkViewSet.as_view({"delete": "destroy"}),
     ),
 ]
