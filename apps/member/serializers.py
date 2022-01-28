@@ -424,11 +424,14 @@ class UserSNSListSerializer(ModelSerializer):
             "url",
         )
 
+
 class UserInstagramOAuthSerializer(SimpleSerializer):
+    # Write Only
+    user_code = fields.CharField(read_only=True, required=False)
+
     # Read Only
-    user = UserSerializer(read_only=True)
-    access_token = fields.CharField(read_only=True)
-    refresh_token = fields.CharField(read_only=True)
+    instagram_user_id = fields.CharField(read_only=True)
+    instagram_access_token = fields.CharField(read_only=True)
 
 
 class UserDetailsSerializer(ModelSerializer):

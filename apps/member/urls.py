@@ -21,9 +21,19 @@ urlpatterns = [
         name=views.UserMeView.__name__,
     ),
     path(
-        "user/me/instagram/oauth",
+        "user/me/instagram/oauth/authorize",
         views.UserInstagramOAuthView.as_view(),
         name=views.UserInstagramOAuthView.__name__,
+    ),
+    path(
+        "user/me/instagram/oauth/cancel",
+        views.UserInstagramOAuthCancelView.as_view(),
+        name=views.UserInstagramOAuthCancelView.__name__,
+    ),
+    path(
+        "user/me/instagram/oauth/delete",
+        views.UserInstagramOAuthDeleteView.as_view(),
+        name=views.UserInstagramOAuthDeleteView.__name__,
     ),
 ]
 
