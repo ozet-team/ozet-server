@@ -1,12 +1,12 @@
-from django.utils.functional import cached_property
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
+import json
+
+from django.http import HttpResponseRedirect
+from drf_spectacular.utils import extend_schema, OpenApiExample
+from rest_framework.exceptions import NotFound
 
 from rest_framework.generics import (
-    RetrieveAPIView,
     CreateAPIView,
     RetrieveUpdateDestroyAPIView,
-    ListCreateAPIView,
     ListAPIView,
 )
 from rest_framework.generics import get_object_or_404
@@ -19,6 +19,7 @@ from apps.member.models import User, UserSNS
 from utils.django.rest_framework.mixins import UserContextMixin, QuerySerializerMixin
 
 from commons.contrib.drf_spectacular import tags as api_tags
+from utils.instagram.api import InstagramAPI
 
 
 class UserPasscodeVerifyRequestView(CreateAPIView):
@@ -373,18 +374,108 @@ class UserMeSNSListView(UserContextMixin, ListAPIView):
         return super(UserMeSNSListView, self).get(request, *args, **kwargs)
 
 
-class UserInstagramOAuthView(UserContextMixin, ListAPIView):
+# noinspection PyMethodMayBeStatic
+class UserInstagramOAuthView(UserContextMixin, RetrieveUpdateDestroyAPIView):
     permission_classes = ()
     serializer_class = serializers.UserInstagramOAuthSerializer
 
+    def __init__(self, *args, **kwargs):
+        self.http_method_names = [method for method in self.http_method_names if method not in ["put", "patch", "delete"]]
+        super(UserInstagramOAuthView, self).__init__(*args, **kwargs)
+
+    def oauth(self, state: str, request, *args, **kwargs):
+        if not state:
+            raise NotFound()
+
+        res = InstagramAPI.oauth(
+            state=state,
+            redirect_uri="https://dbce-125-131-185-253.ngrok.io/api/v1/member/user/me/instagram/oauth/authorize",
+        )
+
+        print(res.url)
+        return HttpResponseRedirect(res.url)
+
+    def access_token(self, code, state: str, request, *args, **kwargs):
+        res = InstagramAPI.get_access_token(
+            code=code,
+            redirect_uri="https://dbce-125-131-185-253.ngrok.io/api/v1/member/user/me/instagram/oauth/authorize"
+        )
+
+        content = json.loads(res.content)
+
+        instagram_access_token = content.get("access_token", None)
+        instagram_user_id = content.get("user_id", None)
+
+        if not instagram_user_id or not instagram_access_token or not state:
+            raise NotFound()
+
+        me_res = InstagramAPI.me(instagram_access_token)
+        media_res = InstagramAPI.media(instagram_user_id, instagram_access_token)
+
+        data = dict(
+            access_token=instagram_access_token,
+            user_id=instagram_user_id
+        )
+
+        """
+        연동 성공 페이지로
+        """
+        return HttpResponseRedirect('https://instagram.com')
+
+
     @extend_schema(
         tags=[api_tags.AUTH],
-        summary="Instagram OAuth API",
+        summary="Instagram OAuth 인증 API",
         description="Instagram OAuth API",
         responses=serializers.UserInstagramOAuthSerializer,
     )
     def get(self, request, *args, **kwargs):
-        return super(UserInstagramOAuthView, self).get(request, *args, **kwargs)
+        code = request.query_params.get('code', None)
+        state = request.query_params.get('state', None)
+
+        if code:
+            return self.access_token(code, state, request, *args, **kwargs)
+        else:
+            return self.oauth(state, request, *args, **kwargs)
+
+        raise NotFound()
+
+
+class UserInstagramOAuthCancelView(UserContextMixin, RetrieveUpdateDestroyAPIView):
+    permission_classes = ()
+    serializer_class = serializers.UserInstagramOAuthSerializer
+
+    def __init__(self, *args, **kwargs):
+        self.http_method_names = [method for method in self.http_method_names if method not in ["put", "patch", "delete"]]
+        super(UserInstagramOAuthCancelView, self).__init__(*args, **kwargs)
+
+    @extend_schema(
+        tags=[api_tags.AUTH],
+        summary="Instagram OAuth 인증 취소 API",
+        description="Instagram OAuth API",
+        responses=serializers.UserInstagramOAuthSerializer,
+    )
+    def get(self, request, *args, **kwargs):
+        raise NotFound()
+
+
+class UserInstagramOAuthDeleteView(UserContextMixin, RetrieveUpdateDestroyAPIView):
+    permission_classes = ()
+    serializer_class = serializers.UserInstagramOAuthSerializer
+
+    def __init__(self, *args, **kwargs):
+        self.http_method_names = [method for method in self.http_method_names if method not in ["put", "patch", "delete"]]
+        super(UserInstagramOAuthDeleteView, self).__init__(*args, **kwargs)
+
+    @extend_schema(
+        tags=[api_tags.AUTH],
+        summary="Instagram OAuth 인증 정보 삭제 API",
+        description="Instagram OAuth API",
+        responses=serializers.UserInstagramOAuthSerializer,
+    )
+    def get(self, request, *args, **kwargs):
+        raise NotFound()
+
 
 class UserTokenLoginView(CreateAPIView):
     permission_classes = ()
