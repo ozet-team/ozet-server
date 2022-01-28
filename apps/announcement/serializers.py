@@ -37,11 +37,6 @@ class AnnouncementSerializer(serializers.ModelSerializer):
 
 
 class BookmarkSerializer(serializers.ModelSerializer):
-    user_id = serializers.PrimaryKeyRelatedField(
-        source="user",
-        write_only=True,
-        queryset=User.objects.all(),
-    )
     announcement = AnnouncementSerializer(read_only=True)
     announcement_id = serializers.PrimaryKeyRelatedField(
         source="announcement",
@@ -53,7 +48,6 @@ class BookmarkSerializer(serializers.ModelSerializer):
         model = Bookmark
         fields = [
             "id",
-            "user_id",
             "announcement",
             "announcement_id",
         ]
