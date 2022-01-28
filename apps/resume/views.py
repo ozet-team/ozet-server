@@ -21,7 +21,7 @@ from commons.contrib.drf_spectacular import tags as api_tags
 
 
 class ResumeDetailView(UserContextMixin, RetrieveAPIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticatedOrReadOnly, )
     serializer_class = serializers.ResumeSerializer
 
     def get_object(self):
@@ -43,7 +43,7 @@ class ResumeDetailView(UserContextMixin, RetrieveAPIView):
         return super(ResumeDetailView, self).get(request, *args, **kwargs)
 
 class ResumeDetailPDFView(UserContextMixin, RetrieveUpdateAPIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticatedOrReadOnly, )
     serializer_class = serializers.ResumePDFSerializer
 
     def get_object(self):
