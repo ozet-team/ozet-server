@@ -257,17 +257,7 @@ class UserPasscodeVerifyPassSerializer(SimpleSerializer):
 
 class UserMeSerializer(ModelSerializer):
     class NestedProfileSerializer(ModelSerializer):
-        class NestedSNSSerializer(ModelSerializer):
-            class Meta:
-                model = UserSNS
-                fields = (
-                    "id",
-                    "username",
-                    "url",
-                )
-
         profile_image = serializers.ImageField(use_url=True)
-        sns_list = NestedSNSSerializer(source='sns_set', many=True)
 
         class Meta:
             model = UserProfile
@@ -277,7 +267,6 @@ class UserMeSerializer(ModelSerializer):
                 "address",
                 "policy_for_terms_agreed",
                 "policy_for_privacy_agreed",
-                "sns_list",
             )
             read_only_fields = (
                 "policy_for_terms_agreed",
@@ -435,23 +424,11 @@ class UserSNSListSerializer(ModelSerializer):
             "url",
         )
 
-    def validate(self, data):
-        return data
-
-    def create(self, validated_data):
-        user = self.context['user']
-
-        username = validated_data['username']
-        url = validated_data['url']
-
-        with transaction.atomic():
-            new_sns = UserSNS.objects.create(
-                username=username,
-                url=url,
-                user_profile=user.profile,
-            )
-
-        return new_sns
+class UserInstagramOAuthSerializer(SimpleSerializer):
+    # Read Only
+    user = UserSerializer(read_only=True)
+    access_token = fields.CharField(read_only=True)
+    refresh_token = fields.CharField(read_only=True)
 
 
 class UserDetailsSerializer(ModelSerializer):

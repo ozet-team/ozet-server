@@ -112,6 +112,7 @@ class ResumeSerializer(ModelSerializer):
             "certificate",
             "academic",
             "military",
+            "pdf_file"
         )
 
     career = CareerSerializer(many=True, source='career_set')

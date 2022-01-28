@@ -2,7 +2,13 @@ from django.utils.functional import cached_property
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 
-from rest_framework.generics import RetrieveAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView, ListCreateAPIView
+from rest_framework.generics import (
+    RetrieveAPIView,
+    CreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+    ListCreateAPIView,
+    ListAPIView,
+)
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -344,7 +350,7 @@ class UserMeSNSDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         return super(UserMeSNSDetailView, self).delete(request, *args, **kwargs)
 
 
-class UserMeSNSListView(UserContextMixin, ListCreateAPIView):
+class UserMeSNSListView(UserContextMixin, ListAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = serializers.UserSNSListSerializer
 
@@ -366,38 +372,19 @@ class UserMeSNSListView(UserContextMixin, ListCreateAPIView):
     def get(self, request, *args, **kwargs):
         return super(UserMeSNSListView, self).get(request, *args, **kwargs)
 
-    @extend_schema(
-        tags=[api_tags.USER_SNS],
-        summary="회원 SNS 정보 추가 API",
-        description="회원 SNS 정보 추가 API 입니다. @IsAuthenticated",
-        responses=serializers.UserMeSerializer,
-        examples=[
-            OpenApiExample(
-                response_only=True,
-                summary="회원 SNS 정보 추가 성공",
-                name="201",
-                value={
-                    "id": 3,
-                    "username": "@bart_not_found",
-                    "url": "https://instagram.com/bart_not_found",
-                },
-            ),
-            OpenApiExample(
-                request_only=True,
-                response_only=False,
-                name="요청 바디 예시",
-                summary="요청 바디 예시",
-                description="",
-                value={
-                    "username": "@bart_not_found",
-                    "url": "https://instagram.com/bart_not_found",
-                },
-            ),
-        ],
-    )
-    def post(self, request, *args, **kwargs):
-        return super(UserMeSNSListView, self).post(request, *args, **kwargs)
 
+class UserInstagramOAuthView(UserContextMixin, ListAPIView):
+    permission_classes = ()
+    serializer_class = serializers.UserInstagramOAuthSerializer
+
+    @extend_schema(
+        tags=[api_tags.AUTH],
+        summary="Instagram OAuth API",
+        description="Instagram OAuth API",
+        responses=serializers.UserInstagramOAuthSerializer,
+    )
+    def get(self, request, *args, **kwargs):
+        return super(UserInstagramOAuthView, self).get(request, *args, **kwargs)
 
 class UserTokenLoginView(CreateAPIView):
     permission_classes = ()

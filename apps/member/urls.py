@@ -21,14 +21,9 @@ urlpatterns = [
         name=views.UserMeView.__name__,
     ),
     path(
-        "user/me/sns",
-        views.UserMeSNSListView.as_view(),
-        name=views.UserMeSNSListView.__name__,
-    ),
-    path(
-        "user/me/sns/<int:id>",
-        views.UserMeSNSDetailView.as_view(),
-        name=views.UserMeSNSDetailView.__name__,
+        "user/me/instagram/oauth",
+        views.UserInstagramOAuthView.as_view(),
+        name=views.UserInstagramOAuthView.__name__,
     ),
 ]
 
