@@ -1,4 +1,6 @@
-from apps.announcement.models import Announcement, EmployeeType
+from apps.announcement.models import Announcement, Bookmark, EmployeeType
+from apps.member.models import User
+from apps.member.serializers import UserSerializer
 from rest_framework import serializers
 
 
@@ -28,3 +30,36 @@ class AnnouncementSerializer(serializers.ModelSerializer):
             "employee_types",
             "description",
         ]
+
+    @classmethod
+    def process_queryset(cls, queryset):
+        return queryset.prefetch_related("employee_types")
+
+
+class BookmarkSerializer(serializers.ModelSerializer):
+    user_id = serializers.PrimaryKeyRelatedField(
+        source="user",
+        write_only=True,
+        queryset=User.objects.all(),
+    )
+    announcement = AnnouncementSerializer(read_only=True)
+    announcement_id = serializers.PrimaryKeyRelatedField(
+        source="announcement",
+        write_only=True,
+        queryset=Announcement.objects.all(),
+    )
+
+    class Meta:
+        model = Bookmark
+        fields = [
+            "id",
+            "user_id",
+            "announcement",
+            "announcement_id",
+        ]
+
+    @classmethod
+    def process_queryset(cls, queryset):
+        return queryset.select_related("user", "announcement").prefetch_related(
+            "announcement__employee_types"
+        )
