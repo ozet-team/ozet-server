@@ -1,8 +1,11 @@
 import json
+from datetime import datetime, timedelta
 
+from django.db import transaction
 from django.http import HttpResponseRedirect
-from drf_spectacular.utils import extend_schema, OpenApiExample
+from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 from rest_framework.exceptions import NotFound
+from django.utils import timezone
 
 from rest_framework.generics import (
     CreateAPIView,
@@ -15,7 +18,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 
 from apps.member import models
 from apps.member import serializers
-from apps.member.models import User
+from apps.member.models import User, UserSocial, UserSocialToken
 from utils.django.rest_framework.mixins import UserContextMixin, QuerySerializerMixin
 
 from commons.contrib.drf_spectacular import tags as api_tags
@@ -161,7 +164,6 @@ class UserDetailView(UserContextMixin, RetrieveAPIView):
         return super(UserDetailView, self).get(request, *args, **kwargs)
 
 
-
 class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = serializers.UserMeSerializer
@@ -300,49 +302,52 @@ class UserInstagramOAuthView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         if not state:
             raise NotFound()
 
-        res = InstagramAPI.oauth(
-            state=state,
-            redirect_uri="https://dbce-125-131-185-253.ngrok.io/api/v1/member/user/me/instagram/oauth/authorize",
-        )
+        oauth_redirect_url = InstagramAPI.oauth(state=state)
+        print(oauth_redirect_url)
 
-        print(res.url)
-        return HttpResponseRedirect(res.url)
+        return HttpResponseRedirect(oauth_redirect_url)
 
-    def access_token(self, code, state: str, request, *args, **kwargs):
-        res = InstagramAPI.get_access_token(
-            code=code,
-            redirect_uri="https://dbce-125-131-185-253.ngrok.io/api/v1/member/user/me/instagram/oauth/authorize"
-        )
-
-        content = json.loads(res.content)
-
-        instagram_access_token = content.get("access_token", None)
-        instagram_user_id = content.get("user_id", None)
-
+    def access_token(self, code: str, state: str, request, *args, **kwargs):
+        """
+        토큰 발급
+        """
+        instagram_access_token, instagram_user_id = InstagramAPI.get_access_token(code=code)
         if not instagram_user_id or not instagram_access_token or not state:
             raise NotFound()
 
-        me_res = InstagramAPI.me(instagram_access_token)
-        media_res = InstagramAPI.media(instagram_user_id, instagram_access_token)
-
-        data = dict(
-            access_token=instagram_access_token,
-            user_id=instagram_user_id
-        )
+        """
+        토큰 연장
+        """
+        instagram_extend_access_token, \
+        instagram_token_type, \
+        instagram_expires_in = InstagramAPI.get_extend_access_token(instagram_access_token)
+        expire_at = timezone.now() + timedelta(seconds=instagram_expires_in)
 
         """
-        연동 성공 페이지로
+        유저 조회
+        """
+        instagram_profile = InstagramAPI.me(instagram_extend_access_token)
+
+        with transaction.atomic():
+            user_social = UserSocial.objects.get_or_create(
+                social_key=instagram_profile.get('id')
+            )
+            user_social.refresh_token(
+                social=UserSocialToken.Social.instagram,
+                social_key=user_social.social_key,
+                token=instagram_extend_access_token,
+                token_type=UserSocialToken.Type.access,
+                expire_at=expire_at
+            )
+
+        instagram_media = InstagramAPI.media(user_social.social_key, user_social.get_valid_token())
+
+        """
+        연동 성공 페이지로 리다이렉트
         """
         return HttpResponseRedirect('https://instagram.com')
 
-
-    @extend_schema(
-        tags=[api_tags.AUTH],
-        summary="Instagram OAuth 인증 API",
-        description="Instagram OAuth API",
-        responses=serializers.UserInstagramOAuthSerializer,
-    )
-    def get(self, request, *args, **kwargs):
+    def retrieve(self, request, *args, **kwargs):
         code = request.query_params.get('code', None)
         state = request.query_params.get('state', None)
 
@@ -352,6 +357,24 @@ class UserInstagramOAuthView(UserContextMixin, RetrieveUpdateDestroyAPIView):
             return self.oauth(state, request, *args, **kwargs)
 
         raise NotFound()
+
+    @extend_schema(
+        tags=[api_tags.AUTH],
+        summary="Instagram OAuth 인증 API",
+        description="Instagram OAuth API",
+        parameters=[
+            OpenApiParameter(
+                name="state",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="유저 식별키",
+                required=False,
+            ),
+        ],
+        responses=serializers.UserInstagramOAuthSerializer,
+    )
+    def get(self, request, *args, **kwargs):
+        return super(UserInstagramOAuthView, self).get(request, *args, **kwargs)
 
 
 class UserInstagramOAuthCancelView(UserContextMixin, RetrieveUpdateDestroyAPIView):

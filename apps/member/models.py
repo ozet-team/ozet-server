@@ -143,7 +143,7 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
     def has_module_perms(self, app_label):
         return True
 
-    def is_valid_token(self, token):
+    def is_valid_token(self, token: str):
         try:
             self.token_set.get(token=token)
         except UserToken.DoesNotExist:
@@ -152,10 +152,13 @@ class User(AbstractBaseUser, SafeDeleteModel, TimeStampedModel):
 
     def refresh_token(self, token_type: ChoiceItem, is_transaction=True):
         def _process():
-            self.token_set.all().update(
-                status=UserToken.Status.expire,
-                type=token_type
-            )
+            self.token_set \
+                .filter(
+                    type=token_type
+                ) \
+                .update(
+                    status=UserToken.Status.expire,
+                )
 
             user_token = UserToken.objects.create(
                 user_id=self.id,
@@ -300,45 +303,105 @@ class UserProfile(TimeStampedModel):
 
 
 class UserSocial(TimeStampedModel):
-    user_key = models.CharField(
+    social_key = models.CharField(
         max_length=50,
         default=None,
+        unique=True,
         null=True,
         blank=True,
-        verbose_name=_('SNS'),
-    )
-
-    token = models.CharField(
-        max_length=255,
-        null=True,
-        blank=False,
-        verbose_name=_('토큰'),
-        unique=True,
+        verbose_name=_('소셜 계정 식별키'),
     )
 
     # Related
-    user_profile = models.ForeignKey(
-        UserProfile,
+    user = models.ForeignKey(
+        User,
         null=False,
         blank=False,
         on_delete=models.CASCADE,
-        related_name='sns_set',
-        verbose_name=_('회원 프로필'),
-    )
-    token = models.ForeignKey(
-        'UserSocialToken',
-        null=False,
-        blank=False,
-        on_delete=models.CASCADE,
-        related_name='token_set',
-        verbose_name=_('소셜 토큰'),
+        related_name='social_set',
+        verbose_name=_('회원'),
     )
 
     class Meta:
-        verbose_name = _('회원 SNS')
-        verbose_name_plural = _('회원 SNS 목록')
+        verbose_name = _('회원 소셜 계정')
+        verbose_name_plural = _('회원 소셜 계정 목록')
 
         db_table = 'member_user_social'
+
+    def is_valid_token(self, social: ChoiceItem, social_key: str, token: str):
+        try:
+            self.token_set.get(social=social, social_key=social_key, token=token)
+        except UserSocial.DoesNotExist:
+            return False
+        return True
+
+    def refresh_token(
+            self,
+            social: ChoiceItem,
+            social_key: str,
+            token: str,
+            token_type: ChoiceItem,
+            is_transaction=True
+    ):
+        def _process():
+            self.token_set \
+                .filter(
+                    social=social,
+                    social_key=social_key,
+                    type=token_type
+                ) \
+                .update(
+                    status=UserSocialToken.Status.expire,
+                )
+
+            user_social_token = UserSocialToken.objects.create(
+                social=social,
+                social_key=social_key,
+                user_id=self.id,
+                token=token,
+                type=token_type
+            )
+
+            return user_social_token
+
+        if is_transaction:
+            with transaction.atomic():
+                return _process()
+
+        return _process()
+
+    def get_valid_token(
+            self,
+            social: ChoiceItem,
+            social_key: str,
+            token_type: ChoiceItem,
+            is_transaction=True,
+    ):
+        """
+        유효한 토큰을 가져옴
+
+        Args:
+            social: 가져올 소셜 업체,
+            social_key: 소셜 계정 식별키,
+            token_type: 토큰 형태
+            is_transaction: 트랜잭션 atomic 처리 여부
+
+        Returns:
+            valid_token: 유효한 토큰
+        """
+        token = self.token_set \
+            .filter(type=token_type) \
+            .order_by('-created') \
+            .first()
+
+        now = timezone.now()
+
+        if not token or \
+               token.status == UserSocialToken.Status.expire or \
+               now < token.expire_at:
+           return None
+
+        return token
 
 
 class UserToken(TimeStampedModel):
@@ -396,7 +459,7 @@ class UserToken(TimeStampedModel):
 
 
 class UserSocialToken(TimeStampedModel):
-    class Status(DjangoChoices):
+    class Social(DjangoChoices):
         instagram = ChoiceItem('instagram', label=_('인스타그램'))
 
     class Status(DjangoChoices):
@@ -430,6 +493,28 @@ class UserSocialToken(TimeStampedModel):
         default=Status.available,
         choices=Status.choices,
         verbose_name=_('유효 상태'),
+    )
+    social = models.CharField(
+        null=False,
+        blank=False,
+        max_length=20,
+        choices=Status.choices,
+        verbose_name=_('소셜'),
+    )
+
+    expire_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        default=None,
+    )
+
+    social = models.ForeignKey(
+        UserSocial,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='token_set',
+        verbose_name=_('소셜 계정'),
     )
 
     class Meta:
