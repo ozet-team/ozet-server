@@ -4,14 +4,7 @@ LABEL maintainer="ozetteam@gmail.com"
 LABEL title="core-server"
 LABEL version="1.0"
 
-# Install system deps
-RUN apt-get update
-RUN apt-get install -y gcc
-RUN apt-get install -y python-dev default-libmysqlclient-dev
-RUN apt-get install -y python3-dev
-
 # Update PIP
-RUN python -m pip install --upgrade pip
 RUN pip install --upgrade setuptools
 RUN pip install --upgrade pip-tools
 
@@ -20,7 +13,7 @@ ADD ./.misc/requirements/dev.txt /tmp/requirements.txt
 RUN pip-sync /tmp/requirements.txt
 RUN rm /tmp/requirements.txt
 
-# Install server deps 
+# Install server deps
 RUN pip install pymysql
 
 # Init project
