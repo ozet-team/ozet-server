@@ -303,6 +303,16 @@ class UserProfile(TimeStampedModel):
 
 
 class UserSocial(TimeStampedModel):
+    class Social(DjangoChoices):
+        instagram = ChoiceItem('instagram', label=_('인스타그램'))
+
+    social = models.CharField(
+        null=False,
+        blank=False,
+        max_length=20,
+        choices=Social.choices,
+        verbose_name=_('소셜'),
+    )
     social_key = models.CharField(
         max_length=50,
         default=None,
@@ -326,28 +336,27 @@ class UserSocial(TimeStampedModel):
         verbose_name = _('회원 소셜 계정')
         verbose_name_plural = _('회원 소셜 계정 목록')
 
+        unique_together = ('social', 'social_key')
+
         db_table = 'member_user_social'
 
-    def is_valid_token(self, social: ChoiceItem, social_key: str, token: str):
+    def is_valid_token(self, token: str):
         try:
-            self.token_set.get(social=social, social_key=social_key, token=token)
+            self.token_set.get(token=token)
         except UserSocial.DoesNotExist:
             return False
         return True
 
     def refresh_token(
             self,
-            social: ChoiceItem,
-            social_key: str,
             token: str,
             token_type: ChoiceItem,
+            expire_at: datetime,
             is_transaction=True
     ):
         def _process():
             self.token_set \
                 .filter(
-                    social=social,
-                    social_key=social_key,
                     type=token_type
                 ) \
                 .update(
@@ -355,11 +364,10 @@ class UserSocial(TimeStampedModel):
                 )
 
             user_social_token = UserSocialToken.objects.create(
-                social=social,
-                social_key=social_key,
-                user_id=self.id,
+                social=self,
                 token=token,
-                type=token_type
+                type=token_type,
+                expire_at=expire_at,
             )
 
             return user_social_token
@@ -372,19 +380,13 @@ class UserSocial(TimeStampedModel):
 
     def get_valid_token(
             self,
-            social: ChoiceItem,
-            social_key: str,
             token_type: ChoiceItem,
-            is_transaction=True,
     ):
         """
         유효한 토큰을 가져옴
 
         Args:
-            social: 가져올 소셜 업체,
-            social_key: 소셜 계정 식별키,
             token_type: 토큰 형태
-            is_transaction: 트랜잭션 atomic 처리 여부
 
         Returns:
             valid_token: 유효한 토큰
@@ -398,7 +400,7 @@ class UserSocial(TimeStampedModel):
 
         if not token or \
                token.status == UserSocialToken.Status.expire or \
-               now < token.expire_at:
+               now > token.expire_at:
            return None
 
         return token
@@ -459,9 +461,6 @@ class UserToken(TimeStampedModel):
 
 
 class UserSocialToken(TimeStampedModel):
-    class Social(DjangoChoices):
-        instagram = ChoiceItem('instagram', label=_('인스타그램'))
-
     class Status(DjangoChoices):
         available = ChoiceItem('used', label=_('유효함'))
         expire = ChoiceItem('expire', label=_('만료됨'))
@@ -469,7 +468,6 @@ class UserSocialToken(TimeStampedModel):
     class Type(DjangoChoices):
         refresh = ChoiceItem('refresh', label=_('REFRESH'))
         access = ChoiceItem('access', label=_('ACCESS'))
-
 
     token = models.CharField(
         max_length=255,
@@ -493,13 +491,6 @@ class UserSocialToken(TimeStampedModel):
         default=Status.available,
         choices=Status.choices,
         verbose_name=_('유효 상태'),
-    )
-    social = models.CharField(
-        null=False,
-        blank=False,
-        max_length=20,
-        choices=Status.choices,
-        verbose_name=_('소셜'),
     )
 
     expire_at = models.DateTimeField(

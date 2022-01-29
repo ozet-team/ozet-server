@@ -21,9 +21,24 @@ urlpatterns = [
         name=views.UserMeView.__name__,
     ),
     path(
-        "user/<int:id>/",
+        "user/<int:user_id>/",
         views.UserDetailView.as_view(),
         name=views.UserDetailView.__name__,
+    ),
+    path(
+        "user/<int:user_id>/instagram/",
+        views.UserInstagramSocialListView.as_view(),
+        name=views.UserInstagramSocialListView.__name__,
+    ),
+    path(
+        "user/<int:user_id>/instagram/<int:social_id>/media/",
+        views.UserInstagramMediaView.as_view(),
+        name=views.UserInstagramMediaView.__name__,
+    ),
+    path(
+        "user/<int:user_id>/instagram/<int:social_id>/profile/",
+        views.UserInstagramProfileView.as_view(),
+        name=views.UserInstagramProfileView.__name__,
     ),
     path(
         "user/me/instagram/oauth/authorize/",
@@ -58,6 +73,11 @@ if settings.DEBUG:
             "auth/token/refresh/",
             views.UserTokenRefreshView.as_view(),
             name=views.UserTokenRefreshView.__name__,
+        ),
+        path(
+            "user/",
+            views.UserListView.as_view(),
+            name=views.UserListView.__name__,
         ),
     ]
 

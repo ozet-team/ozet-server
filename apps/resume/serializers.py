@@ -121,6 +121,24 @@ class ResumeSerializer(ModelSerializer):
     military = MilitaryServiceSerializer()
 
 
+class UserResumeSerializer(ModelSerializer):
+    class Meta:
+        model = Resume
+        fields = (
+            "id",
+            "career",
+            "certificate",
+            "academic",
+            "military",
+            "pdf_file"
+        )
+
+    career = CareerSerializer(many=True, source='career_set')
+    certificate = CertificateSerializer(many=True, source='certificate_set')
+    academic = AcademicBackgroundSerializer(many=True, source='academic_set')
+    military = MilitaryServiceSerializer()
+
+
 class ResumePDFSerializer(ModelSerializer):
     class Meta:
         model = Resume

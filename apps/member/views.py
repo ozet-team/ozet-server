@@ -14,7 +14,7 @@ from rest_framework.generics import (
 )
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 
 from apps.member import models
 from apps.member import serializers
@@ -26,12 +26,12 @@ from utils.instagram.api import InstagramAPI
 
 
 class UserPasscodeVerifyRequestView(CreateAPIView):
-    permission_classes = ()
+    permission_classes = (AllowAny,)
     serializer_class = serializers.UserPasscodeVerifyRequestSerializer
 
     @extend_schema(
         tags=[api_tags.PASSCODE],
-        summary="패스코드 인증 요청 API",
+        summary="패스코드 인증 요청 API @AllowAny",
         description="패스코드 인증 요청 API 입니다.",
         responses=serializers.UserPasscodeVerifyRequestSerializer,
         request=serializers.UserPasscodeVerifyRequestSerializer,
@@ -66,12 +66,12 @@ class UserPasscodeVerifyRequestView(CreateAPIView):
 
 
 class UserPasscodeVerifyView(CreateAPIView):
-    permission_classes = ()
+    permission_classes = (AllowAny,)
     serializer_class = serializers.UserPasscodeVerifySerializer
 
     @extend_schema(
         tags=[api_tags.PASSCODE],
-        summary="패스코드 인증 API",
+        summary="패스코드 인증 API @AllowAny",
         description="패스코드 인증 API 입니다.",
         responses=serializers.UserPasscodeVerifySerializer,
         examples=[
@@ -107,13 +107,13 @@ class UserPasscodeVerifyView(CreateAPIView):
 
 
 class UserPasscodeVerifyPassView(QuerySerializerMixin, CreateAPIView):
-    permission_classes = ()
+    permission_classes = (AllowAny,)
     serializer_class = serializers.UserPasscodeVerifyPassSerializer
     query_serializer_class = serializers.UserPasscodeVerifyPassSerializer
 
     @extend_schema(
-        tags=[api_tags.PASSCODE],
-        summary="패스코드 강제 성공 API @DEBUG",
+        tags=[api_tags.PASSCODE, api_tags.DEBUG],
+        summary="패스코드 강제 성공 API @DEBUG @AllowAny",
         description="패스코드 성공했다고 가정하고 바로 JWT를 발행합니다.",
         responses=serializers.UserPasscodeVerifyPassSerializer,
         examples=[
@@ -148,20 +148,37 @@ class UserPasscodeVerifyPassView(QuerySerializerMixin, CreateAPIView):
 
 
 class UserDetailView(UserContextMixin, RetrieveAPIView):
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    permission_classes = (AllowAny, )
     serializer_class = serializers.UserSerializer
 
     queryset = User.objects
     lookup_field = 'id'
+    lookup_url_kwarg = 'user_id'
 
     @extend_schema(
         tags=[api_tags.USER],
-        summary="회원 정보 가져오기 API",
-        description="회원 정보 가져오기 API 입니다. @IsAuthenticatedOrReadOnly",
+        summary="회원 정보 가져오기 API @AllowAny",
+        description="회원 정보 가져오기 API 입니다.",
         responses=serializers.UserSerializer,
     )
     def get(self, request, *args, **kwargs):
         return super(UserDetailView, self).get(request, *args, **kwargs)
+
+
+class UserListView(UserContextMixin, ListAPIView):
+    permission_classes = (AllowAny, )
+    serializer_class = serializers.UserListSerializer
+
+    queryset = User.objects.all()
+
+    @extend_schema(
+        tags=[api_tags.DEBUG],
+        summary="모든 회원 정보 가져오기 API @DEBUG @AllowAny",
+        description="모든 회원 정보 가져오기 API 입니다.",
+        responses=serializers.UserListSerializer,
+    )
+    def get(self, request, *args, **kwargs):
+        return super(UserListView, self).get(request, *args, **kwargs)
 
 
 class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
@@ -180,8 +197,8 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
 
     @extend_schema(
         tags=[api_tags.USER_ME],
-        summary="회원 정보 가져오기 API",
-        description="회원 정보 가져오기 API 입니다. @IsAuthenticated",
+        summary="회원 정보 가져오기 API @IsAuthenticated",
+        description="회원 정보 가져오기 API 입니다.",
         responses=serializers.UserMeSerializer,
         examples=[
             OpenApiExample(
@@ -219,8 +236,8 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
 
     @extend_schema(
         tags=[api_tags.USER_ME],
-        summary="회원 정보 업데이트 API",
-        description="회원 정보 업데이트 API 입니다. @IsAuthenticated",
+        summary="회원 정보 업데이트 API @IsAuthenticated",
+        description="회원 정보 업데이트 API 입니다.",
         responses=serializers.UserMeSerializer,
         examples=[
             OpenApiExample(
@@ -291,7 +308,7 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
 
 # noinspection PyMethodMayBeStatic
 class UserInstagramOAuthView(UserContextMixin, RetrieveUpdateDestroyAPIView):
-    permission_classes = ()
+    permission_classes = (AllowAny,)
     serializer_class = serializers.UserInstagramOAuthSerializer
 
     def __init__(self, *args, **kwargs):
@@ -328,19 +345,23 @@ class UserInstagramOAuthView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         """
         instagram_profile = InstagramAPI.me(instagram_extend_access_token)
 
+        try:
+            user = User.objects.get(username=state)
+        except User.DoesNotExist:
+            raise NotFound()
+
         with transaction.atomic():
-            user_social = UserSocial.objects.get_or_create(
-                social_key=instagram_profile.get('id')
+            user_social, is_created = UserSocial.objects.get_or_create(
+                social=UserSocial.Social.instagram,
+                social_key=instagram_profile.get('id'),
+                user_id=user.id,
             )
-            user_social.refresh_token(
-                social=UserSocialToken.Social.instagram,
-                social_key=user_social.social_key,
+            user_social_token = user_social.refresh_token(
                 token=instagram_extend_access_token,
                 token_type=UserSocialToken.Type.access,
-                expire_at=expire_at
+                expire_at=expire_at,
+                is_transaction=False
             )
-
-        instagram_media = InstagramAPI.media(user_social.social_key, user_social.get_valid_token())
 
         """
         연동 성공 페이지로 리다이렉트
@@ -359,8 +380,8 @@ class UserInstagramOAuthView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         raise NotFound()
 
     @extend_schema(
-        tags=[api_tags.AUTH],
-        summary="Instagram OAuth 인증 API",
+        tags=[api_tags.SOCIAL_INSTAGRAM],
+        summary="Instagram OAuth API @AllowAny",
         description="Instagram OAuth API",
         parameters=[
             OpenApiParameter(
@@ -377,17 +398,76 @@ class UserInstagramOAuthView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         return super(UserInstagramOAuthView, self).get(request, *args, **kwargs)
 
 
-class UserInstagramOAuthCancelView(UserContextMixin, RetrieveUpdateDestroyAPIView):
-    permission_classes = ()
-    serializer_class = serializers.UserInstagramOAuthSerializer
+class UserInstagramMediaView(UserContextMixin, RetrieveAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = serializers.UserInstagramMediaSerializer
 
-    def __init__(self, *args, **kwargs):
-        self.http_method_names = [method for method in self.http_method_names if method not in ["put", "patch", "delete"]]
-        super(UserInstagramOAuthCancelView, self).__init__(*args, **kwargs)
+    def retrieve(self, request, *args, **kwargs):
+        user_id = self.kwargs.get('user_id', None)
+        social_id = self.kwargs.get('social_id', None)
+        if not user_id or not social_id:
+            raise NotFound()
+
+        user_social = UserSocial.objects.get(id=social_id, user_id=user_id)
+        social_token = user_social.get_valid_token(UserSocialToken.Type.access)
+        if not social_token:
+            raise NotFound()
+
+        instagram_media = InstagramAPI.media(
+            user_social.social_key,
+            social_token.token
+        )
+
+        return Response(instagram_media)
 
     @extend_schema(
-        tags=[api_tags.AUTH],
-        summary="Instagram OAuth 인증 취소 API",
+        tags=[api_tags.SOCIAL_INSTAGRAM],
+        summary="Instagram Media API @AllowAny",
+        description="Instagram Media API",
+        responses=serializers.UserInstagramMediaSerializer,
+    )
+    def get(self, request, *args, **kwargs):
+        return super(UserInstagramMediaView, self).get(request, *args, **kwargs)
+
+
+class UserInstagramProfileView(UserContextMixin, RetrieveAPIView):
+    permission_classes = (AllowAny, )
+    serializer_class = serializers.UserInstagramProfileSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        user_id = self.kwargs.get('user_id', None)
+        social_id = self.kwargs.get('social_id', None)
+        if not user_id or not social_id:
+            raise NotFound()
+
+        user_social = UserSocial.objects.get(id=social_id, user_id=user_id)
+        social_token = user_social.get_valid_token(UserSocialToken.Type.access)
+        if not social_token:
+            raise NotFound()
+
+        instagram_profile = InstagramAPI.me(
+            social_token.token
+        )
+
+        return Response(instagram_profile)
+
+    @extend_schema(
+        tags=[api_tags.SOCIAL_INSTAGRAM],
+        summary="Instagram Profile API @AllowAny",
+        description="Instagram Profile API",
+        responses=serializers.UserInstagramProfileSerializer,
+    )
+    def get(self, request, *args, **kwargs):
+        return super(UserInstagramProfileView, self).get(request, *args, **kwargs)
+
+
+class UserInstagramOAuthCancelView(UserContextMixin, RetrieveAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = serializers.UserInstagramOAuthSerializer
+
+    @extend_schema(
+        tags=[api_tags.SOCIAL_INSTAGRAM],
+        summary="Instagram OAuth 인증 취소 API @AllowAny",
         description="Instagram OAuth API",
         responses=serializers.UserInstagramOAuthSerializer,
     )
@@ -395,31 +475,48 @@ class UserInstagramOAuthCancelView(UserContextMixin, RetrieveUpdateDestroyAPIVie
         raise NotFound()
 
 
-class UserInstagramOAuthDeleteView(UserContextMixin, RetrieveUpdateDestroyAPIView):
-    permission_classes = ()
+class UserInstagramOAuthDeleteView(UserContextMixin, RetrieveAPIView):
+    permission_classes = (AllowAny, )
     serializer_class = serializers.UserInstagramOAuthSerializer
 
-    def __init__(self, *args, **kwargs):
-        self.http_method_names = [method for method in self.http_method_names if method not in ["put", "patch", "delete"]]
-        super(UserInstagramOAuthDeleteView, self).__init__(*args, **kwargs)
-
     @extend_schema(
-        tags=[api_tags.AUTH],
-        summary="Instagram OAuth 인증 정보 삭제 API",
+        tags=[api_tags.SOCIAL_INSTAGRAM],
+        summary="Instagram OAuth 인증 정보 삭제 API @AllowAny",
         description="Instagram OAuth API",
         responses=serializers.UserInstagramOAuthSerializer,
     )
     def get(self, request, *args, **kwargs):
         raise NotFound()
+
+
+class UserInstagramSocialListView(UserContextMixin, ListAPIView):
+    permission_classes = (AllowAny, )
+    serializer_class = serializers.UserInstagramSocialSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id', None)
+        if not user_id:
+            raise NotFound()
+
+        return UserSocial.objects.filter(user_id=user_id)
+
+    @extend_schema(
+        tags=[api_tags.SOCIAL_INSTAGRAM],
+        summary="Instagram 연동 목록 API @AllowAny",
+        description="Instagram OAuth API",
+        responses=serializers.UserInstagramSocialSerializer,
+    )
+    def get(self, request, *args, **kwargs):
+        return super(UserInstagramSocialListView, self).get(request, *args, **kwargs)
 
 
 class UserTokenLoginView(CreateAPIView):
-    permission_classes = ()
+    permission_classes = (AllowAny, )
     serializer_class = serializers.UserTokenLoginSerializer
 
     @extend_schema(
-        tags=[api_tags.AUTH],
-        summary="토큰 로그인 API @DEBUG",
+        tags=[api_tags.AUTH, api_tags.DEBUG],
+        summary="토큰 로그인 API @DEBUG @AllowAny",
         description="토큰 로그인 API 입니다.",
         responses=serializers.UserTokenLoginSerializer,
     )
@@ -428,12 +525,12 @@ class UserTokenLoginView(CreateAPIView):
 
 
 class UserTokenRefreshView(CreateAPIView):
-    permission_classes = ()
+    permission_classes = (AllowAny, )
     serializer_class = serializers.UserTokenRefreshSerializer
 
     @extend_schema(
-        tags=[api_tags.AUTH],
-        summary="토큰 새로고침 API @DEBUG",
+        tags=[api_tags.AUTH, api_tags.DEBUG],
+        summary="토큰 새로고침 API @DEBUG @AllowAny",
         description="토큰 새로고침 API 입니다.",
         responses=serializers.UserTokenRefreshSerializer,
     )

@@ -10,7 +10,11 @@ urlpatterns = [
         views.ResumeDetailView.as_view(),
         name=views.ResumeDetailView.__name__,
     ),
-
+    path(
+        "user/<int:id>/resume/",
+        views.UserResumeDetailView.as_view(),
+        name=views.UserResumeDetailView.__name__,
+    ),
     path(
         "user/me/resume/",
         views.UserMeResumeDetailView.as_view(),

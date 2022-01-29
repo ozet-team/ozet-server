@@ -22,7 +22,7 @@ from rest_framework import serializers, fields
 from phonenumber_field.serializerfields import PhoneNumberField
 from phonenumber_field.phonenumber import PhoneNumber
 
-from apps.member.models import User, UserProfile, UserPasscodeVerify, UserToken
+from apps.member.models import User, UserProfile, UserPasscodeVerify, UserToken, UserSocial
 from apps.resume.models import Career
 from utils.django.rest_framework.serializers import SimpleSerializer, ModelSerializer
 from utils.naver.api import NaverCloudAPI
@@ -59,6 +59,16 @@ class UserSerializer(ModelSerializer):
             )
             read_only_fields = fields
 
+    class NestedUserInstagramSocialSerializer(ModelSerializer):
+        class Meta:
+            model = UserSocial
+            fields = (
+                'id',
+                'social',
+                'social_key',
+            )
+            read_only_fields = fields
+
     class Meta:
         model = User
         fields = (
@@ -71,11 +81,13 @@ class UserSerializer(ModelSerializer):
             "gender",
             "career",
             "is_registration",
+            "social",
         )
         read_only_fields = fields
 
 
     profile = NestedProfileSerializer(flatten=True)
+    social = NestedUserInstagramSocialSerializer(source='social_set', many=True)
     career = serializers.SerializerMethodField(label=_('경력'), read_only=True)
 
     # noinspection PyMethodMayBeStatic
@@ -96,6 +108,33 @@ class UserSerializer(ModelSerializer):
             career_summary.append(dict(position=career.position, duration=duration.days))
 
         return career_summary
+
+
+class UserListSerializer(ModelSerializer):
+    class NestedUserInstagramSocialSerializer(ModelSerializer):
+        class Meta:
+            model = UserSocial
+            fields = (
+                'id',
+                'social',
+                'social_key',
+            )
+            read_only_fields = fields
+
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "username",
+            "name",
+            "profile",
+            "phone_number",
+            "social",
+            "resume",
+        )
+        read_only_fields = fields
+
+    social = NestedUserInstagramSocialSerializer(source='social_set', many=True)
 
 
 class UserPasscodeVerifyRequestSerializer(SimpleSerializer):
@@ -296,6 +335,16 @@ class UserMeSerializer(ModelSerializer):
                 "policy_for_privacy_agreed",
             )
 
+    class NestedUserInstagramSocialSerializer(ModelSerializer):
+        class Meta:
+            model = UserSocial
+            fields = (
+                'id',
+                'social',
+                'social_key',
+            )
+            read_only_fields = fields
+
     class Meta:
         model = User
         fields = (
@@ -308,16 +357,18 @@ class UserMeSerializer(ModelSerializer):
             "gender",
             "career",
             "is_registration",
+            "social",
         )
         read_only_fields = (
             "username",
             "phone_number",
             "career",
             "is_registration",
+            "social",
         )
 
-
     profile = NestedProfileSerializer(flatten=True)
+    social = NestedUserInstagramSocialSerializer(source='social_set', many=True)
     career = serializers.SerializerMethodField(label=_('경력'), read_only=True)
 
     # noinspection PyMethodMayBeStatic
@@ -430,12 +481,36 @@ class UserMeSerializer(ModelSerializer):
 
 class UserInstagramOAuthSerializer(SimpleSerializer):
     # Write Only
-    user_code = fields.CharField(read_only=True, required=False)
+    state = fields.CharField(read_only=True, required=False)
+
+
+class UserInstagramMediaSerializer(SimpleSerializer):
+    # Write Only
+    user_id = fields.CharField(read_only=True, required=False)
 
     # Read Only
-    instagram_user_id = fields.CharField(read_only=True)
-    instagram_access_token = fields.CharField(read_only=True)
+    data = fields.CharField(read_only=True)
+    paging = fields.CharField(read_only=True)
 
+
+class UserInstagramProfileSerializer(SimpleSerializer):
+    # Write Only
+    user_id = fields.CharField(read_only=True, required=False)
+
+    # Read Only
+    id = fields.CharField(read_only=True)
+    username = fields.CharField(read_only=True)
+
+
+class UserInstagramSocialSerializer(ModelSerializer):
+    class Meta:
+        model = UserSocial
+        fields = (
+            'id',
+            'social',
+            'social_key',
+        )
+        read_only_fields = fields
 
 class UserDetailsSerializer(ModelSerializer):
     class NestedProfileSerializer(ModelSerializer):
