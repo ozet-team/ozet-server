@@ -6,12 +6,12 @@ from django.urls import path
 
 urlpatterns = [
     path(
-        "resume/<int:id>/",
+        "resume/<int:resume_id>/",
         views.ResumeDetailView.as_view(),
         name=views.ResumeDetailView.__name__,
     ),
     path(
-        "user/<int:id>/resume/",
+        "user/<int:user_id>/resume/",
         views.UserResumeDetailView.as_view(),
         name=views.UserResumeDetailView.__name__,
     ),
@@ -36,7 +36,7 @@ urlpatterns = [
         name=views.ResumeCareerDetailView.__name__,
     ),
     path(
-        "user/me/resume/certificate/",
+        "user/me/resume/certificates/",
         views.ResumeCertificateListView.as_view(),
         name=views.ResumeCertificateListView.__name__,
     ),

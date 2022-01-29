@@ -28,7 +28,7 @@ class ResumeDetailView(UserContextMixin, RetrieveAPIView):
 
     queryset = Resume.objects
     lookup_field = 'id'
-    lookup_url_kwarg = 'id'
+    lookup_url_kwarg = 'resume_id'
 
     @extend_schema(
         tags=[api_tags.RESUME],
