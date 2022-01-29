@@ -72,6 +72,7 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = (
+            "id",
             "username",
             "name",
             "email",
@@ -246,6 +247,7 @@ class UserPasscodeVerifySerializer(SimpleSerializer):
         class Meta:
             model = User
             fields = (
+                "id",
                 "username",
                 "name",
                 "email",
@@ -348,6 +350,7 @@ class UserMeSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = (
+            "id",
             "username",
             "name",
             "email",
@@ -360,6 +363,7 @@ class UserMeSerializer(ModelSerializer):
             "social",
         )
         read_only_fields = (
+            "id",
             "username",
             "phone_number",
             "career",
