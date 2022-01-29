@@ -7,11 +7,11 @@ from rest_framework.exceptions import NotFound
 from rest_framework.generics import (
     CreateAPIView,
     RetrieveUpdateDestroyAPIView,
-    ListAPIView,
+    ListAPIView, RetrieveAPIView,
 )
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 from apps.member import models
 from apps.member import serializers
@@ -144,6 +144,24 @@ class UserPasscodeVerifyPassView(QuerySerializerMixin, CreateAPIView):
         return super(UserPasscodeVerifyPassView, self).post(request, *args, **kwargs)
 
 
+class UserDetailView(UserContextMixin, RetrieveAPIView):
+    permission_classes = (IsAuthenticatedOrReadOnly, )
+    serializer_class = serializers.UserSerializer
+
+    queryset = User.objects
+    lookup_field = 'id'
+
+    @extend_schema(
+        tags=[api_tags.USER],
+        summary="회원 정보 가져오기 API",
+        description="회원 정보 가져오기 API 입니다. @IsAuthenticatedOrReadOnly",
+        responses=serializers.UserSerializer,
+    )
+    def get(self, request, *args, **kwargs):
+        return super(UserDetailView, self).get(request, *args, **kwargs)
+
+
+
 class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = serializers.UserMeSerializer
@@ -159,7 +177,7 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         return self.user
 
     @extend_schema(
-        tags=[api_tags.USER],
+        tags=[api_tags.USER_ME],
         summary="회원 정보 가져오기 API",
         description="회원 정보 가져오기 API 입니다. @IsAuthenticated",
         responses=serializers.UserMeSerializer,
@@ -198,7 +216,7 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         return super(UserMeView, self).get(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.USER],
+        tags=[api_tags.USER_ME],
         summary="회원 정보 업데이트 API",
         description="회원 정보 업데이트 API 입니다. @IsAuthenticated",
         responses=serializers.UserMeSerializer,
@@ -261,117 +279,12 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         return super(UserMeView, self).patch(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.USER],
+        tags=[api_tags.USER_ME],
         summary="회원 정보 삭제 API",
         description="회원 정보 삭제 API 입니다. @IsAuthenticated",
     )
     def delete(self, request, *args, **kwargs):
         return super(UserMeView, self).delete(request, *args, **kwargs)
-
-
-class UserMeSNSDetailView(UserContextMixin, RetrieveUpdateDestroyAPIView):
-    permission_classes = (IsAuthenticated, )
-    serializer_class = serializers.UserSNSDetailSerializer
-
-    lookup_field = 'id'
-    lookup_url_kwarg = 'id'
-
-    def __init__(self, *args, **kwargs):
-        self.http_method_names = [method for method in self.http_method_names if method != "put"]
-        super(UserMeSNSDetailView, self).__init__(*args, **kwargs)
-
-    def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return UserSNS.objects.none()
-
-        return UserSNS.objects \
-            .filter(resume_id=self.user.resume.id) \
-            .order_by('-id') \
-            .all()
-
-    @extend_schema(
-        tags=[api_tags.USER_SNS],
-        summary="회원 SNS 정보 가져오기 API",
-        description="회원 SNS 정보 가져오기 API 입니다. @IsAuthenticated",
-        responses=serializers.UserMeSerializer,
-        examples=[
-            OpenApiExample(
-                response_only=True,
-                summary="회원 SNS 정보 가져오기 성공",
-                name="200",
-                value={
-                    "id": 3,
-                    "username": "@bart_not_found",
-                    "url": "https://instagram.com/bart_not_found",
-                },
-            ),
-        ],
-    )
-    def get(self, request, *args, **kwargs):
-        return super(UserMeSNSDetailView, self).get(request, *args, **kwargs)
-
-    @extend_schema(
-        tags=[api_tags.USER_SNS],
-        summary="회원 SNS 정보 업데이트 API",
-        description="회원 SNS 정보 업데이트 API 입니다. @IsAuthenticated",
-        responses=serializers.UserMeSerializer,
-        examples=[
-            OpenApiExample(
-                response_only=True,
-                summary="회원 정보 업데이트 성공",
-                name="200",
-                value={
-                    "id": 3,
-                    "username": "@bart_not_found",
-                    "url": "https://instagram.com/bart_not_found",
-                },
-            ),
-            OpenApiExample(
-                request_only=True,
-                response_only=False,
-                name="요청 바디 예시",
-                summary="요청 바디 예시",
-                description="",
-                value={
-                    "username": "@bart_not_found",
-                    "url": "https://instagram.com/bart_not_found",
-                },
-            ),
-        ],
-    )
-    def patch(self, request, *args, **kwargs):
-        return super(UserMeSNSDetailView, self).patch(request, *args, **kwargs)
-
-    @extend_schema(
-        tags=[api_tags.USER_SNS],
-        summary="회원 SNS 정보 삭제 API",
-        description="회원 SNS 정보 삭제 API 입니다. @IsAuthenticated",
-    )
-    def delete(self, request, *args, **kwargs):
-        return super(UserMeSNSDetailView, self).delete(request, *args, **kwargs)
-
-
-class UserMeSNSListView(UserContextMixin, ListAPIView):
-    permission_classes = (IsAuthenticated, )
-    serializer_class = serializers.UserSNSListSerializer
-
-    def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return UserSNS.objects.none()
-
-        return UserSNS.objects \
-            .filter(resume_id=self.user.resume.id) \
-            .order_by('-id') \
-            .all()
-
-    @extend_schema(
-        tags=[api_tags.USER_SNS],
-        summary="회원 SNS 정보 목록 가져오기 API",
-        description="회원 SNS 정보 가져오기 API 입니다. @IsAuthenticated",
-        responses=serializers.UserMeSerializer,
-    )
-    def get(self, request, *args, **kwargs):
-        return super(UserMeSNSListView, self).get(request, *args, **kwargs)
 
 
 # noinspection PyMethodMayBeStatic

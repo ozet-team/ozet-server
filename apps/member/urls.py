@@ -11,27 +11,32 @@ urlpatterns = [
         name=views.UserPasscodeVerifyRequestView.__name__,
     ),
     path(
-        "auth/passcode",
+        "auth/passcode/",
         views.UserPasscodeVerifyView.as_view(),
         name=views.UserPasscodeVerifyView.__name__,
     ),
     path(
-        "user/me",
+        "user/me/",
         views.UserMeView.as_view(),
         name=views.UserMeView.__name__,
     ),
     path(
-        "user/me/instagram/oauth/authorize",
+        "user/<int:id>/",
+        views.UserDetailView.as_view(),
+        name=views.UserDetailView.__name__,
+    ),
+    path(
+        "user/me/instagram/oauth/authorize/",
         views.UserInstagramOAuthView.as_view(),
         name=views.UserInstagramOAuthView.__name__,
     ),
     path(
-        "user/me/instagram/oauth/cancel",
+        "user/me/instagram/oauth/cancel/",
         views.UserInstagramOAuthCancelView.as_view(),
         name=views.UserInstagramOAuthCancelView.__name__,
     ),
     path(
-        "user/me/instagram/oauth/delete",
+        "user/me/instagram/oauth/delete/",
         views.UserInstagramOAuthDeleteView.as_view(),
         name=views.UserInstagramOAuthDeleteView.__name__,
     ),
@@ -40,17 +45,17 @@ urlpatterns = [
 if settings.DEBUG:
     debug_urlpatterns = [
         path(
-            "auth/passcode/pass",
+            "auth/passcode/pass/",
             views.UserPasscodeVerifyPassView.as_view(),
             name=views.UserPasscodeVerifyPassView.__name__,
         ),
         path(
-            "auth/login",
+            "auth/login/",
             views.UserTokenLoginView.as_view(),
             name=views.UserTokenLoginView.__name__,
         ),
         path(
-            "auth/token/refresh",
+            "auth/token/refresh/",
             views.UserTokenRefreshView.as_view(),
             name=views.UserTokenRefreshView.__name__,
         ),

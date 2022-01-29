@@ -47,32 +47,55 @@ class JWTSerializer(BaseJWTSerializer):
 
 
 class UserSerializer(ModelSerializer):
+    class NestedProfileSerializer(ModelSerializer):
+        profile_image = serializers.ImageField(use_url=True)
+
+        class Meta:
+            model = UserProfile
+            fields = (
+                "introduce",
+                "profile_image",
+                "address",
+            )
+            read_only_fields = fields
+
     class Meta:
         model = User
         fields = (
             "username",
             "name",
             "email",
+            "profile",
             "phone_number",
             "birthday",
             "gender",
+            "career",
+            "is_registration",
         )
+        read_only_fields = fields
 
 
-class UserProfileSerializer(ModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = (
-            "introduce",
-            "profile_image",
-            "address",
-            "policy_for_terms_agreed",
-            "policy_for_privacy_agreed",
-        )
-        read_only_fields = (
-            "policy_for_terms_agreed",
-            "policy_for_privacy_agreed",
-        )
+    profile = NestedProfileSerializer(flatten=True)
+    career = serializers.SerializerMethodField(label=_('경력'), read_only=True)
+
+    # noinspection PyMethodMayBeStatic
+    def get_career(self, obj):
+        resume = obj.resume
+        careers = resume.career_set.all()
+
+        position_list = Career.Position.choices
+
+        career_summary = list()
+
+        for career in careers:
+            duration = career.quit_at - career.join_at
+
+            if  duration <= timedelta(30):
+                continue
+
+            career_summary.append(dict(position=career.position, duration=duration.days))
+
+        return career_summary
 
 
 class UserPasscodeVerifyRequestSerializer(SimpleSerializer):

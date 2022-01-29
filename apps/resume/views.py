@@ -47,7 +47,7 @@ class UserMeResumeDetailView(UserContextMixin, RetrieveAPIView):
         return resume
 
     @extend_schema(
-        tags=[api_tags.USER],
+        tags=[api_tags.USER_ME],
         summary="회원 이력서 가져오기 API",
         description="회원 이력서 가져오기 API 입니다. @IsAuthenticated",
         responses=serializers.ResumeSerializer,
@@ -70,7 +70,7 @@ class UserMeResumeDetailPDFView(UserContextMixin, RetrieveUpdateAPIView):
         super(UserMeResumeDetailPDFView, self).__init__(*args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.USER],
+        tags=[api_tags.USER_ME],
         summary="회원 이력서 PDF 업데이트 API",
         description="회원 이력서 PDF 업데이트 API 입니다. @IsAuthenticated",
         responses=serializers.ResumePDFSerializer,
