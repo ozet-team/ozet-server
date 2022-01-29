@@ -19,15 +19,13 @@ SECRET_KEY = "9421262ee369d46bb82c372db0bf3c8e"
 API_VERSION = "v12.0"
 
 """
-https://api.ozet.app/api/v1/member/user/me/instagram/oauth
+https://api.ozet.app/api/v1/member/user/me/instagram/oauth/authorize
 
 https://staging-api.ozet.app/api/v1/member/user/me/instagram/oauth/authorize
-https://staging-api.ozet.app/api/v1/member/user/me/instagram/oauth/access_token
 https://staging-api.ozet.app/api/v1/member/user/me/instagram/oauth/cancel
 https://staging-api.ozet.app/api/v1/member/user/me/instagram/oauth/delete
 
-https://dbce-125-131-185-253.ngrok.io/api/v1/member/user/me/instagram/oauth/authorize
-https://dbce-125-131-185-253.ngrok.io/api/v1/member/user/me/instagram/oauth/access_token
+https://df45-211-37-41-64.ngrok.io /api/v1/member/user/me/instagram/oauth/authorize
 https://dbce-125-131-185-253.ngrok.io/api/v1/member/user/me/instagram/oauth/cancel
 https://dbce-125-131-185-253.ngrok.io/api/v1/member/user/me/instagram/oauth/delete
 
@@ -63,7 +61,7 @@ class InstagramAPI(object):
     def get_access_token(
             cls,
             code: str,
-            redirect_uri: str = "http://localhost:8000"
+            redirect_uri: str = "https://staging-api.ozet.app/api/v1/member/user/me/instagram/oauth/authorize"
     ) -> Response:
         """
         Instagram Token Auth

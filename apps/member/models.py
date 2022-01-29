@@ -299,21 +299,13 @@ class UserProfile(TimeStampedModel):
         return f'<{self._meta.verbose_name.title()}: {self.user.name}>'
 
 
-class UserSNS(TimeStampedModel):
-    username = models.CharField(
+class UserSocial(TimeStampedModel):
+    user_key = models.CharField(
         max_length=50,
         default=None,
         null=True,
         blank=True,
         verbose_name=_('SNS'),
-    )
-
-    url = models.CharField(
-        max_length=250,
-        default=None,
-        null=True,
-        blank=True,
-        verbose_name=_('URL'),
     )
 
     token = models.CharField(
@@ -333,12 +325,20 @@ class UserSNS(TimeStampedModel):
         related_name='sns_set',
         verbose_name=_('회원 프로필'),
     )
+    token = models.ForeignKey(
+        'UserSocialToken',
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='token_set',
+        verbose_name=_('소셜 토큰'),
+    )
 
     class Meta:
         verbose_name = _('회원 SNS')
         verbose_name_plural = _('회원 SNS 목록')
 
-        db_table = 'member_user_profile_sns'
+        db_table = 'member_user_social'
 
 
 class UserToken(TimeStampedModel):
@@ -387,6 +387,56 @@ class UserToken(TimeStampedModel):
         verbose_name_plural = _('회원 토큰 목록')
 
         db_table = 'member_user_token'
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return f'<{self._meta.verbose_name.title()}: {self.token}>'
+
+
+class UserSocialToken(TimeStampedModel):
+    class Status(DjangoChoices):
+        instagram = ChoiceItem('instagram', label=_('인스타그램'))
+
+    class Status(DjangoChoices):
+        available = ChoiceItem('used', label=_('유효함'))
+        expire = ChoiceItem('expire', label=_('만료됨'))
+
+    class Type(DjangoChoices):
+        refresh = ChoiceItem('refresh', label=_('REFRESH'))
+        access = ChoiceItem('access', label=_('ACCESS'))
+
+
+    token = models.CharField(
+        max_length=255,
+        null=False,
+        blank=False,
+        verbose_name=_('토큰'),
+        unique=True,
+    )
+    type = models.CharField(
+        null=False,
+        blank=False,
+        max_length=20,
+        default=Type.access,
+        choices=Type.choices,
+        verbose_name=_('토큰 형태'),
+    )
+    status = models.CharField(
+        null=False,
+        blank=False,
+        max_length=20,
+        default=Status.available,
+        choices=Status.choices,
+        verbose_name=_('유효 상태'),
+    )
+
+    class Meta:
+        verbose_name = _('회원 토큰')
+        verbose_name_plural = _('회원 토큰 목록')
+
+        db_table = 'member_user_social_token'
 
     def __str__(self):
         return self.__repr__()

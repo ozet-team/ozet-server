@@ -15,7 +15,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 
 from apps.member import models
 from apps.member import serializers
-from apps.member.models import User, UserSNS
+from apps.member.models import User
 from utils.django.rest_framework.mixins import UserContextMixin, QuerySerializerMixin
 
 from commons.contrib.drf_spectacular import tags as api_tags

@@ -22,7 +22,7 @@ from rest_framework import serializers, fields
 from phonenumber_field.serializerfields import PhoneNumberField
 from phonenumber_field.phonenumber import PhoneNumber
 
-from apps.member.models import User, UserProfile, UserPasscodeVerify, UserToken, UserSNS
+from apps.member.models import User, UserProfile, UserPasscodeVerify, UserToken
 from apps.resume.models import Career
 from utils.django.rest_framework.serializers import SimpleSerializer, ModelSerializer
 from utils.naver.api import NaverCloudAPI
@@ -426,26 +426,6 @@ class UserMeSerializer(ModelSerializer):
                 instance.save(update_fields=['is_registration'])
 
         return instance
-
-
-class UserSNSDetailSerializer(ModelSerializer):
-    class Meta:
-        model = UserSNS
-        fields = (
-            "id",
-            "username",
-            "url",
-        )
-
-
-class UserSNSListSerializer(ModelSerializer):
-    class Meta:
-        model = UserSNS
-        fields = (
-            "id",
-            "username",
-            "url",
-        )
 
 
 class UserInstagramOAuthSerializer(SimpleSerializer):
