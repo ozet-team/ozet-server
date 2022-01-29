@@ -299,8 +299,8 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
 
     @extend_schema(
         tags=[api_tags.USER_ME],
-        summary="회원 정보 삭제 API",
-        description="회원 정보 삭제 API 입니다. @IsAuthenticated",
+        summary="회원 정보 삭제 API @IsAuthenticated",
+        description="회원 정보 삭제 API 입니다.",
     )
     def delete(self, request, *args, **kwargs):
         return super(UserMeView, self).delete(request, *args, **kwargs)
