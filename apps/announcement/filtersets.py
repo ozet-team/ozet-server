@@ -12,7 +12,7 @@ class AnnouncementFilterSet(FilterSet):
 
     class Meta:
         model = Announcement
-        fields = ["employee_types", "pay_types", "city_id", "country_id_list"]
+        fields = ["employee_types", "pay_types", "city_id_list", "country_id_list"]
 
 
 class BookmarkFilterSet(FilterSet):
