@@ -7,10 +7,12 @@ class AnnouncementFilterSet(FilterSet):
         field_name="employee_types__codename",
     )
     pay_types = filters.BaseInFilter(field_name="pay_type")
+    city_id_list = filters.BaseInFilter(field_name="city_id")
+    country_id_list = filters.BaseInFilter(field_name="country_id")
 
     class Meta:
         model = Announcement
-        fields = ["employee_types", "pay_types"]
+        fields = ["employee_types", "pay_types", "city_id", "country_id_list"]
 
 
 class BookmarkFilterSet(FilterSet):

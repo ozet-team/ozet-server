@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "apps.member",
     "apps.resume",
     "apps.announcement",
+    "apps.address",
     #
     "rest_framework",
     'rest_framework.authtoken',
@@ -246,4 +247,3 @@ DEFAULT_FILE_STORAGE = 'ozet.storages.S3MediaStorage'
 
 STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/'
 STATICFILES_STORAGE = 'ozet.storages.S3StaticStorage'
-

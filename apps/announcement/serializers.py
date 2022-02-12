@@ -1,6 +1,4 @@
 from apps.announcement.models import Announcement, Bookmark, EmployeeType
-from apps.member.models import User
-from apps.member.serializers import UserSerializer
 from rest_framework import serializers
 
 
