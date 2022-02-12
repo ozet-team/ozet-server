@@ -2,9 +2,11 @@ import dataclasses
 import datetime
 import re
 import time
+from collections import defaultdict
 from pathlib import Path
 from typing import Optional
 
+from apps.address.models import City, Country
 from apps.announcement.models import Announcement, EmployeeType
 from django.core.management import BaseCommand
 from selenium.common.exceptions import NoSuchElementException
@@ -24,12 +26,14 @@ class AnnouncementDTO:
     expire_type: Announcement.ExpireType
     expired_datetime: Optional[datetime.datetime]
     working_hour: str
-    pay_type: str
+    pay_type: Announcement.PayType
     pay_amount: int
     employee_types: list[EmployeeType.Type]
     description: str
     external_id: int
     shop_location: str
+    city: City
+    country: Optional[Country]
 
 
 class Command(BaseCommand):
@@ -47,9 +51,12 @@ class Command(BaseCommand):
         driver = Chrome(Path.joinpath(Path.cwd(), "chromedriver"))
         self.login(driver)
 
+        self.cities_dict = self.get_cities_dict()
+        self.countries_dict = self.get_countries_dict()
+
         dto_dict: dict[int, AnnouncementDTO] = {
             num: self.get_announcement(driver, num)
-            for num in self.get_announcement_nums(driver, pages=10)
+            for num in self.get_announcement_nums(driver, pages=2, start_page=4)
         }
         announcement_dict = self.get_announcement_dict_by_nums(list(dto_dict.keys()))
 
@@ -69,6 +76,7 @@ class Command(BaseCommand):
             new_announcements.append(
                 Announcement(
                     id=id,
+                    title=dto.title,
                     shop_name=dto.shop_name,
                     shop_location=dto.shop_location,
                     manager_name=dto.manager_name,
@@ -80,6 +88,8 @@ class Command(BaseCommand):
                     pay_amount=dto.pay_amount,
                     description=dto.description,
                     external_id=dto.external_id,
+                    city=dto.city,
+                    country=dto.country,
                 )
             )
             new_announcement_employee_types_through_list.extend(
@@ -104,10 +114,13 @@ class Command(BaseCommand):
         driver.find_element(By.ID, "loginBtn2").click()
         time.sleep(1)
 
-    def get_announcement_nums(self, driver: Chrome, pages: int = 10) -> list[int]:
+    def get_announcement_nums(
+        self, driver: Chrome, pages: int = 10, start_page: int = 0
+    ) -> list[int]:
         nums = []
 
         for page in range(pages):
+            page = page + start_page
             print("page:", page)
             driver.get(f"{self.urls['list']}#{page + 1}")
             time.sleep(1)
@@ -119,7 +132,9 @@ class Command(BaseCommand):
         return nums
 
     def get_announcement(
-        self, driver: Chrome, announcement_num: int
+        self,
+        driver: Chrome,
+        announcement_num: int,
     ) -> AnnouncementDTO:
         """
         `title: str
@@ -169,6 +184,19 @@ class Command(BaseCommand):
             By.CLASS_NAME, "mapBtn"
         ).get_attribute("data-loc")
 
+        city_name, left_address = shop_location.split(" ", 1)
+        city = self.cities_dict[city_name]
+        country = None
+        for country_name in sorted(
+            self.countries_dict[city].keys(), key=len, reverse=True
+        ):
+            if left_address.startswith(country_name):
+                country = self.countries_dict[city][country_name]
+                break
+
+        if len(self.countries_dict[city].keys()) and country is None:
+            raise ValueError(f"주소 정보를 찾을 수 없음: {shop_location}")
+
         # recruit info
         recruit_info_table = classified_shop_info["recruit_info"].find_element(
             By.TAG_NAME, "table"
@@ -198,6 +226,7 @@ class Command(BaseCommand):
 
         pay_info = pay_info_row.find_element(By.TAG_NAME, "td").text.strip()
         pay_type, raw_pay_amount = pay_info_pattern.match(pay_info).groups()
+        pay_type = self.get_claened_pay_type(pay_type)
         pay_amount = int(raw_pay_amount.split(" ")[0]) * 10_000
 
         # detail_info
@@ -224,6 +253,8 @@ class Command(BaseCommand):
             description=description_article,
             external_id=announcement_num,
             shop_location=shop_location,
+            city=city,
+            country=country,
         )
 
     def get_classified_shop_info(
@@ -249,6 +280,22 @@ class Command(BaseCommand):
                 classified_shop_info[k] = shop_info_element
 
         return classified_shop_info
+
+    def get_claened_pay_type(self, pay_type: str) -> Announcement.PayType:
+        if pay_type == "시급":
+            return Announcement.PayType.HOUR
+        elif pay_type == "일급":
+            return Announcement.PayType.DAY
+        elif pay_type == "주급":
+            return Announcement.PayType.WEEK
+        elif pay_type == "월급":
+            return Announcement.PayType.MONTH
+        elif pay_type == "연봉":
+            return Announcement.PayType.YEAR
+        elif pay_type == "무관":
+            return Announcement.PayType.IRRELEVANT
+
+        raise ValueError(f"invalid pay type: {pay_type}")
 
     def get_cleaned_employee_types(
         self, employee_types: str
@@ -280,3 +327,13 @@ class Command(BaseCommand):
                 "employee_types"
             ).filter(external_id__in=nums)
         }
+
+    def get_cities_dict(self) -> dict[str, City]:
+        return {city.name: city for city in City.objects.all()}
+
+    def get_countries_dict(self) -> dict[City, dict[str, Country]]:
+        countries_dict = defaultdict(dict)
+        for country in Country.objects.select_related("city").all():
+            countries_dict[country.city][country.name] = country
+
+        return dict(countries_dict)

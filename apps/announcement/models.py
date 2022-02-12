@@ -41,6 +41,10 @@ class Announcement(models.Model):
     title = models.CharField("제목", max_length=128)
     shop_name = models.CharField("지점명", max_length=128)
     shop_location = models.CharField("지점 주소", max_length=256)
+    city = models.ForeignKey("address.City", on_delete=models.PROTECT, related_name="+")
+    country = models.ForeignKey(
+        "address.Country", on_delete=models.PROTECT, related_name="+", null=True
+    )
     manager_name = models.CharField("담장자 이름", max_length=32)
     manager_phone_number = PhoneNumberField("담장자 전화번호", max_length=32)
     expire_type = models.CharField("마감 타입", max_length=2, choices=ExpireType.choices)
