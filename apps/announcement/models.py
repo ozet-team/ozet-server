@@ -58,6 +58,7 @@ class Announcement(models.Model):
     )
     description = models.TextField("상세내용", null=True, blank=True)
     external_id = models.IntegerField("외부 ID", null=True, db_index=True)
+    image_url = models.URLField("이미지 URL", null=True)
 
 
 class Bookmark(models.Model):
