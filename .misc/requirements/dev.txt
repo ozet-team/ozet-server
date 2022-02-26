@@ -8,11 +8,17 @@ asgiref==3.4.1
     # via
     #   django
     #   uvicorn
+async-generator==1.10
+    # via
+    #   trio
+    #   trio-websocket
 attrs==21.2.0
     # via
     #   jsonschema
+    #   outcome
     #   pytest
-backports.entry-points-selectable==1.1.1
+    #   trio
+backports-entry-points-selectable==1.1.1
     # via virtualenv
 boto3==1.20.23
     # via -r .misc/requirements/base.in
@@ -24,6 +30,9 @@ certifi==2021.5.30
     # via
     #   requests
     #   sentry-sdk
+    #   urllib3
+cffi==1.15.0
+    # via cryptography
 cfgv==3.3.1
     # via pre-commit
 charset-normalizer==2.0.4
@@ -32,10 +41,20 @@ click==8.0.1
     # via uvicorn
 codecov==2.1.12
     # via -r .misc/requirements/test.in
+colorama==0.4.4
+    # via crayons
+configparser==5.2.0
+    # via webdriver-manager
 coverage==5.5
     # via
     #   codecov
     #   pytest-cov
+crayons==0.4.0
+    # via webdriver-manager
+cryptography==36.0.1
+    # via
+    #   pyopenssl
+    #   urllib3
 distlib==0.3.3
     # via virtualenv
 django==3.2.6
@@ -97,11 +116,16 @@ filelock==3.4.0
 gunicorn==20.1.0
     # via -r .misc/requirements/base.in
 h11==0.12.0
-    # via uvicorn
+    # via
+    #   uvicorn
+    #   wsproto
 identify==2.4.0
     # via pre-commit
 idna==3.2
-    # via requests
+    # via
+    #   requests
+    #   trio
+    #   urllib3
 inflection==0.5.1
     # via
     #   drf-spectacular
@@ -116,6 +140,8 @@ jsonschema==4.2.1
     # via drf-spectacular
 nodeenv==1.6.0
     # via pre-commit
+outcome==1.1.0
+    # via trio
 packaging==21.0
     # via pytest
 phonenumberslite==8.12.38
@@ -132,14 +158,20 @@ py==1.10.0
     # via
     #   pytest
     #   pytest-forked
+pycparser==2.21
+    # via cffi
 pyjwt==1.7.1
     # via djangorestframework-jwt
 pymysql==1.0.2
     # via -r .misc/requirements/base.in
+pyopenssl==22.0.0
+    # via urllib3
 pyparsing==2.4.7
     # via packaging
 pyrsistent==0.18.0
     # via jsonschema
+pysocks==1.7.1
+    # via urllib3
 pytest==6.2.4
     # via
     #   -r .misc/requirements/test.in
@@ -178,9 +210,13 @@ pyyaml==6.0
 redis==3.5.3
     # via django-redis
 requests==2.26.0
-    # via codecov
+    # via
+    #   codecov
+    #   webdriver-manager
 s3transfer==0.5.0
     # via boto3
+selenium==4.1.2
+    # via -r .misc/requirements/base.in
 sentry-sdk==1.3.1
     # via -r .misc/requirements/base.in
 six==1.16.0
@@ -190,6 +226,10 @@ six==1.16.0
     #   pytest-xdist
     #   python-dateutil
     #   virtualenv
+sniffio==1.2.0
+    # via trio
+sortedcontainers==2.4.0
+    # via trio
 sqlparse==0.4.1
     # via django
 text-unidecode==1.3
@@ -199,19 +239,30 @@ toml==0.10.2
     #   pre-commit
     #   pytest
     #   pytest-cov
+trio==0.20.0
+    # via
+    #   selenium
+    #   trio-websocket
+trio-websocket==0.9.2
+    # via selenium
 uritemplate==4.1.1
     # via drf-spectacular
-urllib3==1.26.6
+urllib3[secure,socks]==1.26.6
     # via
     #   botocore
     #   requests
+    #   selenium
     #   sentry-sdk
 uvicorn==0.15.0
     # via -r .misc/requirements/base.in
 virtualenv==20.10.0
     # via pre-commit
+webdriver-manager==3.5.3
+    # via -r .misc/requirements/base.in
 whitenoise==5.3.0
     # via -r .misc/requirements/base.in
+wsproto==1.0.0
+    # via trio-websocket
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
