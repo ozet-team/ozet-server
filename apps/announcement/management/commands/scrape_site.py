@@ -3,7 +3,6 @@ import datetime
 import re
 import time
 from collections import defaultdict
-from pathlib import Path
 from typing import Optional
 
 from apps.address.models import City, Country
@@ -13,8 +12,13 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from webdriver_manager.chrome import ChromeDriverManager
 
 pay_info_pattern = re.compile(r"[(](.+)[)] (.+)")
+
+
+class UnsupportedCountryException(BaseException):
+    pass
 
 
 @dataclasses.dataclass
@@ -34,6 +38,7 @@ class AnnouncementDTO:
     shop_location: str
     city: City
     country: Optional[Country]
+    image_url: Optional[str]
 
 
 class Command(BaseCommand):
@@ -48,16 +53,19 @@ class Command(BaseCommand):
     }
 
     def handle(self, *args, **options):
-        driver = Chrome(Path.joinpath(Path.cwd(), "chromedriver"))
+        driver = Chrome(ChromeDriverManager().install())
         self.login(driver)
 
         self.cities_dict = self.get_cities_dict()
         self.countries_dict = self.get_countries_dict()
 
-        dto_dict: dict[int, AnnouncementDTO] = {
-            num: self.get_announcement(driver, num)
-            for num in self.get_announcement_nums(driver, pages=2, start_page=4)
-        }
+        dto_dict: dict[int, AnnouncementDTO] = {}
+        for num in self.get_announcement_nums(driver, pages=5):
+            try:
+                dto_dict[num] = self.get_announcement(driver, num)
+            except UnsupportedCountryException:
+                continue
+
         announcement_dict = self.get_announcement_dict_by_nums(list(dto_dict.keys()))
 
         latest_announcement = Announcement.objects.order_by("id").last()
@@ -90,6 +98,7 @@ class Command(BaseCommand):
                     external_id=dto.external_id,
                     city=dto.city,
                     country=dto.country,
+                    image_url=dto.image_url,
                 )
             )
             new_announcement_employee_types_through_list.extend(
@@ -185,7 +194,10 @@ class Command(BaseCommand):
         ).get_attribute("data-loc")
 
         city_name, left_address = shop_location.split(" ", 1)
-        city = self.cities_dict[city_name]
+        try:
+            city = self.cities_dict[city_name]
+        except KeyError:
+            raise UnsupportedCountryException
         country = None
         for country_name in sorted(
             self.countries_dict[city].keys(), key=len, reverse=True
@@ -237,6 +249,14 @@ class Command(BaseCommand):
             By.CLASS_NAME, "article"
         ).text.strip()
 
+        # image
+        try:
+            attach_files = driver.find_element(By.CLASS_NAME, "attachFiles")
+            first_image = attach_files.find_element(By.CLASS_NAME, "imgSize")
+            image_url = f"https:{first_image.get_attribute('data-img')}"
+        except NoSuchElementException:
+            image_url = None
+
         return AnnouncementDTO(
             title=title,
             shop_name=shop_name,
@@ -255,6 +275,7 @@ class Command(BaseCommand):
             shop_location=shop_location,
             city=city,
             country=country,
+            image_url=image_url,
         )
 
     def get_classified_shop_info(

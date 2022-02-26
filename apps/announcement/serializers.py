@@ -31,6 +31,7 @@ class AnnouncementSerializer(serializers.ModelSerializer):
             "employee_types",
             "description",
             "bookmark_count",
+            "image_url",
         ]
 
     @classmethod
