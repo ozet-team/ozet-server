@@ -1,3 +1,5 @@
+from rest_framework.filters import OrderingFilter
+
 from apps.announcement.filtersets import AnnouncementFilterSet
 from apps.announcement.models import Announcement, Bookmark
 from apps.announcement.serializers import AnnouncementSerializer, BookmarkSerializer
@@ -11,6 +13,8 @@ class AnnouncementViewSet(ReadOnlyModelViewSet):
     serializer_class = AnnouncementSerializer
     queryset = AnnouncementSerializer.process_queryset(Announcement.objects.all())
     filterset_class = AnnouncementFilterSet
+    filter_backends = [OrderingFilter]
+    ordering_fields = ['bookmark_count', 'id']
     pagination_class = LimitOffsetPagination
 
 

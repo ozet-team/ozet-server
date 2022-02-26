@@ -1,3 +1,5 @@
+from django.db.models import Count
+
 from apps.announcement.models import Announcement, Bookmark, EmployeeType
 from rest_framework import serializers
 
@@ -10,6 +12,7 @@ class EmployeeTypeSerializer(serializers.ModelSerializer):
 
 class AnnouncementSerializer(serializers.ModelSerializer):
     employee_types = EmployeeTypeSerializer(many=True, default=[])
+    bookmark_count = serializers.IntegerField()
 
     class Meta:
         model = Announcement
@@ -27,11 +30,14 @@ class AnnouncementSerializer(serializers.ModelSerializer):
             "pay_amount",
             "employee_types",
             "description",
+            "bookmark_count",
         ]
 
     @classmethod
     def process_queryset(cls, queryset):
-        return queryset.prefetch_related("employee_types")
+        return queryset.prefetch_related("employee_types").annotate(
+            bookmark_count=Count("bookmark_set")
+        )
 
 
 class BookmarkSerializer(serializers.ModelSerializer):
