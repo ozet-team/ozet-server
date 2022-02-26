@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, Prefetch
 
 from apps.announcement.models import Announcement, Bookmark, EmployeeType
 from rest_framework import serializers
@@ -46,7 +46,7 @@ class BookmarkSerializer(serializers.ModelSerializer):
     announcement_id = serializers.PrimaryKeyRelatedField(
         source="announcement",
         write_only=True,
-        queryset=Announcement.objects.all(),
+        queryset=AnnouncementSerializer.process_queryset(Announcement.objects.all()),
     )
 
     class Meta:
@@ -59,6 +59,9 @@ class BookmarkSerializer(serializers.ModelSerializer):
 
     @classmethod
     def process_queryset(cls, queryset):
-        return queryset.select_related("user", "announcement").prefetch_related(
-            "announcement__employee_types"
+        return queryset.select_related("user").prefetch_related(
+            Prefetch(
+                "announcement",
+                AnnouncementSerializer.process_queryset(Announcement.objects.all()),
+            )
         )
