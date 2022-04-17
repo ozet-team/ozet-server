@@ -3,3 +3,7 @@
 from .base import *
 
 INSTAGRAM_OAUTH_REDIRECT_URL = "https://api.ozet.app/api/v1/member/user/me/instagram/oauth/authorize/"
+
+CRONJOBS = [
+    ('* * * * *', 'ozet.cron.hello_every_minute', '>> ./tmp/log/ggbc_cron.log'),
+]
