@@ -1,6 +1,7 @@
-from rest_framework.filters import OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from commons.contrib.rest_framework.filters import OrderingFilter
 
-from apps.announcement.filtersets import AnnouncementFilterSet
+from apps.announcement.filtersets import AnnouncementFilterSet, BookmarkFilterSet
 from apps.announcement.models import Announcement, Bookmark
 from apps.announcement.serializers import AnnouncementSerializer, BookmarkSerializer
 from rest_framework.pagination import LimitOffsetPagination
@@ -13,7 +14,7 @@ class AnnouncementViewSet(ReadOnlyModelViewSet):
     serializer_class = AnnouncementSerializer
     queryset = AnnouncementSerializer.process_queryset(Announcement.objects.all())
     filterset_class = AnnouncementFilterSet
-    filter_backends = [OrderingFilter]
+    filter_backends = [OrderingFilter, DjangoFilterBackend]
     ordering_fields = ['bookmark_count', 'id']
     pagination_class = LimitOffsetPagination
 
@@ -23,6 +24,7 @@ class BookmarkViewSet(ModelViewSet):
     serializer_class = BookmarkSerializer
     queryset = BookmarkSerializer.process_queryset(Bookmark.objects.all())
     pagination_class = LimitOffsetPagination
+    filterset_class = BookmarkFilterSet
 
     def get_queryset(self):
         queryset = super().get_queryset()
