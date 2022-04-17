@@ -6,17 +6,16 @@ orbs:
 executors:
   ozet-excutor:
     environment:
-      IMAGE_NAME: bartkim07120/ozet-core
-      SLACK_APP_PLATFORM: OZET Core
+      IMAGE_NAME: ozetteam/ozet-server
+      SLACK_APP_PLATFORM: OZET 서버
     docker:
       - image: cimg/python:3.9.6
         auth:
           username: $DOCKERHUB_USER
           password: $DOCKERHUB_PASSWORD
     working_directory: ~/workspace
-
 commands:
-  slack_chatie_notify:
+  slack_ozet_notify:
     description: ""
     parameters:
       header:
@@ -67,7 +66,7 @@ commands:
                   "type": "section",
                   "text": {
                       "type": "mrkdwn",
-                      "text": "> *작업 브랜치* - `$CIRCLE_PROJECT_REPONAME/$CIRCLE_BRANCH`\n> *작업자* - `$CIRCLE_USERNAME`\n> <!here>"
+                      "text": "> *작업 브랜치* - `$CIRCLE_PROJECT_REPONAME/$CIRCLE_BRANCH`\n> *작업자* - `$CIRCLE_USERNAME`\n>"
                   },
                   "accessory": {
                     "type": "image",
@@ -86,13 +85,11 @@ jobs:
     executor: ozet-excutor
     steps:
       - checkout
-
       - restore_cache:
           keys:
           - deps1-{{ .Branch }}-{{ checksum ".misc/requirements/base.txt" }}
           # fallback to using the latest cache if no exact match is found
           - deps1-
-
       - run:
           name: Install virtual environments
           command: |
@@ -107,23 +104,19 @@ jobs:
           command: |
             source ~/workspace/venv/bin/activate
             pip-sync .misc/requirements/test.txt
-
       - run:
           name: Install Environment
           command: |
             touch .misc/env/prod.env
             env > .misc/env/prod.env
-
       - save_cache:
           key: deps1-{{ .Branch }}-{{ checksum ".misc/requirements/base.txt" }}
           paths:
             - ./*
-
       - persist_to_workspace:
           root: ./
           paths:
             - ./*
-
       - store_artifacts:
           name: Save artifacts - tests
           path: ~/workspace/app/tests
@@ -139,10 +132,8 @@ jobs:
             source ~/workspace/venv/bin/activate
             sh .misc/scripts/run_tests.sh
             cp -r ~/workspace/.pytest_results ~/workspace/.tests-results
-
       - store_test_results:
           path: ~/workspace/.tests-results
-
       - run:
           name: Upload Codecov
           command: |
@@ -157,50 +148,45 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/workspace
-
       - setup_remote_docker:
           version: 20.10.2
-
       - run:
           name: Install Package
           command: |
             sudo apt-get update
             sudo apt-get install sshpass
-
       - run:
           name: Install Environment
           command: |
             env > .env
             cp .env prod.env
-
       - run:
           name: Login to docker hub
           command: |
             docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
-
       - run:
           name: Build docker image
           command: |
             docker build --file .misc/docker/Dockerfile -t $IMAGE_NAME:latest .
-
       - run:
           name: Deploy docker image
           command: |
             docker push $IMAGE_NAME:latest
-
+      - add_ssh_keys:
+          fingerprints:
+            - "01:29:99:65:69:4a:8a:8e:bc:47:0f:fa:72:51:0c:9a"
+            - "21:16:51:85:ec:f5:69:71:4b:e1:00:44:6b:e2:05:34"
       - run:
           name: Release docker image
           command: |
-            #sshpass -p $RELEASE_PASSWORD ssh -o StrictHostKeyChecking=no $RELEASE_HOST "$RELEASE_HOOK"
-            echo 'Deploy Trigger'
-
-      - slack_chatie_notify:
-          header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
-          img_url: "https://i.ibb.co/52X6Dnc/free-icon-backlog-5229430.png"
+            ssh -o StrictHostKeyChecking=no ubuntu@api-staging.ozet.app "sh /docker/ozet-server-docker/deploy.sh"
+      - slack_ozet_notify:
+          header: "${SLACK_APP_PLATFORM} 를 << parameters.deploy_target >>에 성공적으로 배포했습니다 :tada:"
+          img_url: "https://user-images.githubusercontent.com/36470472/132522100-b182718b-5f22-4cfa-8443-d602bede1853.png"
           event: pass
-      - slack_chatie_notify:
-          header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
-          img_url: "https://i.ibb.co/HVbJ5FC/free-icon-cancelled-5229496.png"
+      - slack_ozet_notify:
+          header: "${SLACK_APP_PLATFORM} 를 << parameters.deploy_target >>에 배포하는 중에 문제가 발생했습니다 :warning:"
+          img_url: "https://user-images.githubusercontent.com/36470472/132522181-f446d07b-091e-4f69-b0a9-a04e7afc3b33.png"
           event: fail
   deploy_production:
     executor: ozet-excutor
@@ -211,52 +197,46 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/workspace
-
       - setup_remote_docker:
           version: 20.10.2
-
       - run:
           name: Install Package
           command: |
             sudo apt-get update
             sudo apt-get install sshpass
-
       - run:
           name: Install Environment
           command: |
             env > .env
             cp .env prod.env
-
       - run:
           name: Login to docker hub
           command: |
             docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
-
       - run:
           name: Build docker image
           command: |
             docker build --file .misc/docker/Dockerfile -t $IMAGE_NAME:latest .
-
       - run:
           name: Deploy docker image
           command: |
             docker push $IMAGE_NAME:latest
-
+      - add_ssh_keys:
+          fingerprints:
+            - "01:29:99:65:69:4a:8a:8e:bc:47:0f:fa:72:51:0c:9a"
+            - "21:16:51:85:ec:f5:69:71:4b:e1:00:44:6b:e2:05:34"
       - run:
           name: Release docker image
           command: |
-            #sshpass -p $RELEASE_PASSWORD ssh -o StrictHostKeyChecking=no $RELEASE_HOST "$RELEASE_HOOK"
-            echo 'Deploy Trigger'
-
-      - slack_chatie_notify:
-          header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 성공적으로 배포했습니다 :tada:"
-          img_url: "https://i.ibb.co/52X6Dnc/free-icon-backlog-5229430.png"
+            ssh -o StrictHostKeyChecking=no ubuntu@api.ozet.app "sh /docker/ozet-server-docker/deploy.sh"
+      - slack_ozet_notify:
+          header: "${SLACK_APP_PLATFORM}를 << parameters.deploy_target >>에 성공적으로 배포했습니다 :tada:"
+          img_url: "https://user-images.githubusercontent.com/36470472/132522100-b182718b-5f22-4cfa-8443-d602bede1853.png"
           event: pass
-      - slack_chatie_notify:
-          header: "${SLACK_APP_PLATFORM}를 '<< parameters.deploy_target >>'에 배포하는 중에 문제가 발생했습니다 :warning:"
-          img_url: "https://i.ibb.co/HVbJ5FC/free-icon-cancelled-5229496.png"
+      - slack_ozet_notify:
+          header: "${SLACK_APP_PLATFORM}를 << parameters.deploy_target >>에 배포하는 중에 문제가 발생했습니다 :warning:"
+          img_url: "https://user-images.githubusercontent.com/36470472/132522176-4d62ccc8-1f46-407c-a9ef-f12ad49d6a9c.png"
           event: fail
-
 workflows:
   build-with-test:
     jobs:
@@ -266,6 +246,7 @@ workflows:
               only:
                 - /^(enhance)[/].+/
                 - /^(feature)[/].+/
+                - /^(feat)[/].+/
                 - /^(hotfix)[/].+/
                 - /^(fix)[/].+/
 
@@ -295,7 +276,7 @@ workflows:
             - test
           filters:
             <<: *filters-deploy
-          deploy_target: "스테이징 서버"
+          deploy_target: "스테이징"
 
   deploy_production:
     jobs:
@@ -311,9 +292,9 @@ workflows:
           filters:
             <<: *filters-deploy
 
-      - deploy_staging:
+      - deploy_production:
           requires:
             - test
           filters:
             <<: *filters-deploy
-          deploy_target: "프로덕션 서버"
+          deploy_target: "프로덕션"
