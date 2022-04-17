@@ -31,6 +31,10 @@ RUN DJANGO_SETTINGS_MODULE=ozet.settings.live python manage.py migrate
 # Static
 # RUN DJANGO_SETTINGS_MODULE=ozet.settings.live python manage.py collectstatic --noinput
 
+# Crontab
+RUN DJANGO_SETTINGS_MODULE=ozet.settings.live python manage.py crontab add
+RUN DJANGO_SETTINGS_MODULE=ozet.settings.live python manage.py crontab show
+
 EXPOSE 8080
 
 CMD DJANGO_SETTINGS_MODULE=ozet.settings.live gunicorn ozet.asgi:application -b :8080 -k uvicorn.workers.UvicornWorker
