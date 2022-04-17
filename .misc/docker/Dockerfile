@@ -5,7 +5,9 @@ LABEL title="core-server"
 LABEL version="1.0"
 
 # Dependencies
-RUN yum install wkhtmltopdf
+RUN wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.3/wkhtmltox-0.12.3_linux-generic-amd64.tar.xz
+RUN tar vxf wkhtmltox-0.12.3_linux-generic-amd64.tar.xz
+RUN cp wkhtmltox/bin/wk* /usr/local/bin/
 
 # Update PIP
 RUN pip install --upgrade setuptools
