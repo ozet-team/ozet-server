@@ -5,7 +5,7 @@ LABEL title="core-server"
 LABEL version="1.0"
 
 # Dependencies
-RUN apt-get install wkhtmltopdf
+RUN yum install wkhtmltopdf
 
 # Update PIP
 RUN pip install --upgrade setuptools
