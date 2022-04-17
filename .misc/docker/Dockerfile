@@ -4,6 +4,9 @@ LABEL maintainer="ozetteam@gmail.com"
 LABEL title="core-server"
 LABEL version="1.0"
 
+# Dependencies
+RUN apt-get install wkhtmltopdf
+
 # Update PIP
 RUN pip install --upgrade setuptools
 RUN pip install --upgrade pip-tools

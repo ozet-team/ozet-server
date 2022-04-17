@@ -145,29 +145,39 @@ class ResumePDFSerializer(ModelSerializer):
     class Meta:
         model = Resume
         fields = (
-            "id",
             "html",
+            "pdf_file",
+        )
+
+        read_only_fields = (
+            'pdf_file',
         )
 
     # WRITE ONLY
-    html = serializers.CharField(
+    html = serializers.FileField(
         label=gettext_lazy('PDF HTML'),
         required=True,
         allow_null=False,
-        allow_blank=False,
         write_only=True,
     )
 
-    def create(self, validated_data):
+    def update(self, request, *args, **kwargs):
         import pdfkit
+        import io
 
-        user = validated_data.get('user')
-        pdf_html = validated_data.get('pdf_html')
+        resume: Resume = request
+        html = self.validated_data.get('html')
 
-        resume: Resume = user.resume
+        css = ".misc/pdf/resume/style.css"
+        try:
+            html_str = html.file.read().decode('utf')
+            pdf = pdfkit.from_string(html_str, False, css=css)
+        except Exception as e:
+            raise ValueError(f'{e}')
 
-        pdf = pdfkit.from_string(pdf_html, False)
-        ticket_pdf = ContentFile(pdf)
+        ticket_pdf = ContentFile(pdf, name=f'{resume.user.id}_{resume.id}.pdf')
 
         resume.pdf_file = ticket_pdf
         resume.save()
+
+        return resume
