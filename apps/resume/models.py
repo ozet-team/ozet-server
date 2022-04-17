@@ -40,7 +40,7 @@ class Resume(TimeStampedModel):
         blank=False,
         on_delete=models.CASCADE,
         related_name='resume',
-        verbose_name=_('회원'),
+        verbose_name=_('이력서'),
     )
 
     class Meta:
@@ -122,11 +122,11 @@ class Career(TimeStampedModel):
         blank=False,
         on_delete=models.CASCADE,
         related_name='career_set',
-        verbose_name=_('회원'),
+        verbose_name=_('이력서'),
     )
 
     class Meta:
-        verbose_name = _('이력서')
+        verbose_name = _('커리어')
 
         db_table = 'member_user_resume_career'
 
@@ -172,11 +172,11 @@ class Certificate(TimeStampedModel):
         blank=False,
         on_delete=models.CASCADE,
         related_name='certificate_set',
-        verbose_name=_('회원'),
+        verbose_name=_('이력서'),
     )
 
     class Meta:
-        verbose_name = _('이력서')
+        verbose_name = _('자격증')
 
         db_table = 'member_user_resume_certificate'
 
@@ -232,11 +232,11 @@ class AcademicBackground(TimeStampedModel):
         blank=False,
         on_delete=models.CASCADE,
         related_name='academic_set',
-        verbose_name=_('회원'),
+        verbose_name=_('이력서'),
     )
 
     class Meta:
-        verbose_name = _('이력서')
+        verbose_name = _('학력')
 
         db_table = 'member_user_resume_academic'
 
@@ -293,12 +293,11 @@ class MilitaryService(TimeStampedModel):
         blank=False,
         on_delete=models.CASCADE,
         related_name='military',
-        verbose_name=_('회원'),
+        verbose_name=_('이력서'),
     )
 
-
     class Meta:
-        verbose_name = _('이력서')
+        verbose_name = _('병역')
 
         db_table = 'member_user_resume_military'
 
@@ -307,3 +306,41 @@ class MilitaryService(TimeStampedModel):
 
     def __repr__(self):
         return f'<{self._meta.verbose_name.title()}: {self.resume.user.name}>'
+
+
+class PictureCollection(TimeStampedModel):
+    image_id = models.CharField(
+        max_length=20,
+        null=True,
+    )
+
+    url = models.URLField(
+        max_length=200,
+        null=False,
+    )
+
+    is_active = models.BooleanField(
+        null=False,
+        default=True,
+    )
+
+    # Related
+    resume = models.ForeignKey(
+        Resume,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='collection_set',
+        verbose_name=_('이력서'),
+    )
+
+    class Meta:
+        verbose_name = _('사진 모음')
+
+        db_table = 'member_user_resume_picture_collection'
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return f'<{self._meta.verbose_name.title()}: {self.url}>'

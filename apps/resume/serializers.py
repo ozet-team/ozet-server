@@ -3,6 +3,8 @@ import random
 import uuid
 from http import HTTPStatus
 
+from django.core.files.base import ContentFile
+from django.utils.translation.trans_null import gettext_lazy
 from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
 from rest_auth.utils import jwt_encode
 from rest_framework.exceptions import NotFound
@@ -144,5 +146,28 @@ class ResumePDFSerializer(ModelSerializer):
         model = Resume
         fields = (
             "id",
-            "pdf_file",
+            "html",
         )
+
+    # WRITE ONLY
+    html = serializers.CharField(
+        label=gettext_lazy('PDF HTML'),
+        required=True,
+        allow_null=False,
+        allow_blank=False,
+        write_only=True,
+    )
+
+    def create(self, validated_data):
+        import pdfkit
+
+        user = validated_data.get('user')
+        pdf_html = validated_data.get('pdf_html')
+
+        resume: Resume = user.resume
+
+        pdf = pdfkit.from_string(pdf_html, False)
+        ticket_pdf = ContentFile(pdf)
+
+        resume.pdf_file = ticket_pdf
+        resume.save()

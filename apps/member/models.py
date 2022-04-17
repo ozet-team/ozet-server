@@ -652,3 +652,5 @@ class UserPasscodeVerify(TimeStampedModel):
             __process()
 
         return latest_passcode_verify.status == cls.Status.verified
+
+
