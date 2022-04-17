@@ -154,7 +154,13 @@ class ResumePDFSerializer(ModelSerializer):
         )
 
     # WRITE ONLY
-    html = serializers.FileField(
+    # html = serializers.FileField(
+    #     label=gettext_lazy('PDF HTML'),
+    #     required=True,
+    #     allow_null=False,
+    #     write_only=True,
+    # )
+    html = serializers.CharField(
         label=gettext_lazy('PDF HTML'),
         required=True,
         allow_null=False,
@@ -163,14 +169,14 @@ class ResumePDFSerializer(ModelSerializer):
 
     def update(self, request, *args, **kwargs):
         import pdfkit
-        import io
 
         resume: Resume = request
         html = self.validated_data.get('html')
 
         css = ".misc/pdf/resume/style.css"
         try:
-            html_str = html.file.read().decode('utf')
+            # html_str = html.file.read().decode('utf')
+            html_str = html
             pdf = pdfkit.from_string(html_str, False, css=css)
         except Exception as e:
             raise ValueError(f'{e}')
