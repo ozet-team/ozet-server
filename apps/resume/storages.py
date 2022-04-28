@@ -8,4 +8,4 @@ def resume_pdf_upload(instance: any, filename: str):
 
     root_dir = 'user/resume/'
 
-    return f"{root_dir}/{instance.id}/{datetime.now().strftime('%Y%m%d')}_{str(randint(10000000, 99999999))}.{filename_ext}"
+    return f"{root_dir}/{instance.id}/{datetime.now().strftime('%Y%m%d')}_{str(randint(10000000, 99999999))}{filename_ext}"

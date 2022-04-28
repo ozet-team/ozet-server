@@ -191,13 +191,16 @@ class ResumePDFSerializer(ModelSerializer):
 
         css = ".misc/pdf/resume/style.css"
         try:
-            # html_str = html.file.read().decode('utf')
             html_str = html
             pdf = pdfkit.from_string(html_str, False, css=css, options=options)
-        except Exception as e:
-            raise ValueError(f'{e}')
+        except OSError as e:
+            resume.pdf_file = ''
 
-        ticket_pdf = ContentFile(pdf, name=f'{resume.user.id}_{resume.id}.pdf')
+            return resume
+        except Exception as e:
+            raise e
+
+        ticket_pdf = ContentFile(pdf, name=f'{resume.user.id}_{resume.id}' + '.pdf')
 
         resume.pdf_file = ticket_pdf
         resume.save()
