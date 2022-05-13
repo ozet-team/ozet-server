@@ -1,27 +1,19 @@
-import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.db import transaction
 from django.http import HttpResponseRedirect
-from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
-from rest_framework.exceptions import NotFound
 from django.utils import timezone
-
-from rest_framework.generics import (
-    CreateAPIView,
-    RetrieveUpdateDestroyAPIView,
-    ListAPIView, RetrieveAPIView,
-)
-from rest_framework.generics import get_object_or_404
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
+from rest_framework.exceptions import NotFound
+from rest_framework.generics import (CreateAPIView, ListAPIView, RetrieveAPIView,
+                                     RetrieveUpdateDestroyAPIView)
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 
-from apps.member import models
 from apps.member import serializers
 from apps.member.models import User, UserSocial, UserSocialToken
-from utils.django.rest_framework.mixins import UserContextMixin, QuerySerializerMixin
-
 from commons.contrib.drf_spectacular import tags as api_tags
+from utils.django.rest_framework.mixins import QuerySerializerMixin, UserContextMixin
 from utils.instagram.api import InstagramAPI
 
 
@@ -30,36 +22,36 @@ class UserPasscodeVerifyRequestView(CreateAPIView):
     serializer_class = serializers.UserPasscodeVerifyRequestSerializer
 
     @extend_schema(
-        tags=[api_tags.PASSCODE],
-        summary="패스코드 인증 요청 API @AllowAny",
-        description="패스코드 인증 요청 API 입니다.",
-        responses=serializers.UserPasscodeVerifyRequestSerializer,
-        request=serializers.UserPasscodeVerifyRequestSerializer,
-        examples=[
-            OpenApiExample(
-                response_only=True,
-                summary="패스코드 인증 요청 성공",
-                name="201",
-                value={
-                  "requestedVerify": {
-                    "requesterPhoneNumber": "+821057809397",
-                    "requesterDeviceUuid": "ozet_d16066f09b594276bb7d9628e5ea1564",
-                    "status": "pending",
-                    "expireAt": "2021-12-11T06:30:47.390Z"
-                  }
-                },
-            ),
-            OpenApiExample(
-                request_only=True,
-                response_only=False,
-                name="요청 바디 예시",
-                summary="요청 바디 예시",
-                description="전화번호 포맷은 E164를 사용합니다.[https://www.twilio.com/docs/glossary/what-e164]",
-                value={
-                    "phoneNumber": "+821057809397",
-                },
-            ),
-        ],
+            tags=[api_tags.PASSCODE],
+            summary="패스코드 인증 요청 API @AllowAny",
+            description="패스코드 인증 요청 API 입니다.",
+            responses=serializers.UserPasscodeVerifyRequestSerializer,
+            request=serializers.UserPasscodeVerifyRequestSerializer,
+            examples=[
+                OpenApiExample(
+                    response_only=True,
+                    summary="패스코드 인증 요청 성공",
+                    name="201",
+                    value={
+                        "requestedVerify": {
+                            "requesterPhoneNumber": "+821057809397",
+                            "requesterDeviceUuid": "ozet_d16066f09b594276bb7d9628e5ea1564",
+                            "status": "pending",
+                            "expireAt": "2021-12-11T06:30:47.390Z"
+                        }
+                    },
+                ),
+                OpenApiExample(
+                    request_only=True,
+                    response_only=False,
+                    name="요청 바디 예시",
+                    summary="요청 바디 예시",
+                    description="전화번호 포맷은 E164를 사용합니다.[https://www.twilio.com/docs/glossary/what-e164]",
+                    value={
+                        "phoneNumber": "+821057809397",
+                    },
+                ),
+            ],
     )
     def post(self, request, *args, **kwargs):
         return super(UserPasscodeVerifyRequestView, self).post(request, *args, **kwargs)
@@ -70,37 +62,37 @@ class UserPasscodeVerifyView(CreateAPIView):
     serializer_class = serializers.UserPasscodeVerifySerializer
 
     @extend_schema(
-        tags=[api_tags.PASSCODE],
-        summary="패스코드 인증 API @AllowAny",
-        description="패스코드 인증 API 입니다.",
-        responses=serializers.UserPasscodeVerifySerializer,
-        examples=[
-            OpenApiExample(
-                response_only=True,
-                summary="패스코드 인증 요청 성공",
-                name="201",
-                value={
-                    "user": {
-                        "username": "ozet_d16066f09b594276bb7d9628e5ea1564",
-                        "name": "김헤어",
-                        "email": "kimhair@hair.com",
-                        "phoneNumber": "+821057809397"
+            tags=[api_tags.PASSCODE],
+            summary="패스코드 인증 API @AllowAny",
+            description="패스코드 인증 API 입니다.",
+            responses=serializers.UserPasscodeVerifySerializer,
+            examples=[
+                OpenApiExample(
+                    response_only=True,
+                    summary="패스코드 인증 요청 성공",
+                    name="201",
+                    value={
+                        "user": {
+                            "username": "ozet_d16066f09b594276bb7d9628e5ea1564",
+                            "name": "김헤어",
+                            "email": "kimhair@hair.com",
+                            "phoneNumber": "+821057809397"
+                        },
+                        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2Ijo5LCJ1c2VybmF..",
                     },
-                    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo5LCJ1c2VybmF..",
-                },
-            ),
-            OpenApiExample(
-                request_only=True,
-                response_only=False,
-                name="요청 바디 예시",
-                summary="요청 바디 예시",
-                description="전화번호 포맷은 E164를 사용합니다.[https://www.twilio.com/docs/glossary/what-e164]",
-                value={
-                    "phoneNumber": "+821057809397",
-                    "passcode": "958322",
-                },
-            ),
-        ],
+                ),
+                OpenApiExample(
+                    request_only=True,
+                    response_only=False,
+                    name="요청 바디 예시",
+                    summary="요청 바디 예시",
+                    description="전화번호 포맷은 E164를 사용합니다.[https://www.twilio.com/docs/glossary/what-e164]",
+                    value={
+                        "phoneNumber": "+821057809397",
+                        "passcode": "958322",
+                    },
+                ),
+            ],
     )
     def post(self, request, *args, **kwargs):
         return super(UserPasscodeVerifyView, self).post(request, *args, **kwargs)
@@ -112,43 +104,43 @@ class UserPasscodeVerifyPassView(QuerySerializerMixin, CreateAPIView):
     query_serializer_class = serializers.UserPasscodeVerifyPassSerializer
 
     @extend_schema(
-        tags=[api_tags.PASSCODE, api_tags.DEBUG],
-        summary="패스코드 강제 성공 API @DEBUG @AllowAny",
-        description="패스코드 성공했다고 가정하고 바로 JWT를 발행합니다.",
-        responses=serializers.UserPasscodeVerifyPassSerializer,
-        examples=[
-            OpenApiExample(
-                response_only=True,
-                summary="패스코드 강제 성공 API @DEBUG",
-                name="201",
-                value={
-                    "user": {
-                        "username": "ozet_d16066f09b594276bb7d9628e5ea1564",
-                        "name": "김헤어",
-                        "email": "kimhair@hair.com",
-                        "phoneNumber": "+821057809397",
+            tags=[api_tags.PASSCODE, api_tags.DEBUG],
+            summary="패스코드 강제 성공 API @DEBUG @AllowAny",
+            description="패스코드 성공했다고 가정하고 바로 JWT를 발행합니다.",
+            responses=serializers.UserPasscodeVerifyPassSerializer,
+            examples=[
+                OpenApiExample(
+                    response_only=True,
+                    summary="패스코드 강제 성공 API @DEBUG",
+                    name="201",
+                    value={
+                        "user": {
+                            "username": "ozet_d16066f09b594276bb7d9628e5ea1564",
+                            "name": "김헤어",
+                            "email": "kimhair@hair.com",
+                            "phoneNumber": "+821057809397",
+                        },
+                        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo5LCJmF..",
                     },
-                    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo5LCJ1c2VybmF..",
-                },
-            ),
-            OpenApiExample(
-                request_only=True,
-                response_only=False,
-                name="요청 바디 예시",
-                summary="요청 바디 예시",
-                description="",
-                value={
-                    "user_id": "9",
-                },
-            ),
-        ],
+                ),
+                OpenApiExample(
+                    request_only=True,
+                    response_only=False,
+                    name="요청 바디 예시",
+                    summary="요청 바디 예시",
+                    description="",
+                    value={
+                        "user_id": "9",
+                    },
+                ),
+            ],
     )
     def post(self, request, *args, **kwargs):
         return super(UserPasscodeVerifyPassView, self).post(request, *args, **kwargs)
 
 
 class UserDetailView(UserContextMixin, RetrieveAPIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
     serializer_class = serializers.UserSerializer
 
     queryset = User.objects
@@ -156,33 +148,33 @@ class UserDetailView(UserContextMixin, RetrieveAPIView):
     lookup_url_kwarg = 'user_id'
 
     @extend_schema(
-        tags=[api_tags.USER],
-        summary="회원 정보 가져오기 API @AllowAny",
-        description="회원 정보 가져오기 API 입니다.",
-        responses=serializers.UserSerializer,
+            tags=[api_tags.USER],
+            summary="회원 정보 가져오기 API @AllowAny",
+            description="회원 정보 가져오기 API 입니다.",
+            responses=serializers.UserSerializer,
     )
     def get(self, request, *args, **kwargs):
         return super(UserDetailView, self).get(request, *args, **kwargs)
 
 
 class UserListView(UserContextMixin, ListAPIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
     serializer_class = serializers.UserListSerializer
 
     queryset = User.objects.all()
 
     @extend_schema(
-        tags=[api_tags.DEBUG],
-        summary="모든 회원 정보 가져오기 API @DEBUG @AllowAny",
-        description="모든 회원 정보 가져오기 API 입니다.",
-        responses=serializers.UserListSerializer,
+            tags=[api_tags.DEBUG],
+            summary="모든 회원 정보 가져오기 API @DEBUG @AllowAny",
+            description="모든 회원 정보 가져오기 API 입니다.",
+            responses=serializers.UserListSerializer,
     )
     def get(self, request, *args, **kwargs):
         return super(UserListView, self).get(request, *args, **kwargs)
 
 
 class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     serializer_class = serializers.UserMeSerializer
 
     def __init__(self, *args, **kwargs):
@@ -196,116 +188,132 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         return self.user
 
     @extend_schema(
-        tags=[api_tags.USER_ME],
-        summary="회원 정보 가져오기 API @IsAuthenticated",
-        description="회원 정보 가져오기 API 입니다.",
-        responses=serializers.UserMeSerializer,
-        examples=[
-            OpenApiExample(
-                response_only=True,
-                summary="회원 정보 가져오기 성공",
-                name="201",
-                value={
-                  "id": 9,
-                  "username": "ozet_d16066f09b594276bb7d9628e5ea1564",
-                  "name": "김헤어",
-                  "email": "kimhair@hair.com",
-                  "phoneNumber": "+821057809397",
-                  "birthday": "1997-07-12",
-                  "gender": "MALE",
-                  "career": [
-                    {
-                      "position": "STAFF",
-                      "duration": 120
-                    }
-                  ],
-                  "isRegistration": True,
-                  "social": [
-                    {
-                      "id": 7,
-                      "social": "instagram",
-                      "socialKey": "5097361770286093"
-                    }
-                  ],
-                  "introduce": "내가 바로 개쩌는 헤어 디자이너",
-                  "profileImage": "https://ozet-bucket.s3.ap-northeast-2.amazonaws.com/media/%EB%82%B4%EA%B0%80%20%EB%B0%94%EB%A1%9C%20%EA%B0%9C%EC%A9%8C%EB%8A%94%20%ED%97%A4%EC%96%B4%20%EB%94%94%EC%9E%90%EC%9D%B4%EB%84%88",
-                  "address": "경기도 성남시 분당구 야탑동 386-6",
-                  "policyForTermsAgreed": "2021-12-11T03:07:48.706758",
-                  "policyForPrivacyAgreed": "2021-12-11T03:07:48.706758"
-                },
-            ),
-        ],
+            tags=[api_tags.USER_ME],
+            summary="회원 정보 가져오기 API @IsAuthenticated",
+            description="회원 정보 가져오기 API 입니다.",
+            responses=serializers.UserMeSerializer,
+            examples=[
+                OpenApiExample(
+                    response_only=True,
+                    summary="회원 정보 가져오기 성공",
+                    name="201",
+                    value={
+                        "id": 9,
+                        "username": "ozet_d16066f09b594276bb7d9628e5ea1564",
+                        "name": "김헤어",
+                        "email": "kimhair@hair.com",
+                        "phoneNumber": "+821057809397",
+                        "birthday": "1997-07-12",
+                        "gender": "MALE",
+                        "career": [
+                            {
+                                "position": "STAFF",
+                                "duration": 120
+                            }
+                        ],
+                        "isRegistration": True,
+                        "social": [
+                            {
+                                "id": 7,
+                                "social": "instagram",
+                                "socialKey": "5097361770286093"
+                            }
+                        ],
+                        "introduce": "내가 바로 개쩌는 헤어 디자이너",
+                        "profileImage": "https://ozet-bucket.s3.ap-northeast-2.amazonaws.com/media/%EB%82%B4%EA%B0%80%20%EB%B0%94%EB%A1%9C%20%EA%B0%9C%EC%A9%8C%EB%8A%94%20%ED%97%A4%EC%96%B4%20%EB%94%94%EC%9E%90%EC%9D%B4%EB%84%88",
+                        "address": "경기도 성남시 분당구 야탑동 386-6",
+                        "policyForTermsAgreed": "2021-12-11T03:07:48.706758",
+                        "policyForPrivacyAgreed": "2021-12-11T03:07:48.706758"
+                    },
+                ),
+            ],
     )
     def get(self, request, *args, **kwargs):
         return super(UserMeView, self).get(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.USER_ME],
-        summary="회원 정보 업데이트 API @IsAuthenticated",
-        description="회원 정보 업데이트 API 입니다.",
-        responses=serializers.UserMeSerializer,
-        examples=[
-            OpenApiExample(
-                response_only=True,
-                summary="회원 정보 업데이트 성공",
-                name="200",
-                value={
-                    "username": "ozet_d16066f09b594276bb7d9628e5ea1564",
-                    "name": "김헤어",
-                    "email": "kimhair@hair.com",
-                    "phoneNumber": "+821057809397",
-                    "birthday": "1997-7-12",
-                    "gender": "male",
-                    "introduce": "나는 업데이트 된 더욱 개쩌는 헤어 디자이너",
-                    "address": "경기도 성남시 불라불라",
-                    "profileImage": "https://ozet-bucket.s3.ap-northeast-2.amazonaws.com/media/user/profile/5/20211212_25522567",
-                    "policyForTermsAgreed": "2021-12-11T07:47:33.336Z",
-                    "policyForPrivacyAgreed": "2021-12-11T07:47:33.336Z",
-                    "snsList": [
-                        {
-                            "username": "@bart_not_found",
-                            "url": "https://instagram.com/bart_not_found",
-                        },
-                        {
-                            "username": "@bart_not_found",
-                            "url": "https://twitter.com/bart_not_found",
-                        }
-                    ],
-                },
-            ),
-            OpenApiExample(
-                request_only=True,
-                response_only=False,
-                name="요청 바디 예시",
-                summary="요청 바디 예시",
-                description="",
-                value={
-                    "name": "김헤어",
-                    "email": "kimhair@hair.com",
-                    "introduce": "내가 바로 개쩌는 헤어 디자이너",
-                    "address": "경기도 여주시 불라불라",
-                    "profileImage": "https://ozet-bucket.s3.ap-northeast-2.amazonaws.com/media/user/profile/5/20211212_25522567",
-                    "snsList": [
-                        {
-                            "username": "@bart_not_found",
-                            "url": "https://instagram.com/bart_not_found",
-                        },
-                        {
-                            "username": "@bart_not_found",
-                            "url": "https://twitter.com/bart_not_found",
-                        }
-                    ],
-                },
-            ),
-        ],
+            tags=[api_tags.USER_ME],
+            summary="회원 정보 업데이트 API @IsAuthenticated",
+            description="회원 정보 업데이트 API 입니다.",
+            responses=serializers.UserMeSerializer,
+            examples=[
+                OpenApiExample(
+                    response_only=True,
+                    summary="회원 정보 업데이트 성공",
+                    name="200",
+                    value={
+                        "id": 9,
+                        "username": "ozet_d16066f09b594276bb7d9628e5ea1564",
+                        "name": "김헤어",
+                        "email": "kimhair@hair.com",
+                        "phoneNumber": "+821057809397",
+                        "birthday": "1997-07-12",
+                        "gender": "MALE",
+                        "career": [
+                            {
+                                "position": "STAFF",
+                                "duration": 120
+                            }
+                        ],
+                        "isRegistration": True,
+                        "social": [
+                            {
+                                "id": 7,
+                                "social": "instagram",
+                                "socialKey": "5097361770286093"
+                            }
+                        ],
+                        "introduce": "내가 바로 개쩌는 헤어 디자이너",
+                        "profileImage": "https://ozet-bucket.s3.ap-northeast-2.amazonaws.com/media/%EB%82%B4%EA%B0%80%20%EB%B0%94%EB%A1%9C%20%EA%B0%9C%EC%A9%8C%EB%8A%94%20%ED%97%A4%EC%96%B4%20%EB%94%94%EC%9E%90%EC%9D%B4%EB%84%88",
+                        "address": "경기도 성남시 분당구 야탑동 386-6",
+                        "policyForTermsAgreed": "2021-12-11T03:07:48.706758",
+                        "policyForPrivacyAgreed": "2021-12-11T03:07:48.706758"
+                    },
+                ),
+                OpenApiExample(
+                    request_only=True,
+                    response_only=False,
+                    name="요청 바디 예시",
+                    summary="요청 바디 예시",
+                    description="",
+                    value={
+                        "id": 9,
+                        "username": "ozet_d16066f09b594276bb7d9628e5ea1564",
+                        "name": "김헤어",
+                        "email": "kimhair@hair.com",
+                        "phoneNumber": "+821057809397",
+                        "birthday": "1997-07-12",
+                        "gender": "MALE",
+                        "career": [
+                            {
+                                "position": "STAFF",
+                                "duration": 120
+                            }
+                        ],
+                        "isRegistration": True,
+                        "social": [
+                            {
+                                "id": 7,
+                                "social": "instagram",
+                                "socialKey": "5097361770286093"
+                            }
+                        ],
+                        "introduce": "내가 바로 개쩌는 헤어 디자이너",
+                        "profileImage": "https://ozet-bucket.s3.ap-northeast-2.amazonaws.com/media/%EB%82%B4%EA%B0%80%20%EB%B0%94%EB%A1%9C%20%EA%B0%9C%EC%A9%8C%EB%8A%94%20%ED%97%A4%EC%96%B4%20%EB%94%94%EC%9E%90%EC%9D%B4%EB%84%88",
+                        "address": "경기도 성남시 분당구 야탑동 386-6",
+                        "policyForTermsAgreed": "2021-12-11T03:07:48.706758",
+                        "policyForPrivacyAgreed": "2021-12-11T03:07:48.706758"
+                    },
+                ),
+            ],
     )
     def patch(self, request, *args, **kwargs):
         return super(UserMeView, self).patch(request, *args, **kwargs)
 
     @extend_schema(
-        tags=[api_tags.USER_ME],
-        summary="회원 정보 삭제 API @IsAuthenticated",
-        description="회원 정보 삭제 API 입니다.",
+            tags=[api_tags.USER_ME],
+            summary="회원 정보 삭제 API @IsAuthenticated",
+            description="회원 정보 삭제 API 입니다.",
     )
     def delete(self, request, *args, **kwargs):
         return super(UserMeView, self).delete(request, *args, **kwargs)
@@ -317,7 +325,8 @@ class UserInstagramOAuthView(UserContextMixin, RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.UserInstagramOAuthSerializer
 
     def __init__(self, *args, **kwargs):
-        self.http_method_names = [method for method in self.http_method_names if method not in ["put", "patch", "delete"]]
+        self.http_method_names = [method for method in self.http_method_names if
+                                  method not in ["put", "patch", "delete"]]
         super(UserInstagramOAuthView, self).__init__(*args, **kwargs)
 
     def oauth(self, state: str, request, *args, **kwargs):
@@ -340,9 +349,9 @@ class UserInstagramOAuthView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         """
         토큰 연장
         """
-        instagram_extend_access_token, \
-        instagram_token_type, \
-        instagram_expires_in = InstagramAPI.get_extend_access_token(instagram_access_token)
+        instagram_extend_access_token, instagram_token_type, instagram_expires_in = InstagramAPI \
+                                                .get_extend_access_token(instagram_access_token)
+
         expire_at = timezone.now() + timedelta(seconds=instagram_expires_in)
 
         """
@@ -377,12 +386,10 @@ class UserInstagramOAuthView(UserContextMixin, RetrieveUpdateDestroyAPIView):
         code = request.query_params.get('code', None)
         state = request.query_params.get('state', None)
 
-        if code:
-            return self.access_token(code, state, request, *args, **kwargs)
-        else:
+        if not code:
             return self.oauth(state, request, *args, **kwargs)
 
-        raise NotFound()
+        return self.access_token(code, state, request, *args, **kwargs)
 
     @extend_schema(
         tags=[api_tags.SOCIAL_INSTAGRAM],
@@ -419,8 +426,8 @@ class UserInstagramMediaView(UserContextMixin, RetrieveAPIView):
             raise NotFound()
 
         instagram_media = InstagramAPI.media(
-            user_social.social_key,
-            social_token.token
+                user_social.social_key,
+                social_token.token
         )
 
         return Response(instagram_media)
@@ -436,7 +443,7 @@ class UserInstagramMediaView(UserContextMixin, RetrieveAPIView):
 
 
 class UserInstagramProfileView(UserContextMixin, RetrieveAPIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
     serializer_class = serializers.UserInstagramProfileSerializer
 
     def retrieve(self, request, *args, **kwargs):
@@ -451,7 +458,7 @@ class UserInstagramProfileView(UserContextMixin, RetrieveAPIView):
             raise NotFound()
 
         instagram_profile = InstagramAPI.me(
-            social_token.token
+                social_token.token
         )
 
         return Response(instagram_profile)
@@ -481,21 +488,21 @@ class UserInstagramOAuthCancelView(UserContextMixin, RetrieveAPIView):
 
 
 class UserInstagramOAuthDeleteView(UserContextMixin, RetrieveAPIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
     serializer_class = serializers.UserInstagramOAuthSerializer
 
     @extend_schema(
-        tags=[api_tags.SOCIAL_INSTAGRAM],
-        summary="Instagram OAuth 인증 정보 삭제 API @AllowAny",
-        description="Instagram OAuth API",
-        responses=serializers.UserInstagramOAuthSerializer,
+            tags=[api_tags.SOCIAL_INSTAGRAM],
+            summary="Instagram OAuth 인증 정보 삭제 API @AllowAny",
+            description="Instagram OAuth API",
+            responses=serializers.UserInstagramOAuthSerializer,
     )
     def get(self, request, *args, **kwargs):
         raise NotFound()
 
 
 class UserInstagramSocialListView(UserContextMixin, ListAPIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
     serializer_class = serializers.UserInstagramSocialSerializer
 
     def get_queryset(self):
@@ -506,38 +513,38 @@ class UserInstagramSocialListView(UserContextMixin, ListAPIView):
         return UserSocial.objects.filter(user_id=user_id)
 
     @extend_schema(
-        tags=[api_tags.SOCIAL_INSTAGRAM],
-        summary="Instagram 연동 목록 API @AllowAny",
-        description="Instagram OAuth API",
-        responses=serializers.UserInstagramSocialSerializer,
+            tags=[api_tags.SOCIAL_INSTAGRAM],
+            summary="Instagram 연동 목록 API @AllowAny",
+            description="Instagram OAuth API",
+            responses=serializers.UserInstagramSocialSerializer,
     )
     def get(self, request, *args, **kwargs):
         return super(UserInstagramSocialListView, self).get(request, *args, **kwargs)
 
 
 class UserTokenLoginView(CreateAPIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
     serializer_class = serializers.UserTokenLoginSerializer
 
     @extend_schema(
-        tags=[api_tags.AUTH, api_tags.DEBUG],
-        summary="토큰 로그인 API @DEBUG @AllowAny",
-        description="토큰 로그인 API 입니다.",
-        responses=serializers.UserTokenLoginSerializer,
+            tags=[api_tags.AUTH, api_tags.DEBUG],
+            summary="토큰 로그인 API @DEBUG @AllowAny",
+            description="토큰 로그인 API 입니다.",
+            responses=serializers.UserTokenLoginSerializer,
     )
     def post(self, request, *args, **kwargs):
         return super(UserTokenLoginView, self).post(request, *args, **kwargs)
 
 
 class UserTokenRefreshView(CreateAPIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
     serializer_class = serializers.UserTokenRefreshSerializer
 
     @extend_schema(
-        tags=[api_tags.AUTH, api_tags.DEBUG],
-        summary="토큰 새로고침 API @DEBUG @AllowAny",
-        description="토큰 새로고침 API 입니다.",
-        responses=serializers.UserTokenRefreshSerializer,
+            tags=[api_tags.AUTH, api_tags.DEBUG],
+            summary="토큰 새로고침 API @DEBUG @AllowAny",
+            description="토큰 새로고침 API 입니다.",
+            responses=serializers.UserTokenRefreshSerializer,
     )
     def post(self, request, *args, **kwargs):
         return super(UserTokenRefreshView, self).post(request, *args, **kwargs)
