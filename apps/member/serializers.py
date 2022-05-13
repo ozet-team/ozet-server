@@ -522,11 +522,11 @@ class UserInstagramImageCollectionSerializer(ModelSerializer):
     class Meta:
         model = SocialImageCollection
         fields = (
-            'images',
+            'instagram_images',
             'social_user',
         )
         read_only_fields = (
-            'social_user'
+            'social_user',
         )
 
     def update(self, instance: SocialImageCollection, validated_data):
