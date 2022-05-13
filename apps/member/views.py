@@ -206,27 +206,32 @@ class UserMeView(UserContextMixin, RetrieveUpdateDestroyAPIView):
                 summary="회원 정보 가져오기 성공",
                 name="201",
                 value={
-                    "username": "ozet_d16066f09b594276bb7d9628e5ea1564",
-                    "name": "김헤어",
-                    "email": "kimhair@hair.com",
-                    "phoneNumber": "+821057809397",
-                    "birthday": "1997-7-12",
-                    "gender": "male",
-                    "introduce": "나는 개쩌는 헤어 디자이너",
-                    "address": "경기도 성남시 불라불라",
-                    "profileImage": "https://ozet-bucket.s3.ap-northeast-2.amazonaws.com/media/user/profile/5/20211212_25522567",
-                    "policyForTermsAgreed": "2021-12-11T07:47:33.336Z",
-                    "policyForPrivacyAgreed": "2021-12-11T07:47:33.336Z",
-                    "snsList": [
-                        {
-                            "username": "@bart_not_found",
-                            "url": "https://instagram.com/bart_not_found",
-                        },
-                        {
-                            "username": "@bart_not_found",
-                            "url": "https://twitter.com/bart_not_found",
-                        }
-                    ],
+                  "id": 9,
+                  "username": "ozet_d16066f09b594276bb7d9628e5ea1564",
+                  "name": "김헤어",
+                  "email": "kimhair@hair.com",
+                  "phoneNumber": "+821057809397",
+                  "birthday": "1997-07-12",
+                  "gender": "MALE",
+                  "career": [
+                    {
+                      "position": "STAFF",
+                      "duration": 120
+                    }
+                  ],
+                  "isRegistration": True,
+                  "social": [
+                    {
+                      "id": 7,
+                      "social": "instagram",
+                      "socialKey": "5097361770286093"
+                    }
+                  ],
+                  "introduce": "내가 바로 개쩌는 헤어 디자이너",
+                  "profileImage": "https://ozet-bucket.s3.ap-northeast-2.amazonaws.com/media/%EB%82%B4%EA%B0%80%20%EB%B0%94%EB%A1%9C%20%EA%B0%9C%EC%A9%8C%EB%8A%94%20%ED%97%A4%EC%96%B4%20%EB%94%94%EC%9E%90%EC%9D%B4%EB%84%88",
+                  "address": "경기도 성남시 분당구 야탑동 386-6",
+                  "policyForTermsAgreed": "2021-12-11T03:07:48.706758",
+                  "policyForPrivacyAgreed": "2021-12-11T03:07:48.706758"
                 },
             ),
         ],
