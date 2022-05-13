@@ -522,18 +522,27 @@ class UserInstagramImageCollectionSerializer(ModelSerializer):
     class Meta:
         model = SocialImageCollection
         fields = (
-            'instagram_images',
+            'instagram_image_ids',
             'social_user',
+            'image_ids',
         )
         read_only_fields = (
+            'instagram_image_ids',
             'social_user',
         )
+
+    image_ids = serializers.ListField(
+        label='이미지 ID 목록',
+        allow_empty=False,
+        child=serializers.IntegerField(label='이미지 ID'),
+        write_only=True
+    )
 
     def update(self, instance: SocialImageCollection, validated_data):
         image_ids = validated_data.get('image_ids', [])
 
         if image_ids:
-            instance.instagram_images = image_ids
+            instance.instagram_image_ids = image_ids
             instance.save(update_fields=['collection_data'])
 
         return instance

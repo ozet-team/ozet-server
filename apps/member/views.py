@@ -523,7 +523,7 @@ class UserInstagramSocialListView(UserContextMixin, ListAPIView):
 
 
 class UserInstagramSocialImageCollectionView(UserContextMixin, RetrieveUpdateDestroyAPIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     serializer_class = serializers.UserInstagramImageCollectionSerializer
 
     def __init__(self, *args, **kwargs):
@@ -531,13 +531,17 @@ class UserInstagramSocialImageCollectionView(UserContextMixin, RetrieveUpdateDes
                                   method not in ["put", "delete"]]
         super(UserInstagramSocialImageCollectionView, self).__init__(*args, **kwargs)
 
-    def retrieve(self, request, *args, **kwargs):
+    def get_object(self):
         user_id = self.kwargs.get('user_id', None)
         social_id = self.kwargs.get('social_id', None)
         if not user_id or not social_id:
             raise NotFound()
 
-        image_collection = SocialImageCollection.objects.get_or_create(social_user_id=social_id)
+        user_social = UserSocial.objects.get(id=social_id, user_id=user_id)
+        if not user_social:
+            raise NotFound()
+
+        image_collection, _ = SocialImageCollection.objects.get_or_create(social_user=user_social)
 
         return image_collection
 
@@ -549,6 +553,27 @@ class UserInstagramSocialImageCollectionView(UserContextMixin, RetrieveUpdateDes
     )
     def get(self, request, *args, **kwargs):
         return super(UserInstagramSocialImageCollectionView, self).get(request, *args, **kwargs)
+
+    @extend_schema(
+        tags=[api_tags.SOCIAL_INSTAGRAM],
+        summary="Instagram Image Collection API @IsAuthenticated",
+        description="Instagram Image Collection API",
+        examples=[
+            OpenApiExample(
+                request_only=True,
+                response_only=False,
+                name="요청 바디 예시",
+                summary="요청 바디 예시",
+                description="",
+                value={
+                    "image_ids": [0, 1, 2],
+                },
+            ),
+        ],
+        responses=serializers.UserInstagramImageCollectionSerializer,
+    )
+    def patch(self, request, *args, **kwargs):
+        return super(UserInstagramSocialImageCollectionView, self).patch(request, *args, **kwargs)
 
 
 class UserTokenLoginView(CreateAPIView):

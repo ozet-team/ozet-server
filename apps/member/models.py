@@ -682,12 +682,12 @@ class SocialImageCollection(TimeStampedModel):
         return self.__repr__()
 
     def __repr__(self):
-        return f'<{self._meta.verbose_name.title()}: {self.user.phone_number}>'
+        return f'<{self._meta.verbose_name.title()}: {self.social_user.id}>'
 
     @property
-    def instagram_images(self) -> List[int]:
+    def instagram_image_ids(self) -> List[int]:
         return self.collection_data.get('image_ids', [])
 
-    @instagram_images.setter
-    def instagram_images(self, v: List[int]) -> None:
+    @instagram_image_ids.setter
+    def instagram_image_ids(self, v: List[int]) -> None:
         self.collection_data['image_ids'] = v
