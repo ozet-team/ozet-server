@@ -22,7 +22,8 @@ from rest_framework import serializers, fields
 from phonenumber_field.serializerfields import PhoneNumberField
 from phonenumber_field.phonenumber import PhoneNumber
 
-from apps.member.models import User, UserProfile, UserPasscodeVerify, UserToken, UserSocial
+from apps.member.models import SocialImageCollection, User, UserProfile, UserPasscodeVerify, \
+    UserToken, UserSocial
 from apps.resume.models import Career
 from utils.django.rest_framework.serializers import SimpleSerializer, ModelSerializer
 from utils.naver.api import NaverCloudAPI
@@ -515,6 +516,28 @@ class UserInstagramSocialSerializer(ModelSerializer):
             'social_key',
         )
         read_only_fields = fields
+
+
+class UserInstagramImageCollectionSerializer(ModelSerializer):
+    class Meta:
+        model = SocialImageCollection
+        fields = (
+            'images',
+            'social_user',
+        )
+        read_only_fields = (
+            'social_user'
+        )
+
+    def update(self, instance: SocialImageCollection, validated_data):
+        image_ids = validated_data.get('image_ids', [])
+
+        if image_ids:
+            instance.instagram_images = image_ids
+            instance.save(update_fields=['collection_data'])
+
+        return instance
+
 
 class UserDetailsSerializer(ModelSerializer):
     class NestedProfileSerializer(ModelSerializer):

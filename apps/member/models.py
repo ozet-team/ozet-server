@@ -655,9 +655,6 @@ class UserPasscodeVerify(TimeStampedModel):
 
 
 class SocialImageCollection(TimeStampedModel):
-    class Social(DjangoChoices):
-        instagram = ChoiceItem('instagram', label=_('인스타그램'))
-
     collection_data = models.JSONField(
         null=False,
         blank=False,
@@ -666,7 +663,7 @@ class SocialImageCollection(TimeStampedModel):
     )
 
     # Related
-    social_user = models.ForeignKey(
+    social_user = models.OneToOneField(
         UserSocial,
         null=False,
         blank=False,
@@ -688,9 +685,9 @@ class SocialImageCollection(TimeStampedModel):
         return f'<{self._meta.verbose_name.title()}: {self.user.phone_number}>'
 
     @property
-    def images(self) -> List[int]:
+    def instagram_images(self) -> List[int]:
         return self.collection_data.get('image_ids', [])
 
-    @images.setter
-    def images(self, v: List[int]) -> None:
+    @instagram_images.setter
+    def instagram_images(self, v: List[int]) -> None:
         self.collection_data['image_ids'] = v

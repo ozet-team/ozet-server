@@ -36,6 +36,11 @@ urlpatterns = [
         name=views.UserInstagramMediaView.__name__,
     ),
     path(
+        "user/<int:user_id>/instagram/<int:social_id>/media/collection",
+        views.UserInstagramSocialImageCollectionView.as_view(),
+        name=views.UserInstagramSocialImageCollectionView.__name__,
+    ),
+    path(
         "user/<int:user_id>/instagram/<int:social_id>/profile/",
         views.UserInstagramProfileView.as_view(),
         name=views.UserInstagramProfileView.__name__,

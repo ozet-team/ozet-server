@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from apps.member import serializers
-from apps.member.models import User, UserSocial, UserSocialToken
+from apps.member.models import SocialImageCollection, User, UserSocial, UserSocialToken
 from commons.contrib.drf_spectacular import tags as api_tags
 from utils.django.rest_framework.mixins import QuerySerializerMixin, UserContextMixin
 from utils.instagram.api import InstagramAPI
@@ -426,8 +426,8 @@ class UserInstagramMediaView(UserContextMixin, RetrieveAPIView):
             raise NotFound()
 
         instagram_media = InstagramAPI.media(
-                user_social.social_key,
-                social_token.token
+            user_social.social_key,
+            social_token.token
         )
 
         return Response(instagram_media)
@@ -520,6 +520,35 @@ class UserInstagramSocialListView(UserContextMixin, ListAPIView):
     )
     def get(self, request, *args, **kwargs):
         return super(UserInstagramSocialListView, self).get(request, *args, **kwargs)
+
+
+class UserInstagramSocialImageCollectionView(UserContextMixin, RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.UserInstagramImageCollectionSerializer
+
+    def __init__(self, *args, **kwargs):
+        self.http_method_names = [method for method in self.http_method_names if
+                                  method not in ["put", "delete"]]
+        super(UserInstagramSocialImageCollectionView, self).__init__(*args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        user_id = self.kwargs.get('user_id', None)
+        social_id = self.kwargs.get('social_id', None)
+        if not user_id or not social_id:
+            raise NotFound()
+
+        image_collection = SocialImageCollection.objects.get_or_create(social_user_id=social_id)
+
+        return image_collection
+
+    @extend_schema(
+        tags=[api_tags.SOCIAL_INSTAGRAM],
+        summary="Instagram Image Collection API @IsAuthenticated",
+        description="Instagram Image Collection API",
+        responses=serializers.UserInstagramImageCollectionSerializer,
+    )
+    def get(self, request, *args, **kwargs):
+        return super(UserInstagramSocialImageCollectionView, self).get(request, *args, **kwargs)
 
 
 class UserTokenLoginView(CreateAPIView):
