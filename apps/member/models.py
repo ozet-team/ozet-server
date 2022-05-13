@@ -1,5 +1,5 @@
 import os
-from typing import Union
+from typing import List, Union
 from datetime import datetime, timedelta
 from random import randint
 
@@ -654,3 +654,43 @@ class UserPasscodeVerify(TimeStampedModel):
         return latest_passcode_verify.status == cls.Status.verified
 
 
+class SocialImageCollection(TimeStampedModel):
+    class Social(DjangoChoices):
+        instagram = ChoiceItem('instagram', label=_('인스타그램'))
+
+    collection_data = models.JSONField(
+        null=False,
+        blank=False,
+        default=dict,
+        verbose_name=_('추가 정보'),
+    )
+
+    # Related
+    social_user = models.ForeignKey(
+        UserSocial,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name='image_collection',
+        verbose_name=_('선택된 이미지 목록'),
+    )
+
+    class Meta:
+        verbose_name = _('소셜 이미지 컬렉션')
+        verbose_name_plural = _('소셜 이미지 컬렉션 목록')
+
+        db_table = 'member_user_social_image_collection'
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return f'<{self._meta.verbose_name.title()}: {self.user.phone_number}>'
+
+    @property
+    def images(self) -> List[int]:
+        return self.collection_data.get('image_ids', [])
+
+    @images.setter
+    def images(self, v: List[int]) -> None:
+        self.collection_data['image_ids'] = v

@@ -206,7 +206,6 @@ class InstagramAPI(object):
 
         return content
 
-
     @classmethod
     def media(
         cls,
